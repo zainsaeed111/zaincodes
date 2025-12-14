@@ -10,10 +10,6 @@
 [build.environment]
   NODE_VERSION = "18"
 
-# Explicitly skip plugins
-[[plugins]]
-# No plugins needed for CRA
-
 # Handle client-side routing for Single Page Application
 [[redirects]]
   from = "/*"
