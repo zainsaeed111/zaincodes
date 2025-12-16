@@ -152,7 +152,7 @@ const Hero = () => {
             <div className="image-container">
               <div className="image-glow"></div>
               <img
-                src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=400&h=400&fit=crop&crop=face"
+                src="/Profile.png"
                 alt="Zain - Mobile App Developer"
                 className="profile-image"
               />

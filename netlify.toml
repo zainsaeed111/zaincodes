@@ -9,6 +9,8 @@
 # Disable automatic framework detection (prevents Next.js plugin from running)
 [build.environment]
   NODE_VERSION = "18"
+  # Skip the Next.js plugin (this is a CRA project, not Next.js)
+  NETLIFY_NEXT_PLUGIN_SKIP = "true"
 
 # Handle client-side routing for Single Page Application
 [[redirects]]
