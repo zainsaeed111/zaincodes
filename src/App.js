@@ -57,17 +57,47 @@ const defaultProjects = [
     highlights: ["Bank-level security", "PCI DSS compliant", "Zero breaches"],
     playStoreLink: "#",
     githubLink: "#"
+  },
+  {
+    id: 4,
+    slug: "saas-analytics-dashboard",
+    title: "SaaS Analytics Dashboard",
+    category: "web",
+    image: "https://images.unsplash.com/photo-1551288049-bebda4e38f71?w=800&h=600&fit=crop",
+    thumbnail: "https://images.unsplash.com/photo-1460925895917-afdab827c52f?w=400&h=300&fit=crop",
+    description: "Real-time analytics dashboard for SaaS businesses with interactive charts and data visualizations.",
+    longDescription: "A modern, full-stack analytics platform built with Next.js and PostgreSQL, featuring real-time data pipelines and interactive D3.js visualizations.",
+    technologies: ["React", "Next.js", "TypeScript", "PostgreSQL", "D3.js", "Tailwind CSS"],
+    features: ["Real-time Analytics", "Custom Reports", "Team Collaboration", "API Integrations", "Export to PDF"],
+    highlights: ["Sub-200ms load time", "10K+ daily active users", "99.99% uptime"],
+    playStoreLink: "#",
+    githubLink: "#"
+  },
+  {
+    id: 5,
+    slug: "ai-content-platform",
+    title: "AI Content Platform",
+    category: "web",
+    image: "https://images.unsplash.com/photo-1677442136019-21780ecad995?w=800&h=600&fit=crop",
+    thumbnail: "https://images.unsplash.com/photo-1677442136019-21780ecad995?w=400&h=300&fit=crop",
+    description: "AI-powered content management system with automated SEO optimization and multi-language support.",
+    longDescription: "A next-generation CMS powered by GPT APIs, allowing marketers to generate, optimize and schedule content across multiple channels.",
+    technologies: ["React", "Node.js", "MongoDB", "OpenAI API", "Redis", "Docker"],
+    features: ["AI Content Generation", "SEO Auto-Optimization", "Multi-Language", "Scheduling", "Analytics"],
+    highlights: ["80% faster content creation", "40% SEO improvement", "5-star user rating"],
+    playStoreLink: "#",
+    githubLink: "#",
+    liveLink: "#"
   }
 ];
 
-// Helper to get projects from localStorage or default
 const getProjects = () => {
   const savedProjects = localStorage.getItem('portfolioProjects');
   if (savedProjects) {
     const parsed = JSON.parse(savedProjects);
     if (parsed.length > 0) return parsed;
   }
-  return defaultProjects;
+  return [defaultProjects[0]];
 };
 
 // Scroll to top on route change
@@ -98,6 +128,35 @@ function App() {
   const [isLoading, setIsLoading] = useState(true);
   const [showBackToTop, setShowBackToTop] = useState(false);
   const [projects, setProjects] = useState(getProjects());
+
+  /* Theme state and application */
+  useEffect(() => {
+    const applyTheme = () => {
+      const savedTheme = localStorage.getItem('siteTheme') || 'dark';
+      document.body.className = savedTheme === 'light' ? 'light-theme' : '';
+    };
+
+    applyTheme();
+
+    // Listen for theme changes from other tabs (Admin)
+    const handleThemeChange = (e) => {
+      if (e.key === 'siteTheme') applyTheme();
+    };
+    window.addEventListener('storage', handleThemeChange);
+
+    // Also check for same-tab updates
+    const themeSync = setInterval(() => {
+      const savedTheme = localStorage.getItem('siteTheme') || 'dark';
+      const isCurrentlyLight = document.body.classList.contains('light-theme');
+      if (savedTheme === 'light' && !isCurrentlyLight) applyTheme();
+      if (savedTheme === 'dark' && isCurrentlyLight) applyTheme();
+    }, 1000);
+
+    return () => {
+      window.removeEventListener('storage', handleThemeChange);
+      clearInterval(themeSync);
+    };
+  }, []);
 
   useEffect(() => {
     const timer = setTimeout(() => {
@@ -148,7 +207,7 @@ function App() {
       <div className="loading-screen">
         <div className="loading-spinner"></div>
         <h2>ZainCodes</h2>
-        <p>Loading amazing mobile experiences...</p>
+        <p>Loading amazing digital experiences...</p>
       </div>
     );
   }

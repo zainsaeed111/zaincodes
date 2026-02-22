@@ -46,6 +46,7 @@ const Portfolio = ({ projects }) => {
 
   const filters = [
     { id: 'all', label: 'All Projects', icon: '🎯' },
+    { id: 'web', label: 'Web', icon: '🌐' },
     { id: 'android', label: 'Android', icon: '🤖' },
     { id: 'flutter', label: 'Flutter', icon: '📱' }
   ];
@@ -85,19 +86,32 @@ const Portfolio = ({ projects }) => {
                 <img src={project.thumbnail} alt={project.title} loading="lazy" />
                 <div className="portfolio-overlay">
                   <div className="overlay-content">
-                    <span className="view-text">View Project</span>
-                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                      <path d="M5 12h14M12 5l7 7-7 7" />
-                    </svg>
+                    <div className="overlay-buttons">
+                      {project.liveLink && project.liveLink !== '#' && (
+                        <a href={project.liveLink} target="_blank" rel="noopener noreferrer" className="overlay-btn primary" onClick={(e) => e.stopPropagation()}>
+                          <span>Live Demo</span>
+                        </a>
+                      )}
+                      <button className="overlay-btn secondary">
+                        <span>Details</span>
+                      </button>
+                    </div>
                   </div>
                 </div>
               </div>
               <div className="portfolio-info">
                 <div className="portfolio-category">
-                  {project.category === 'android' ? '🤖 Android' : '📱 Flutter'}
+                  {project.category === 'android' ? '🤖 Android' : project.category === 'flutter' ? '📱 Flutter' : '🌐 Web'}
                 </div>
                 <h3 className="portfolio-title">{project.title}</h3>
                 <p className="portfolio-description">{project.description}</p>
+                {project.highlights && project.highlights.length > 0 && (
+                  <div className="portfolio-highlights">
+                    {project.highlights.slice(0, 2).map((h, idx) => (
+                      <span key={idx} className="highlight-badge">✦ {h}</span>
+                    ))}
+                  </div>
+                )}
                 <div className="portfolio-tech">
                   {project.technologies.slice(0, 3).map((tech, idx) => (
                     <span key={idx} className="tech-tag">{tech}</span>

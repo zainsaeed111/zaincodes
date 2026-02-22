@@ -9,8 +9,8 @@
   position: absolute;
   inset: 0;
   background:
-    radial-gradient(ellipse 50% 40% at 20% 80%, rgba(0, 212, 255, 0.06) 0%, transparent 50%),
-    radial-gradient(ellipse 50% 40% at 80% 20%, rgba(236, 72, 153, 0.06) 0%, transparent 50%);
+    radial-gradient(ellipse 50% 40% at 20% 80%, rgba(0, 201, 167, 0.06) 0%, transparent 50%),
+    radial-gradient(ellipse 50% 40% at 80% 20%, rgba(250, 204, 21, 0.06) 0%, transparent 50%);
   pointer-events: none;
 }
 
@@ -83,7 +83,7 @@
 .contact-item:hover {
   transform: translateX(10px);
   border-color: var(--neon-cyan);
-  box-shadow: 0 10px 30px rgba(0, 212, 255, 0.1);
+  box-shadow: 0 0 20px rgba(0, 201, 167, 0.2);
 }
 
 .contact-icon {
@@ -148,7 +148,7 @@
   background: var(--primary-gradient);
   color: white;
   transform: translateY(-3px);
-  box-shadow: 0 10px 30px rgba(0, 212, 255, 0.3);
+  box-shadow: 0 10px 30px rgba(0, 201, 167, 0.3);
   border-color: transparent;
 }
 
@@ -215,7 +215,7 @@
   outline: none;
   border-color: var(--neon-cyan);
   background: var(--dark-bg);
-  box-shadow: 0 0 0 4px rgba(0, 212, 255, 0.1), var(--glow-cyan);
+  box-shadow: 0 0 0 4px rgba(0, 201, 167, 0.1), var(--glow-cyan);
 }
 
 .form-group input::placeholder,
@@ -243,12 +243,12 @@
   align-items: center;
   justify-content: center;
   gap: 0.5rem;
-  box-shadow: 0 4px 25px rgba(0, 212, 255, 0.3);
+  box-shadow: 0 4px 25px rgba(0, 201, 167, 0.3);
 }
 
 .submit-btn:hover:not(:disabled) {
   transform: translateY(-3px);
-  box-shadow: 0 10px 40px rgba(0, 212, 255, 0.4), var(--glow-cyan);
+  box-shadow: 0 10px 40px rgba(0, 201, 167, 0.4), var(--glow-cyan);
 }
 
 .submit-btn:disabled {

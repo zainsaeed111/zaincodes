@@ -12,6 +12,21 @@ const Contact = () => {
   const [submitStatus, setSubmitStatus] = useState(null);
   const contactRef = useRef(null);
 
+  // Load contact and social data from localStorage
+  const contactData = (() => {
+    try {
+      const d = localStorage.getItem('contactData');
+      return d ? JSON.parse(d) : null;
+    } catch { return null; }
+  })();
+
+  const socialData = (() => {
+    try {
+      const d = localStorage.getItem('socialData');
+      return d ? JSON.parse(d) : null;
+    } catch { return null; }
+  })();
+
   const handleChange = (e) => {
     setFormData({
       ...formData,
@@ -22,13 +37,13 @@ const Contact = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     setIsSubmitting(true);
-    
+
     // Simulate form submission
     setTimeout(() => {
       setIsSubmitting(false);
       setSubmitStatus('success');
       setFormData({ name: '', email: '', subject: '', message: '' });
-      
+
       // Reset status after 3 seconds
       setTimeout(() => {
         setSubmitStatus(null);
@@ -59,27 +74,28 @@ const Contact = () => {
     {
       icon: "📧",
       title: "Email",
-      value: "zain@zaincodes.dev",
-      link: "mailto:zain@zaincodes.dev"
+      value: contactData?.email || "zain@zaincodes.dev",
+      link: `mailto:${contactData?.email || "zain@zaincodes.dev"}`
     },
     {
       icon: "📱",
       title: "Phone",
-      value: "+1 (555) 123-4567",
-      link: "tel:+15551234567"
+      value: contactData?.phone || "+1 (555) 123-4567",
+      link: `tel:${(contactData?.phone || "+15551234567").replace(/[^0-9+]/g, '')}`
     },
     {
       icon: "📍",
       title: "Location",
-      value: "San Francisco, CA",
+      value: contactData?.location || "San Francisco, CA",
       link: "#"
-    },
-    {
-      icon: "💼",
-      title: "LinkedIn",
-      value: "linkedin.com/in/zaincodes",
-      link: "https://linkedin.com/in/zaincodes"
     }
+  ];
+
+  const socialLinks = socialData || [
+    { name: 'GitHub', icon: '🐙', url: 'https://github.com/zaincodes' },
+    { name: 'LinkedIn', icon: '💼', url: 'https://linkedin.com/in/zaincodes' },
+    { name: 'Twitter', icon: '🐦', url: 'https://twitter.com/zaincodes' },
+    { name: 'Instagram', icon: '📸', url: 'https://instagram.com/zaincodes' }
   ];
 
   return (
@@ -95,17 +111,17 @@ const Contact = () => {
             <div className="info-header">
               <h3>Let's Build Something Amazing Together</h3>
               <p>
-                I'm always excited to work on new projects and help bring innovative 
-                mobile app ideas to life. Whether you have a clear vision or just 
+                I'm always excited to work on new projects and help bring innovative
+                mobile app ideas to life. Whether you have a clear vision or just
                 a concept, I'm here to help make it happen.
               </p>
             </div>
 
             <div className="contact-details">
               {contactInfo.map((info, index) => (
-                <a 
-                  key={index} 
-                  href={info.link} 
+                <a
+                  key={index}
+                  href={info.link}
                   className="contact-item"
                   target={info.link.startsWith('http') ? '_blank' : '_self'}
                   rel={info.link.startsWith('http') ? 'noopener noreferrer' : ''}
@@ -122,22 +138,12 @@ const Contact = () => {
             <div className="social-links">
               <h4>Follow Me</h4>
               <div className="social-icons">
-                <a href="https://github.com/zaincodes" target="_blank" rel="noopener noreferrer" className="social-link">
-                  <span className="social-icon">🐙</span>
-                  <span>GitHub</span>
-                </a>
-                <a href="https://twitter.com/zaincodes" target="_blank" rel="noopener noreferrer" className="social-link">
-                  <span className="social-icon">🐦</span>
-                  <span>Twitter</span>
-                </a>
-                <a href="https://linkedin.com/in/zaincodes" target="_blank" rel="noopener noreferrer" className="social-link">
-                  <span className="social-icon">💼</span>
-                  <span>LinkedIn</span>
-                </a>
-                <a href="https://dribbble.com/zaincodes" target="_blank" rel="noopener noreferrer" className="social-link">
-                  <span className="social-icon">🏀</span>
-                  <span>Dribbble</span>
-                </a>
+                {socialLinks.map((social, index) => (
+                  <a key={index} href={social.url} target="_blank" rel="noopener noreferrer" className="social-link">
+                    <span className="social-icon">{social.icon}</span>
+                    <span>{social.name}</span>
+                  </a>
+                ))}
               </div>
             </div>
           </div>
@@ -201,8 +207,8 @@ const Contact = () => {
                 ></textarea>
               </div>
 
-              <button 
-                type="submit" 
+              <button
+                type="submit"
                 className={`submit-btn ${isSubmitting ? 'submitting' : ''}`}
                 disabled={isSubmitting}
               >

@@ -12,11 +12,26 @@ const Footer = () => {
     { name: 'Contact', href: '#contact' }
   ];
 
-  const socialLinks = [
+  // Load contact and social data from localStorage
+  const contactData = (() => {
+    try {
+      const d = localStorage.getItem('contactData');
+      return d ? JSON.parse(d) : null;
+    } catch { return null; }
+  })();
+
+  const socialData = (() => {
+    try {
+      const d = localStorage.getItem('socialData');
+      return d ? JSON.parse(d) : null;
+    } catch { return null; }
+  })();
+
+  const socialLinks = socialData || [
     { name: 'GitHub', icon: '🐙', url: 'https://github.com/zaincodes' },
     { name: 'LinkedIn', icon: '💼', url: 'https://linkedin.com/in/zaincodes' },
     { name: 'Twitter', icon: '🐦', url: 'https://twitter.com/zaincodes' },
-    { name: 'Dribbble', icon: '🏀', url: 'https://dribbble.com/zaincodes' }
+    { name: 'Instagram', icon: '📸', url: 'https://instagram.com/zaincodes' }
   ];
 
   const scrollToSection = (sectionId) => {
@@ -36,15 +51,15 @@ const Footer = () => {
               <span className="logo-dot">.</span>
             </div>
             <p className="footer-description">
-              Full-stack mobile application developer specializing in Android and Flutter. 
-              Creating exceptional mobile experiences that make a difference.
+              Full-stack developer specializing in React, Next.js, Android & Flutter.
+              Building high-performance web platforms and mobile apps that make a difference.
             </p>
             <div className="social-links">
               {socialLinks.map((social, index) => (
-                <a 
+                <a
                   key={index}
-                  href={social.url} 
-                  target="_blank" 
+                  href={social.url}
+                  target="_blank"
                   rel="noopener noreferrer"
                   className="social-link"
                   aria-label={social.name}
@@ -60,8 +75,8 @@ const Footer = () => {
             <ul className="footer-links">
               {quickLinks.map((link, index) => (
                 <li key={index}>
-                  <a 
-                    href={link.href} 
+                  <a
+                    href={link.href}
                     onClick={(e) => {
                       e.preventDefault();
                       scrollToSection(link.href.substring(1));
@@ -78,10 +93,10 @@ const Footer = () => {
           <div className="footer-section">
             <h4>Services</h4>
             <ul className="footer-links">
+              <li><span className="footer-text">Web App Development</span></li>
               <li><span className="footer-text">Android App Development</span></li>
               <li><span className="footer-text">Flutter Development</span></li>
               <li><span className="footer-text">UI/UX Design</span></li>
-              <li><span className="footer-text">App Maintenance</span></li>
               <li><span className="footer-text">Consulting</span></li>
             </ul>
           </div>
@@ -91,15 +106,15 @@ const Footer = () => {
             <div className="contact-info">
               <div className="contact-item">
                 <span className="contact-icon">📧</span>
-                <span>zain@zaincodes.dev</span>
+                <span>{contactData?.email || "zain@zaincodes.dev"}</span>
               </div>
               <div className="contact-item">
                 <span className="contact-icon">📱</span>
-                <span>+1 (555) 123-4567</span>
+                <span>{contactData?.phone || "+1 (555) 123-4567"}</span>
               </div>
               <div className="contact-item">
                 <span className="contact-icon">📍</span>
-                <span>San Francisco, CA</span>
+                <span>{contactData?.location || "San Francisco, CA"}</span>
               </div>
             </div>
           </div>

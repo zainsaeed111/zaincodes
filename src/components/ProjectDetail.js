@@ -87,19 +87,29 @@ const ProjectDetail = ({ projects }) => {
                     </Link>
                     <div className="project-meta">
                         <span className="project-category-badge">
-                            {project.category === 'android' ? '🤖 Android' : '📱 Flutter'}
+                            {project.category === 'android' ? '🤖 Android' : project.category === 'flutter' ? '📱 Flutter' : '🌐 Web'}
                         </span>
                     </div>
                     <h1 className="project-title">{project.title}</h1>
                     <p className="project-tagline">{project.description}</p>
 
                     <div className="project-actions">
-                        <a href={project.playStoreLink} className="btn-primary" target="_blank" rel="noopener noreferrer">
-                            <span>View on Play Store</span>
-                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                                <path d="M18 13v6a2 2 0 01-2 2H5a2 2 0 01-2-2V8a2 2 0 012-2h6M15 3h6v6M10 14L21 3" />
-                            </svg>
-                        </a>
+                        {project.liveLink && project.liveLink !== '#' && (
+                            <a href={project.liveLink} className="btn-primary" target="_blank" rel="noopener noreferrer">
+                                <span>{project.category === 'web' ? 'View Live Demo' : 'View Application'}</span>
+                                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                                    <path d="M18 13v6a2 2 0 01-2 2H5a2 2 0 01-2-2V8a2 2 0 012-2h6M15 3h6v6M10 14L21 3" />
+                                </svg>
+                            </a>
+                        )}
+                        {project.category !== 'web' && project.playStoreLink && project.playStoreLink !== '#' && (
+                            <a href={project.playStoreLink} className="btn-primary" target="_blank" rel="noopener noreferrer">
+                                <span>View on Play Store</span>
+                                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                                    <path d="M18 13v6a2 2 0 01-2 2H5a2 2 0 01-2-2V8a2 2 0 012-2h6M15 3h6v6M10 14L21 3" />
+                                </svg>
+                            </a>
+                        )}
                         <a href={project.githubLink} className="btn-secondary" target="_blank" rel="noopener noreferrer">
                             <span>View Source Code</span>
                         </a>

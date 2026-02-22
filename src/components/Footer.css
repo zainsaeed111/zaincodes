@@ -83,7 +83,7 @@
   background: var(--primary-gradient);
   border-color: transparent;
   transform: translateY(-5px);
-  box-shadow: 0 10px 30px rgba(0, 212, 255, 0.3);
+  box-shadow: 0 10px 30px rgba(0, 201, 167, 0.3);
 }
 
 .footer .social-icon {
@@ -211,7 +211,7 @@
   height: 350px;
   top: -150px;
   right: -100px;
-  background: radial-gradient(circle, rgba(0, 212, 255, 0.08), transparent 60%);
+  background: radial-gradient(circle, rgba(0, 201, 167, 0.08), transparent 60%);
   animation-delay: 0s;
 }
 
@@ -220,7 +220,7 @@
   height: 250px;
   bottom: -80px;
   left: 5%;
-  background: radial-gradient(circle, rgba(139, 92, 246, 0.08), transparent 60%);
+  background: radial-gradient(circle, rgba(14, 165, 233, 0.08), transparent 60%);
   animation-delay: 4s;
 }
 
@@ -229,7 +229,7 @@
   height: 180px;
   top: 40%;
   left: 35%;
-  background: radial-gradient(circle, rgba(236, 72, 153, 0.06), transparent 60%);
+  background: radial-gradient(circle, rgba(250, 204, 21, 0.06), transparent 60%);
   animation-delay: 8s;
 }
 

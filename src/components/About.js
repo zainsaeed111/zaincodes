@@ -4,6 +4,14 @@ import './About.css';
 const About = () => {
   const aboutRef = useRef(null);
 
+  // Load about data from localStorage (set via Admin Panel)
+  const aboutData = (() => {
+    try {
+      const d = localStorage.getItem('aboutData');
+      return d ? JSON.parse(d) : null;
+    } catch { return null; }
+  })();
+
   useEffect(() => {
     const observer = new IntersectionObserver(
       (entries) => {
@@ -30,14 +38,14 @@ const About = () => {
     return () => observer.disconnect();
   }, []);
 
-  const techStack = [
+  const techStack = aboutData?.techStack || [
+    { name: "React", icon: "⚛️", color: "#61DAFB" },
+    { name: "Next.js", icon: "▶️", color: "#ffffff" },
     { name: "Android", icon: "🤖", color: "#3DDC84" },
-    { name: "Kotlin", icon: "🎯", color: "#7F52FF" },
-    { name: "Java", icon: "☕", color: "#F89820" },
     { name: "Flutter", icon: "💙", color: "#02569B" },
-    { name: "React Native", icon: "⚛️", color: "#61DAFB" },
+    { name: "Node.js", icon: "🟢", color: "#339933" },
     { name: "Firebase", icon: "🔥", color: "#FFCA28" },
-    { name: "Cloud", icon: "☁️", color: "#4285F4" },
+    { name: "TypeScript", icon: "📝", color: "#3178C6" },
     { name: "UI/UX", icon: "🎨", color: "#FF6B6B" }
   ];
 
@@ -71,17 +79,15 @@ const About = () => {
       <div className="container">
         <div className="section-header">
           <h2 className="section-title">About <span>Me</span></h2>
-          <p className="section-subtitle">Passionate about creating exceptional mobile experiences</p>
+          <p className="section-subtitle">{aboutData?.subtitle || 'Passionate about building exceptional web & mobile experiences'}</p>
         </div>
 
         <div className="about-content">
           <div className="about-text">
             <div className="about-intro animate-item">
-              <h3>Hello! I'm Zain, a dedicated mobile app developer</h3>
+              <h3>{aboutData?.introTitle || "Hello! I'm Zain, a Full-Stack Developer"}</h3>
               <p>
-                With over 3 years of experience in mobile development, I specialize in creating
-                robust, scalable, and user-friendly applications for Android and cross-platform
-                solutions.
+                {aboutData?.introText || "With over 3 years of experience in web and mobile development, I specialize in building robust, scalable applications using React, Next.js, Android (Kotlin/Java) and Flutter — from pixel-perfect frontends to production-ready backends."}
               </p>
             </div>
 

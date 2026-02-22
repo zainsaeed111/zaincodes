@@ -4,7 +4,26 @@ import './Skills.css';
 const Skills = () => {
   const skillsRef = useRef(null);
 
-  const skillCategories = [
+  // Load skills data from localStorage (set via Admin Panel)
+  const savedSkills = (() => {
+    try {
+      const d = localStorage.getItem('skillsData');
+      return d ? JSON.parse(d) : null;
+    } catch { return null; }
+  })();
+
+  const skillCategories = savedSkills || [
+    {
+      title: "Web Development",
+      icon: "🌐",
+      skills: [
+        { name: "React / Next.js", level: 92, color: "#61DAFB" },
+        { name: "TypeScript", level: 88, color: "#3178C6" },
+        { name: "HTML / CSS", level: 95, color: "#E34F26" },
+        { name: "Tailwind CSS", level: 85, color: "#06B6D4" },
+        { name: "Node.js", level: 85, color: "#339933" }
+      ]
+    },
     {
       title: "Mobile Development",
       icon: "📱",
@@ -21,32 +40,21 @@ const Skills = () => {
       icon: "⚙️",
       skills: [
         { name: "Firebase", level: 92, color: "#FFA000" },
-        { name: "Node.js", level: 85, color: "#339933" },
+        { name: "PostgreSQL", level: 85, color: "#336791" },
         { name: "REST APIs", level: 90, color: "#FF6B6B" },
-        { name: "SQLite", level: 88, color: "#003B57" },
-        { name: "MongoDB", level: 80, color: "#47A248" }
+        { name: "MongoDB", level: 80, color: "#47A248" },
+        { name: "Docker", level: 75, color: "#2496ED" }
       ]
     },
     {
-      title: "UI/UX Design",
+      title: "Tools & Design",
       icon: "🎨",
       skills: [
-        { name: "Material Design", level: 95, color: "#6200EA" },
+        { name: "Git / GitHub", level: 90, color: "#F05032" },
         { name: "Figma", level: 85, color: "#F24E1E" },
-        { name: "Adobe XD", level: 80, color: "#FF61F6" },
-        { name: "Sketch", level: 75, color: "#F7B500" },
-        { name: "Prototyping", level: 88, color: "#00D4AA" }
-      ]
-    },
-    {
-      title: "Tools & Technologies",
-      icon: "🛠️",
-      skills: [
-        { name: "Git/GitHub", level: 90, color: "#F05032" },
-        { name: "Android Studio", level: 95, color: "#3DDC84" },
         { name: "VS Code", level: 88, color: "#007ACC" },
-        { name: "Docker", level: 75, color: "#2496ED" },
-        { name: "CI/CD", level: 80, color: "#FF6B35" }
+        { name: "CI/CD", level: 80, color: "#FF6B35" },
+        { name: "Material Design", level: 95, color: "#00C9A7" }
       ]
     }
   ];
@@ -128,10 +136,10 @@ const Skills = () => {
                         <span className="skill-percentage">{skill.level}%</span>
                       </div>
                       <div className="skill-bar">
-                        <div 
+                        <div
                           className="skill-bar-fill"
                           data-level={skill.level}
-                          style={{ 
+                          style={{
                             '--skill-color': skill.color,
                             width: '0%'
                           }}
@@ -149,7 +157,7 @@ const Skills = () => {
             <div className="achievements-grid">
               {achievements.map((achievement, index) => (
                 <div key={index} className="achievement-card">
-                  <div 
+                  <div
                     className="achievement-icon"
                     style={{ backgroundColor: achievement.color }}
                   >

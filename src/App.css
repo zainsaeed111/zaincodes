@@ -27,9 +27,9 @@
   position: absolute;
   inset: 0;
   background:
-    radial-gradient(circle at 20% 20%, rgba(0, 212, 255, 0.15) 0%, transparent 40%),
-    radial-gradient(circle at 80% 80%, rgba(139, 92, 246, 0.15) 0%, transparent 40%),
-    radial-gradient(circle at 50% 50%, rgba(236, 72, 153, 0.1) 0%, transparent 50%);
+    radial-gradient(circle at 20% 20%, rgba(0, 201, 167, 0.15) 0%, transparent 40%),
+    radial-gradient(circle at 80% 80%, rgba(14, 165, 233, 0.15) 0%, transparent 40%),
+    radial-gradient(circle at 50% 50%, rgba(250, 204, 21, 0.1) 0%, transparent 50%);
   animation: gradientMove 4s ease infinite;
   background-size: 200% 200%;
 }
@@ -183,7 +183,7 @@
   text-align: center;
   position: relative;
   overflow: hidden;
-  box-shadow: 0 4px 25px rgba(0, 212, 255, 0.3);
+  box-shadow: 0 4px 25px rgba(0, 201, 167, 0.3);
 }
 
 .btn-primary::before {
@@ -193,13 +193,13 @@
   left: -100%;
   width: 100%;
   height: 100%;
-  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.3), transparent);
+  background: linear-gradient(135deg, rgba(0, 201, 167, 0.7), rgba(14, 165, 233, 0.7));
   transition: left 0.5s ease;
 }
 
 .btn-primary:hover {
   transform: translateY(-4px) scale(1.02);
-  box-shadow: 0 10px 40px rgba(0, 212, 255, 0.4), var(--glow-cyan);
+  box-shadow: 0 10px 40px rgba(0, 201, 167, 0.4), var(--glow-cyan);
 }
 
 .btn-primary:hover::before {
@@ -243,7 +243,7 @@
   color: white;
   border-color: transparent;
   transform: translateY(-4px);
-  box-shadow: 0 10px 40px rgba(0, 212, 255, 0.3);
+  box-shadow: 0 10px 40px rgba(0, 201, 167, 0.3);
 }
 
 .btn-secondary:hover::before {
@@ -281,7 +281,7 @@
   transform: translateY(20px);
   transition: all var(--transition-spring);
   z-index: 999;
-  box-shadow: 0 5px 25px rgba(0, 212, 255, 0.4);
+  box-shadow: 0 5px 25px rgba(0, 201, 167, 0.4);
 }
 
 .back-to-top.visible {
@@ -292,7 +292,7 @@
 
 .back-to-top:hover {
   transform: translateY(-8px);
-  box-shadow: 0 15px 40px rgba(0, 212, 255, 0.5), var(--glow-cyan);
+  box-shadow: 0 15px 40px rgba(0, 201, 167, 0.5), var(--glow-cyan);
 }
 
 /* Responsive design */

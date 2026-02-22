@@ -6,7 +6,22 @@ const Hero = () => {
   const [typedText, setTypedText] = useState('');
   const [showCursor, setShowCursor] = useState(true);
   const [stats, setStats] = useState({ apps: 0, years: 0, satisfaction: 0 });
-  const fullText = "Full-Stack Mobile Application Developer";
+
+  // Load hero data from localStorage (set via Admin Panel)
+  const heroData = (() => {
+    try {
+      const d = localStorage.getItem('heroData');
+      return d ? JSON.parse(d) : null;
+    } catch { return null; }
+  })();
+
+  const fullText = heroData?.title || "Full-Stack Developer Specialized in Web & Mobile Apps";
+  const heroGreeting = heroData?.greeting || "Hi, I'm Zain";
+  const heroDesc = heroData?.description || "I build high-performance web platforms and mobile applications using React, Next.js, Android (Kotlin/Java) and Flutter. With a passion for clean architecture and pixel-perfect design, I transform ideas into scalable digital products that deliver real impact.";
+  const heroBadge = heroData?.badge || "Available for new projects";
+  const targetApps = heroData?.statApps ?? 50;
+  const targetYears = heroData?.statYears ?? 3;
+  const targetSat = heroData?.statSatisfaction ?? 100;
 
   // Typing animation
   useEffect(() => {
@@ -49,9 +64,9 @@ const Hero = () => {
               currentStep++;
               const progress = currentStep / steps;
               setStats({
-                apps: Math.floor(50 * progress),
-                years: Math.floor(3 * progress),
-                satisfaction: Math.floor(100 * progress)
+                apps: Math.floor(targetApps * progress),
+                years: Math.floor(targetYears * progress),
+                satisfaction: Math.floor(targetSat * progress)
               });
               if (currentStep >= steps) clearInterval(interval);
             }, stepDuration);
@@ -91,19 +106,20 @@ const Hero = () => {
           <div className="hero-text">
             <div className="hero-badge">
               <span className="badge-dot"></span>
-              Available for new projects
+              {heroBadge}
             </div>
             <h1 className="hero-title">
-              Hi, I'm <span className="highlight">Zain</span>
+              {heroGreeting.includes('Zain')
+                ? <>{heroGreeting.split('Zain')[0]}<span className="highlight">Zain</span>{heroGreeting.split('Zain')[1]}</>
+                : heroGreeting
+              }
             </h1>
             <h2 className="hero-subtitle">
               {typedText}
               <span className={`cursor ${showCursor ? 'visible' : ''}`}>|</span>
             </h2>
             <p className="hero-description">
-              I specialize in creating exceptional mobile experiences using Android (Kotlin/Java)
-              and Flutter. With a passion for clean code and innovative solutions, I transform
-              ideas into powerful, user-friendly mobile applications that make a difference.
+              {heroDesc}
             </p>
             <div className="hero-buttons">
               <button
@@ -153,15 +169,15 @@ const Hero = () => {
               <div className="image-glow"></div>
               <img
                 src="/Profile.png"
-                alt="Zain - Mobile App Developer"
+                alt="Zain - Full-Stack Developer"
                 className="profile-image"
               />
               <div className="floating-elements">
                 <div className="floating-icon android">
-                  <span>📱</span>
+                  <span>🌐</span>
                 </div>
                 <div className="floating-icon flutter">
-                  <span>🎯</span>
+                  <span>📱</span>
                 </div>
                 <div className="floating-icon kotlin">
                   <span>⚡</span>

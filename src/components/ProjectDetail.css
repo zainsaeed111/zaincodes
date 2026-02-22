@@ -244,12 +244,12 @@
     font-weight: 600;
     font-size: 0.95rem;
     transition: all var(--transition-spring);
-    box-shadow: 0 4px 20px rgba(0, 212, 255, 0.2);
+    box-shadow: 0 4px 20px rgba(0, 201, 167, 0.2);
 }
 
 .tech-item:hover {
     transform: translateY(-3px);
-    box-shadow: 0 8px 30px rgba(0, 212, 255, 0.4), var(--glow-cyan);
+    box-shadow: 0 8px 30px rgba(0, 201, 167, 0.4), var(--glow-cyan);
 }
 
 /* Features Grid */
@@ -273,7 +273,7 @@
 .feature-card:hover {
     border-color: var(--neon-cyan);
     transform: translateX(5px);
-    box-shadow: 0 0 30px rgba(0, 212, 255, 0.1);
+    box-shadow: 0 0 30px rgba(0, 201, 167, 0.1);
 }
 
 .feature-icon {
@@ -358,7 +358,7 @@
 
 .related-card:hover {
     border-color: var(--neon-cyan);
-    box-shadow: 0 10px 40px rgba(0, 212, 255, 0.1);
+    box-shadow: 0 10px 40px rgba(0, 201, 167, 0.1);
     transform: translateY(-5px);
 }
 
@@ -400,6 +400,7 @@
     margin: 0;
     display: -webkit-box;
     -webkit-line-clamp: 2;
+    line-clamp: 2;
     -webkit-box-orient: vertical;
     overflow: hidden;
 }
