@@ -36,7 +36,7 @@ const Hero = () => {
     }, 50);
 
     return () => clearInterval(typingInterval);
-  }, []);
+  }, [fullText]);
 
   // Cursor blinking
   useEffect(() => {
@@ -81,7 +81,7 @@ const Hero = () => {
     }
 
     return () => observer.disconnect();
-  }, []);
+  }, [targetApps, targetSat, targetYears]);
 
   // Create particles
   const particles = Array.from({ length: 20 }, (_, i) => (
