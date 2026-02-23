@@ -1,0 +1,247 @@
+{
+    "heroData": {
+        "title": "Full-Stack Developer Specialized in Web & Mobile Apps",
+        "greeting": "Hi, I'm Zain",
+        "description": "I build high-performance web platforms and mobile applications using React, Next.js, Android (Kotlin/Java) and Flutter. With a passion for clean architecture and pixel-perfect design, I transform ideas into scalable digital products that deliver real impact.",
+        "badge": "Available for new projects",
+        "statApps": 50,
+        "statYears": 3,
+        "statSatisfaction": 100
+    },
+    "aboutData": {
+        "subtitle": "Passionate about building exceptional web & mobile experiences",
+        "introTitle": "Hello! I'm Zain, a Full-Stack Developer",
+        "introText": "With over 3 years of experience in web and mobile development, I specialize in building robust, scalable applications using React, Next.js, Android (Kotlin/Java) and Flutter — from pixel-perfect frontends to production-ready backends.",
+        "techStack": [
+            {
+                "name": "React",
+                "icon": "⚛️",
+                "color": "#61DAFB"
+            },
+            {
+                "name": "Next.js",
+                "icon": "▶️",
+                "color": "#ffffff"
+            },
+            {
+                "name": "Android",
+                "icon": "🤖",
+                "color": "#3DDC84"
+            },
+            {
+                "name": "Flutter",
+                "icon": "💙",
+                "color": "#02569B"
+            },
+            {
+                "name": "Node.js",
+                "icon": "🟢",
+                "color": "#339933"
+            },
+            {
+                "name": "Firebase",
+                "icon": "🔥",
+                "color": "#FFCA28"
+            },
+            {
+                "name": "TypeScript",
+                "icon": "📝",
+                "color": "#3178C6"
+            },
+            {
+                "name": "UI/UX",
+                "icon": "🎨",
+                "color": "#FF6B6B"
+            }
+        ]
+    },
+    "skillsData": [
+        {
+            "title": "Web Development",
+            "icon": "🌐",
+            "skills": [
+                {
+                    "name": "React / Next.js",
+                    "level": 92,
+                    "color": "#61DAFB"
+                },
+                {
+                    "name": "TypeScript",
+                    "level": 88,
+                    "color": "#3178C6"
+                },
+                {
+                    "name": "HTML / CSS",
+                    "level": 95,
+                    "color": "#E34F26"
+                },
+                {
+                    "name": "Tailwind CSS",
+                    "level": 85,
+                    "color": "#06B6D4"
+                },
+                {
+                    "name": "Node.js",
+                    "level": 85,
+                    "color": "#339933"
+                }
+            ]
+        },
+        {
+            "title": "Mobile Development",
+            "icon": "📱",
+            "skills": [
+                {
+                    "name": "Android (Kotlin)",
+                    "level": 95,
+                    "color": "#3DDC84"
+                },
+                {
+                    "name": "Android (Java)",
+                    "level": 90,
+                    "color": "#F57C00"
+                },
+                {
+                    "name": "Flutter",
+                    "level": 88,
+                    "color": "#2196F3"
+                },
+                {
+                    "name": "React Native",
+                    "level": 75,
+                    "color": "#61DAFB"
+                },
+                {
+                    "name": "iOS (Swift)",
+                    "level": 70,
+                    "color": "#007AFF"
+                }
+            ]
+        },
+        {
+            "title": "Backend & Database",
+            "icon": "⚙️",
+            "skills": [
+                {
+                    "name": "Firebase",
+                    "level": 92,
+                    "color": "#FFA000"
+                },
+                {
+                    "name": "PostgreSQL",
+                    "level": 85,
+                    "color": "#336791"
+                },
+                {
+                    "name": "REST APIs",
+                    "level": 90,
+                    "color": "#FF6B6B"
+                },
+                {
+                    "name": "MongoDB",
+                    "level": 80,
+                    "color": "#47A248"
+                },
+                {
+                    "name": "Docker",
+                    "level": 75,
+                    "color": "#2496ED"
+                }
+            ]
+        },
+        {
+            "title": "Tools & Design",
+            "icon": "🎨",
+            "skills": [
+                {
+                    "name": "Git / GitHub",
+                    "level": 90,
+                    "color": "#F05032"
+                },
+                {
+                    "name": "Figma",
+                    "level": 85,
+                    "color": "#F24E1E"
+                },
+                {
+                    "name": "VS Code",
+                    "level": 88,
+                    "color": "#007ACC"
+                },
+                {
+                    "name": "CI/CD",
+                    "level": 80,
+                    "color": "#FF6B35"
+                },
+                {
+                    "name": "Material Design",
+                    "level": 95,
+                    "color": "#00C9A7"
+                }
+            ]
+        }
+    ],
+    "contactData": {
+        "email": "zain@zaincodes.dev",
+        "phone": "+1 (555) 123-4567",
+        "location": "San Francisco, CA"
+    },
+    "socialLinks": [
+        {
+            "name": "GitHub",
+            "icon": "🐙",
+            "url": "https://github.com/zaincodes"
+        },
+        {
+            "name": "LinkedIn",
+            "icon": "💼",
+            "url": "https://linkedin.com/in/zaincodes"
+        },
+        {
+            "name": "Twitter",
+            "icon": "🐦",
+            "url": "https://twitter.com/zaincodes"
+        },
+        {
+            "name": "Instagram",
+            "icon": "📸",
+            "url": "https://instagram.com/zaincodes"
+        }
+    ],
+    "portfolioProjects": [
+        {
+            "id": 1,
+            "slug": "e-commerce-mobile-app",
+            "title": "E-Commerce Mobile App",
+            "category": "android",
+            "image": "https://images.unsplash.com/photo-1556742049-0cfed4f6a45d?w=800&h=600&fit=crop",
+            "thumbnail": "https://images.unsplash.com/photo-1556742049-0cfed4f6a45d?w=400&h=300&fit=crop",
+            "description": "A comprehensive e-commerce solution built with Kotlin and Android Architecture Components.",
+            "longDescription": "This full-featured e-commerce application revolutionizes mobile shopping with its intuitive interface and robust architecture.",
+            "technologies": [
+                "Kotlin",
+                "Android",
+                "Room Database",
+                "Retrofit",
+                "MVVM"
+            ],
+            "features": [
+                "User Authentication",
+                "Product Catalog",
+                "Shopping Cart",
+                "Payment Integration",
+                "Order Tracking"
+            ],
+            "highlights": [
+                "50,000+ downloads",
+                "4.8 star rating",
+                "99.9% crash-free"
+            ],
+            "playStoreLink": "#",
+            "githubLink": "#",
+            "liveLink": "#"
+        }
+    ],
+    "resumeLink": "",
+    "siteTheme": "dark"
+}

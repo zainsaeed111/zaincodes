@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import './AdminPanel.css';
+import { pushToGitHub } from '../utils/githubSync';
 
 const ADMIN_PASSWORD = 'zaincodes2024'; // Change this to your password
 
@@ -135,6 +136,8 @@ const AdminPanel = () => {
     const [theme, setTheme] = useState(() => localStorage.getItem('siteTheme') || 'dark');
     const [projects, setProjects] = useState([]);
     const [resumeLink, setResumeLink] = useState('');
+    const [githubToken, setGithubToken] = useState(() => localStorage.getItem('REACT_APP_GITHUB_TOKEN') || '');
+    const [isSyncing, setIsSyncing] = useState(false);
 
     /* ── Project form ── */
     const [editingProject, setEditingProject] = useState(null);
@@ -162,7 +165,33 @@ const AdminPanel = () => {
         setTheme(newTheme);
         localStorage.setItem('siteTheme', newTheme);
         document.documentElement.className = newTheme === 'light' ? 'light-theme' : '';
+        saveTheme('siteTheme', newTheme);
         showToast(`Appearance updated to ${newTheme} mode!`);
+        triggerGlobalSync();
+    };
+
+    const triggerGlobalSync = async () => {
+        if (!githubToken) return;
+
+        setIsSyncing(true);
+        try {
+            const fullData = {
+                heroData: hero,
+                aboutData: about,
+                skillsData: skills,
+                contactData: contact,
+                socialLinks: social,
+                portfolioProjects: projects,
+                resumeLink: resumeLink,
+                siteTheme: theme
+            };
+            await pushToGitHub(fullData);
+            showToast('Changes synced globally! Vercel is redeploying.');
+        } catch (err) {
+            showToast('Sync failed: ' + err.message);
+        } finally {
+            setIsSyncing(false);
+        }
     };
 
     useEffect(() => {
@@ -199,14 +228,14 @@ const AdminPanel = () => {
         const { name, value } = e.target;
         setHero(prev => ({ ...prev, [name]: name.startsWith('stat') ? Number(value) : value }));
     };
-    const saveHero = () => { save('heroData', hero); showToast('Hero section saved!'); };
+    const saveHero = () => { save('heroData', hero); showToast('Hero section saved!'); triggerGlobalSync(); };
 
     /* ── About ── */
     const handleAboutChange = (e) => {
         const { name, value } = e.target;
         setAbout(prev => ({ ...prev, [name]: value }));
     };
-    const saveAbout = () => { save('aboutData', about); showToast('About section saved!'); };
+    const saveAbout = () => { save('aboutData', about); showToast('About section saved!'); triggerGlobalSync(); };
     const addTech = () => {
         const name = prompt('Tech name (e.g. React)');
         if (!name) return;
@@ -223,7 +252,7 @@ const AdminPanel = () => {
         const { name, value } = e.target;
         setContact(prev => ({ ...prev, [name]: value }));
     };
-    const saveContact = () => { save('contactData', contact); showToast('Contact info saved!'); };
+    const saveContact = () => { save('contactData', contact); showToast('Contact info saved!'); triggerGlobalSync(); };
 
     /* ── Social ── */
     const openSocialEditor = (idx) => {
@@ -242,6 +271,7 @@ const AdminPanel = () => {
         save('socialData', updated);
         setEditingSocial(null);
         showToast('Social link saved!');
+        triggerGlobalSync();
     };
     const deleteSocialItem = (idx) => {
         if (!window.confirm('Remove this social link?')) return;
@@ -249,6 +279,7 @@ const AdminPanel = () => {
         setSocial(updated);
         save('socialData', updated);
         showToast('Social link removed');
+        triggerGlobalSync();
     };
 
     /* ── Skills ── */
@@ -277,6 +308,7 @@ const AdminPanel = () => {
         save('skillsData', updated);
         setEditingSkillCat(null);
         showToast('Skill category saved!');
+        triggerGlobalSync();
     };
     const deleteSkillCategory = (idx) => {
         if (!window.confirm('Delete this skill category?')) return;
@@ -284,6 +316,7 @@ const AdminPanel = () => {
         setSkills(updated);
         save('skillsData', updated);
         showToast('Category deleted');
+        triggerGlobalSync();
     };
 
     /* ── Projects (existing logic preserved) ── */
@@ -310,6 +343,7 @@ const AdminPanel = () => {
         const updated = editingProject ? projects.map(p => p.id === editingProject.id ? d : p) : [...projects, d];
         setProjects(updated); save('portfolioProjects', updated);
         resetForm(); showToast(editingProject ? 'Project updated!' : 'Project added!');
+        triggerGlobalSync();
     };
     const resetForm = () => {
         setFormData({
@@ -335,6 +369,7 @@ const AdminPanel = () => {
         if (!window.confirm('Delete this project?')) return;
         const updated = projects.filter(p => p.id !== id);
         setProjects(updated); save('portfolioProjects', updated);
+        triggerGlobalSync();
     };
 
     /* ── Resume ── */
@@ -643,8 +678,28 @@ const AdminPanel = () => {
                             <p className="section-info">Upload your resume to Google Drive, then paste the shareable link here.</p>
                             <div className="resume-form">
                                 <input type="url" value={resumeLink} onChange={(e) => setResumeLink(e.target.value)} placeholder="https://drive.google.com/your-resume-link" />
-                                <button onClick={handleResumeUpdate} className="btn-primary"><span>Save</span></button>
+                                <button onClick={() => { handleResumeUpdate(); triggerGlobalSync(); }} className="btn-primary"><span>Save</span></button>
                             </div>
+                        </section>
+
+                        <section className="admin-section github-sync-settings">
+                            <h2>🌐 Global Sync (Real-Time)</h2>
+                            <p className="section-info">To make changes reflect globally on all devices, enter your <strong>GitHub Personal Access Token</strong>. Changes will then be committed directly to your repository.</p>
+                            <div className="resume-form">
+                                <input
+                                    type="password"
+                                    value={githubToken}
+                                    onChange={(e) => {
+                                        setGithubToken(e.target.value);
+                                        localStorage.setItem('REACT_APP_GITHUB_TOKEN', e.target.value);
+                                    }}
+                                    placeholder="ghp_xxxxxxxxxxxx"
+                                />
+                                <button onClick={triggerGlobalSync} className="btn-primary" disabled={isSyncing || !githubToken}>
+                                    <span>{isSyncing ? 'Syncing...' : 'Sync Now'}</span>
+                                </button>
+                            </div>
+                            {!githubToken && <p className="token-hint">Don't have a token? <a href="https://github.com/settings/tokens/new?scopes=repo" target="_blank" rel="noopener noreferrer">Create one with 'repo' scope</a></p>}
                         </section>
                         <section className="admin-section">
                             <h2>💾 Backup & Restore</h2>

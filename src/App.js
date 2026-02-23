@@ -10,6 +10,8 @@ import Contact from './components/Contact';
 import Footer from './components/Footer';
 import ProjectDetail from './components/ProjectDetail';
 import AdminPanel from './components/AdminPanel';
+import portfolioData from './data/portfolioData.json';
+import { fetchLatestGitHubData } from './utils/githubSync';
 
 // Default projects data (used if no admin data exists)
 const defaultProjects = [
@@ -97,7 +99,7 @@ const getProjects = () => {
     const parsed = JSON.parse(savedProjects);
     if (parsed.length > 0) return parsed;
   }
-  return [defaultProjects[0]];
+  return portfolioData.portfolioProjects;
 };
 
 // Scroll to top on route change
@@ -128,6 +130,61 @@ function App() {
   const [isLoading, setIsLoading] = useState(true);
   const [showBackToTop, setShowBackToTop] = useState(false);
   const [projects, setProjects] = useState(getProjects());
+
+  /* Global Data Initialization */
+  useEffect(() => {
+    const initializeData = async () => {
+      // 1. Initially populate from built-in JSON if localStorage is empty
+      const keys = [
+        { key: 'heroData', data: portfolioData.heroData },
+        { key: 'aboutData', data: portfolioData.aboutData },
+        { key: 'skillsData', data: portfolioData.skillsData },
+        { key: 'contactData', data: portfolioData.contactData },
+        { key: 'socialLinks', data: portfolioData.socialLinks },
+        { key: 'portfolioProjects', data: portfolioData.portfolioProjects },
+        { key: 'resumeLink', data: portfolioData.resumeLink },
+        { key: 'siteTheme', data: portfolioData.siteTheme || 'dark' }
+      ];
+
+      keys.forEach(({ key, data }) => {
+        if (!localStorage.getItem(key)) {
+          localStorage.setItem(key, JSON.stringify(data));
+        }
+      });
+
+      // 2. Proactively fetch latest data from GitHub for "Real-Time" feel
+      try {
+        const latestData = await fetchLatestGitHubData();
+        if (latestData) {
+          const mapping = {
+            heroData: latestData.heroData,
+            aboutData: latestData.aboutData,
+            skillsData: latestData.skillsData,
+            contactData: latestData.contactData,
+            socialLinks: latestData.socialLinks,
+            portfolioProjects: latestData.portfolioProjects,
+            resumeLink: latestData.resumeLink,
+            siteTheme: latestData.siteTheme
+          };
+
+          Object.entries(mapping).forEach(([key, val]) => {
+            if (val) localStorage.setItem(key, JSON.stringify(val));
+          });
+
+          // Update projects state immediately if it changed
+          if (latestData.portfolioProjects) {
+            setProjects(latestData.portfolioProjects);
+          }
+        }
+      } catch (err) {
+        console.warn('Real-time sync notice:', err.message);
+      }
+
+      setIsLoading(false);
+    };
+
+    initializeData();
+  }, []);
 
   /* Theme state and application */
   useEffect(() => {
