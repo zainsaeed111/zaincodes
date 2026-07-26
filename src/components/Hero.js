@@ -1,10 +1,9 @@
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useEffect, useRef } from 'react';
 import './Hero.css';
 
 const Hero = () => {
   const heroRef = useRef(null);
   const portraitRef = useRef(null);
-  const [stats, setStats] = useState({ apps: 0, years: 0, retention: 0 });
 
   const heroData = (() => {
     try {
@@ -14,41 +13,11 @@ const Hero = () => {
   })();
 
   const badge = heroData?.badge || 'Available for Q3/Q4 Projects';
-  const description = heroData?.description || 'From architecture to app store launch. React, Kotlin, and Flutter to convert complex product visions into high-retention digital businesses.';
+  const description = heroData?.description || 'Engineering high-performance mobile products and web platforms from architecture to app store launch.';
 
   const targetApps = heroData?.statApps ?? 50;
   const targetYears = heroData?.statYears ?? 3;
   const targetSatisfaction = heroData?.statSatisfaction ?? 100;
-
-  useEffect(() => {
-    const observer = new IntersectionObserver(
-      (entries) => {
-        entries.forEach((entry) => {
-          if (entry.isIntersecting) {
-            entry.target.classList.add('animate');
-            const duration = 1800;
-            const steps = 90;
-            const stepDuration = duration / steps;
-            let currentStep = 0;
-            const interval = setInterval(() => {
-              currentStep++;
-              const progress = currentStep / steps;
-              setStats({
-                apps: Math.floor(targetApps * progress),
-                years: Math.floor(targetYears * progress),
-                retention: Math.floor(targetSatisfaction * progress)
-              });
-              if (currentStep >= steps) clearInterval(interval);
-            }, stepDuration);
-          }
-        });
-      },
-      { threshold: 0.1 }
-    );
-
-    if (heroRef.current) observer.observe(heroRef.current);
-    return () => observer.disconnect();
-  }, [targetApps, targetYears, targetSatisfaction]);
 
   useEffect(() => {
     const heroSection = heroRef.current;
@@ -59,7 +28,6 @@ const Hero = () => {
 
     const handleMouseMove = (e) => {
       if (rafId) cancelAnimationFrame(rafId);
-
       rafId = requestAnimationFrame(() => {
         const { clientX, clientY } = e;
         const rect = heroSection.getBoundingClientRect();
@@ -89,19 +57,19 @@ const Hero = () => {
   }, []);
 
   return (
-    <section id="home" className="hero-section section-hero" ref={heroRef}>
-      <div className="hero-container container">
+    <section id="home" className="hero-section" ref={heroRef}>
+      <div className="hero-container">
         <div className="hero-content">
-          <div className="hero-badge">
-            <span className="hero-badge-dot" />
-            <span className="hero-badge-text">{badge}</span>
+          <div className="hero-eyebrow">
+            <span className="hero-eyebrow-dot" />
+            <span className="hero-eyebrow-text">{badge}</span>
           </div>
 
           <h1 className="hero-headline">
-            <span className="hero-headline-primary">Zain Saeed</span>
-            <span className="hero-headline-accent">Mobile App Developer</span>
-            <span className="hero-headline-secondary">& Full-Stack Engineer</span>
+            Zain Saeed
           </h1>
+
+          <p className="hero-positioning">Product Engineer &amp; Architect</p>
 
           <p className="hero-description">
             {description}
@@ -112,49 +80,39 @@ const Hero = () => {
               className="btn-primary"
               onClick={() => document.getElementById('contact').scrollIntoView({ behavior: 'smooth' })}
             >
-              <span>Start a Project</span>
-              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
-                <path d="M5 12h14M12 5l7 7-7 7" />
-              </svg>
+              <span>Schedule a Technical Discovery Call</span>
             </button>
             <button
               className="btn-secondary"
               onClick={() => document.getElementById('portfolio').scrollIntoView({ behavior: 'smooth' })}
             >
-              <span>Explore Work</span>
+              <span>View Work</span>
             </button>
           </div>
 
-          <div className="hero-stats">
-            <div className="hero-stat">
-              <div className="hero-stat-number">{stats.apps}+</div>
-              <div className="hero-stat-label">Products Shipped</div>
+          <div className="hero-trust">
+            <div className="hero-trust-item">
+              <span className="hero-trust-number">{targetApps}+</span>
+              <span className="hero-trust-label">Products Shipped</span>
             </div>
-            <div className="hero-stat-divider" />
-            <div className="hero-stat">
-              <div className="hero-stat-number">{stats.years}+</div>
-              <div className="hero-stat-label">Years Architecture</div>
+            <span className="hero-trust-sep" />
+            <div className="hero-trust-item">
+              <span className="hero-trust-number">{targetYears}+</span>
+              <span className="hero-trust-label">Years Engineering</span>
             </div>
-            <div className="hero-stat-divider" />
-            <div className="hero-stat">
-              <div className="hero-stat-number">{stats.retention}%</div>
-              <div className="hero-stat-label">Client Retention</div>
+            <span className="hero-trust-sep" />
+            <div className="hero-trust-item">
+              <span className="hero-trust-number">{targetSatisfaction}%</span>
+              <span className="hero-trust-label">Launch Success</span>
             </div>
           </div>
         </div>
 
         <div className="hero-visual">
-          {/* Depth layers - positioned behind the portrait, never overlapping the face */}
-          <div className="hero-depth">
-            <div className="hero-depth-layer hero-soft-glow" />
-            <div className="hero-depth-layer hero-glass-layer" />
-            <div className="hero-depth-layer hero-product-layer" />
-          </div>
-
-          {/* Portrait - no wrapper, no frame, no border. Direct <img> with 3D transforms */}
+          <div className="hero-portrait-glow" />
           <img
             src="/Profile.webp"
-            alt="Zain Saeed"
+            alt="Zain Saeed — Product Engineer & Architect"
             className="hero-portrait"
             ref={portraitRef}
             loading="eager"
