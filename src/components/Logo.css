@@ -1,0 +1,12 @@
+.logo-mark {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--text-primary);
+  transition: color var(--duration-fast) ease;
+}
+
+.logo-mark svg {
+  width: 32px;
+  height: 32px;
+}

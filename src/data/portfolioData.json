@@ -211,34 +211,117 @@
     "portfolioProjects": [
         {
             "id": 1,
-            "slug": "e-commerce-mobile-app",
-            "title": "E-Commerce Mobile App",
+            "slug": "ecotrack-offline-logistics",
+            "title": "EcoTrack: Offline-First Logistics Platform",
             "category": "android",
-            "image": "https://images.unsplash.com/photo-1556742049-0cfed4f6a45d?w=800&h=600&fit=crop",
-            "thumbnail": "https://images.unsplash.com/photo-1556742049-0cfed4f6a45d?w=400&h=300&fit=crop",
-            "description": "A comprehensive e-commerce solution built with Kotlin and Android Architecture Components.",
-            "longDescription": "This full-featured e-commerce application revolutionizes mobile shopping with its intuitive interface and robust architecture.",
+            "image": "https://images.unsplash.com/photo-1512428559087-560fa5ceab42?w=800&h=600&fit=crop",
+            "thumbnail": "https://images.unsplash.com/photo-1512428559087-560fa5ceab42?w=400&h=300&fit=crop",
+            "description": "An offline-first native Android delivery app designed to maintain logistics data parity under zero-connectivity conditions.",
+            "longDescription": "EcoTrack resolves tracking gaps for dispatch couriers operating in signal-dead zones. By utilizing local-first caching, we guarantee courier inputs are never lost.",
+            "problem": "Couriers operating in remote routing areas suffered frequent data losses when cellular coverage dropped. In-transit scan events failed to persist, leading to missing delivery records, double dispatching, and tracking discrepancies on client-facing channels.",
+            "solution": "Built a Kotlin-native Android logistics application that implements local-first Room DB data tables. We established a background replication loop using Jetpack WorkManager that monitors network states and pushes queued scan payloads immediately once internet connectivity resumes.",
+            "architecture": "Clean Architecture matching strict MVVM boundaries. Employs Repository pattern to coordinate SQLite local writes and Retrofit remote posts. Background services utilize Coroutines and Flow data channels to prevent UI thread lockouts.",
             "technologies": [
                 "Kotlin",
-                "Android",
-                "Room Database",
+                "Android SDK",
+                "Room DB",
+                "Jetpack WorkManager",
                 "Retrofit",
-                "MVVM"
+                "Coroutines & Flow"
             ],
             "features": [
-                "User Authentication",
-                "Product Catalog",
-                "Shopping Cart",
-                "Payment Integration",
-                "Order Tracking"
+                "Real-time Geo-location Tracking",
+                "Offline signature & photo capture",
+                "Automated background sync queues",
+                "Intelligent local route optimizations"
             ],
             "highlights": [
-                "50,000+ downloads",
-                "4.8 star rating",
-                "99.9% crash-free"
+                "Sub-500ms local database writes",
+                "100% scanning event preservation",
+                "Clean MVVM Separation of Concerns"
+            ],
+            "screenshots": [
+                "https://images.unsplash.com/photo-1512428559087-560fa5ceab42?w=800&h=600&fit=crop",
+                "https://images.unsplash.com/photo-1526498460520-4c246339dccb?w=800&h=600&fit=crop"
             ],
             "playStoreLink": "#",
-            "githubLink": "#",
+            "githubLink": "https://github.com/zaincodes/ecotrack-offline-logistics",
+            "liveLink": "#"
+        },
+        {
+            "id": 2,
+            "slug": "apexhealth-telemedicine",
+            "title": "ApexHealth: Telemedicine Patient Portal",
+            "category": "flutter",
+            "image": "https://images.unsplash.com/photo-1576091160399-112ba8d25d1d?w=800&h=600&fit=crop",
+            "thumbnail": "https://images.unsplash.com/photo-1576091160399-112ba8d25d1d?w=400&h=300&fit=crop",
+            "description": "A cross-platform patient dashboard designed for rapid appointment scheduling, medical file access, and encrypted chat channels.",
+            "longDescription": "ApexHealth bridges patient-care gaps by packaging encrypted consultations and scheduling workflows into a single Flutter code architecture.",
+            "problem": "Patient booking systems felt clunky on budget mobile hardware. Chat streams loaded slowly, scheduling dashboards lagged, and sensitive medical data was prone to key interception during transit.",
+            "solution": "Developed a cross-platform mobile client in Flutter utilizing WebSockets for real-time schedule syncing and instant messaging. Secured all local keys and access tokens using hardware biometrics authentication and keychain secure storage.",
+            "architecture": "BLoC (Business Logic Component) state division. Communications leverage WebSocket channels for chat frames and RESTful APIs for appointment booking. SQLite-backed local cache (Hive) acts as an instant local catalog.",
+            "technologies": [
+                "Flutter & Dart",
+                "BLoC Pattern",
+                "WebSockets",
+                "Hive Database",
+                "Secure Storage API"
+            ],
+            "features": [
+                "Encrypted doctor-patient messaging",
+                "Dynamic calendar scheduling",
+                "Digital medical records locker",
+                "Biometric login authentication"
+            ],
+            "highlights": [
+                "Sub-100ms message delivery",
+                "Keychain API integration",
+                "60FPS smooth UI rendering"
+            ],
+            "screenshots": [
+                "https://images.unsplash.com/photo-1576091160399-112ba8d25d1d?w=800&h=600&fit=crop",
+                "https://images.unsplash.com/photo-1504868584819-f8e8b4b6d7e3?w=800&h=600&fit=crop"
+            ],
+            "playStoreLink": "#",
+            "githubLink": "https://github.com/zaincodes/apexhealth-telemedicine",
+            "liveLink": "#"
+        },
+        {
+            "id": 3,
+            "slug": "synapse-collaborative-workspace",
+            "title": "Synapse: Real-Time Kanban Platform",
+            "category": "web",
+            "image": "https://images.unsplash.com/photo-1531403009284-440f080d1e12?w=800&h=600&fit=crop",
+            "thumbnail": "https://images.unsplash.com/photo-1531403009284-440f080d1e12?w=400&h=300&fit=crop",
+            "description": "A collaborative workspace software featuring real-time kanban synchronization, document sheets, and online presence indicators.",
+            "longDescription": "Synapse establishes project workspaces that synchronize board card movements instantly across team browsers.",
+            "problem": "Collaborators operating on project boards suffered page sync lag. Overwriting states occurred when two users moved cards concurrently, causing workspace confusion and data loss.",
+            "solution": "Built a collaborative Next.js web application utilizing Socket.io rooms. Integrated optimistic state updates on the client UI to render drag animations instantly, while a PostgreSQL backend utilizes transaction isolation levels to handle conflicts safely.",
+            "architecture": "Event-driven architecture with React/Next.js frontend and Node/Express server. Real-time changes flow through WebSockets. Relational database schemas utilize transaction locks to handle race states.",
+            "technologies": [
+                "React / Next.js",
+                "Node.js / Express",
+                "Socket.io",
+                "PostgreSQL",
+                "TailwindCSS"
+            ],
+            "features": [
+                "Collaborative Kanban boards",
+                "Optimistic drag-and-drop state",
+                "Real-time user presence cursors",
+                "Workspace auditing logs"
+            ],
+            "highlights": [
+                "Real-time board synchronization",
+                "Optimistic UI updates",
+                "PostgreSQL locking integrity"
+            ],
+            "screenshots": [
+                "https://images.unsplash.com/photo-1531403009284-440f080d1e12?w=800&h=600&fit=crop",
+                "https://images.unsplash.com/photo-1460925895917-afdab827c52f?w=800&h=600&fit=crop"
+            ],
+            "playStoreLink": "#",
+            "githubLink": "https://github.com/zaincodes/synapse-workspace",
             "liveLink": "#"
         }
     ],

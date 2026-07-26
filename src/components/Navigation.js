@@ -1,11 +1,11 @@
 import React, { useState, useEffect } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
+import Logo from './Logo';
 import './Navigation.css';
 
 const Navigation = () => {
   const [isScrolled, setIsScrolled] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
-  const [scrollProgress, setScrollProgress] = useState(0);
   const [activeSection, setActiveSection] = useState('home');
   const location = useLocation();
   const navigate = useNavigate();
@@ -15,13 +15,6 @@ const Navigation = () => {
     const handleScroll = () => {
       setIsScrolled(window.scrollY > 50);
 
-      // Calculate scroll progress
-      const winScroll = document.body.scrollTop || document.documentElement.scrollTop;
-      const height = document.documentElement.scrollHeight - document.documentElement.clientHeight;
-      const scrolled = (winScroll / height) * 100;
-      setScrollProgress(scrolled);
-
-      // Determine active section
       if (isHomePage) {
         const sections = ['home', 'about', 'portfolio', 'skills', 'contact'];
         for (const section of sections.reverse()) {
@@ -46,15 +39,11 @@ const Navigation = () => {
       navigate('/');
       setTimeout(() => {
         const element = document.getElementById(sectionId);
-        if (element) {
-          element.scrollIntoView({ behavior: 'smooth' });
-        }
+        if (element) element.scrollIntoView({ behavior: 'smooth' });
       }, 100);
     } else {
       const element = document.getElementById(sectionId);
-      if (element) {
-        element.scrollIntoView({ behavior: 'smooth' });
-      }
+      if (element) element.scrollIntoView({ behavior: 'smooth' });
     }
     setIsMobileMenuOpen(false);
   };
@@ -62,18 +51,17 @@ const Navigation = () => {
   const navLinks = [
     { id: 'home', label: 'Home' },
     { id: 'about', label: 'About' },
-    { id: 'portfolio', label: 'Portfolio' },
-    { id: 'skills', label: 'Skills' },
+    { id: 'portfolio', label: 'Work' },
+    { id: 'skills', label: 'Expertise' },
     { id: 'contact', label: 'Contact' }
   ];
 
   return (
     <nav className={`navigation ${isScrolled ? 'scrolled' : ''}`}>
-      <div className="scroll-progress" style={{ width: `${scrollProgress}%` }}></div>
       <div className="nav-container">
-        <div className="nav-logo" onClick={() => scrollToSection('home')}>
-          <span className="logo-text">ZainCodes</span>
-          <span className="logo-dot">.</span>
+        <div className="nav-brand" onClick={() => scrollToSection('home')}>
+          <Logo />
+          <span className="nav-brand-text">ZainCodes</span>
         </div>
 
         <div className={`nav-menu ${isMobileMenuOpen ? 'active' : ''}`}>
@@ -90,6 +78,16 @@ const Navigation = () => {
               {link.label}
             </a>
           ))}
+          <a
+            href="#contact"
+            onClick={(e) => {
+              e.preventDefault();
+              scrollToSection('contact');
+            }}
+            className="nav-cta"
+          >
+            Start a Project
+          </a>
         </div>
 
         <div

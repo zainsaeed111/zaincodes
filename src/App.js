@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, Suspense } from 'react';
 import { BrowserRouter as Router, Routes, Route, useLocation } from 'react-router-dom';
 import './App.css';
 import Navigation from './components/Navigation';
@@ -9,89 +9,12 @@ import Skills from './components/Skills';
 import Contact from './components/Contact';
 import Footer from './components/Footer';
 import ProjectDetail from './components/ProjectDetail';
-import AdminPanel from './components/AdminPanel';
 import portfolioData from './data/portfolioData.json';
 import { fetchLatestGitHubData } from './utils/githubSync';
 
-// Default projects data (used if no admin data exists)
-const defaultProjects = [
-  {
-    id: 1,
-    slug: "e-commerce-mobile-app",
-    title: "E-Commerce Mobile App",
-    category: "android",
-    image: "https://images.unsplash.com/photo-1556742049-0cfed4f6a45d?w=800&h=600&fit=crop",
-    thumbnail: "https://images.unsplash.com/photo-1556742049-0cfed4f6a45d?w=400&h=300&fit=crop",
-    description: "A comprehensive e-commerce solution built with Kotlin and Android Architecture Components.",
-    longDescription: "This full-featured e-commerce application revolutionizes mobile shopping with its intuitive interface and robust architecture.",
-    technologies: ["Kotlin", "Android", "Room Database", "Retrofit", "MVVM"],
-    features: ["User Authentication", "Product Catalog", "Shopping Cart", "Payment Integration", "Order Tracking"],
-    highlights: ["50,000+ downloads", "4.8 star rating", "99.9% crash-free"],
-    playStoreLink: "#",
-    githubLink: "#"
-  },
-  {
-    id: 2,
-    slug: "fitness-tracker",
-    title: "Fitness Tracker",
-    category: "flutter",
-    image: "https://images.unsplash.com/photo-1571019613454-1cb2f99b2d8b?w=800&h=600&fit=crop",
-    thumbnail: "https://images.unsplash.com/photo-1571019613454-1cb2f99b2d8b?w=400&h=300&fit=crop",
-    description: "Cross-platform fitness tracking app with real-time data synchronization and analytics.",
-    longDescription: "A comprehensive fitness companion that helps users achieve their health goals through personalized workout plans.",
-    technologies: ["Flutter", "Dart", "Firebase", "Bloc Pattern", "Charts"],
-    features: ["Workout Tracking", "Progress Analytics", "Social Features", "Wearable Integration"],
-    highlights: ["Cross-platform", "Real-time sync", "10+ wearables"],
-    playStoreLink: "#",
-    githubLink: "#"
-  },
-  {
-    id: 3,
-    slug: "banking-app",
-    title: "Banking App",
-    category: "android",
-    image: "https://images.unsplash.com/photo-1551288049-bebda4e38f71?w=800&h=600&fit=crop",
-    thumbnail: "https://images.unsplash.com/photo-1551288049-bebda4e38f71?w=400&h=300&fit=crop",
-    description: "Secure banking application with biometric authentication and real-time transaction monitoring.",
-    longDescription: "An enterprise-grade mobile banking solution designed with security as the top priority.",
-    technologies: ["Java", "Android", "Biometric API", "Encryption", "REST API"],
-    features: ["Biometric Login", "Account Management", "Transfer Money", "Transaction History"],
-    highlights: ["Bank-level security", "PCI DSS compliant", "Zero breaches"],
-    playStoreLink: "#",
-    githubLink: "#"
-  },
-  {
-    id: 4,
-    slug: "saas-analytics-dashboard",
-    title: "SaaS Analytics Dashboard",
-    category: "web",
-    image: "https://images.unsplash.com/photo-1551288049-bebda4e38f71?w=800&h=600&fit=crop",
-    thumbnail: "https://images.unsplash.com/photo-1460925895917-afdab827c52f?w=400&h=300&fit=crop",
-    description: "Real-time analytics dashboard for SaaS businesses with interactive charts and data visualizations.",
-    longDescription: "A modern, full-stack analytics platform built with Next.js and PostgreSQL, featuring real-time data pipelines and interactive D3.js visualizations.",
-    technologies: ["React", "Next.js", "TypeScript", "PostgreSQL", "D3.js", "Tailwind CSS"],
-    features: ["Real-time Analytics", "Custom Reports", "Team Collaboration", "API Integrations", "Export to PDF"],
-    highlights: ["Sub-200ms load time", "10K+ daily active users", "99.99% uptime"],
-    playStoreLink: "#",
-    githubLink: "#"
-  },
-  {
-    id: 5,
-    slug: "ai-content-platform",
-    title: "AI Content Platform",
-    category: "web",
-    image: "https://images.unsplash.com/photo-1677442136019-21780ecad995?w=800&h=600&fit=crop",
-    thumbnail: "https://images.unsplash.com/photo-1677442136019-21780ecad995?w=400&h=300&fit=crop",
-    description: "AI-powered content management system with automated SEO optimization and multi-language support.",
-    longDescription: "A next-generation CMS powered by GPT APIs, allowing marketers to generate, optimize and schedule content across multiple channels.",
-    technologies: ["React", "Node.js", "MongoDB", "OpenAI API", "Redis", "Docker"],
-    features: ["AI Content Generation", "SEO Auto-Optimization", "Multi-Language", "Scheduling", "Analytics"],
-    highlights: ["80% faster content creation", "40% SEO improvement", "5-star user rating"],
-    playStoreLink: "#",
-    githubLink: "#",
-    liveLink: "#"
-  }
-];
+const AdminPanel = React.lazy(() => import('./components/AdminPanel'));
+
+// Default projects data removed to clean up code and fix ESLint warning
 
 const getProjects = () => {
   const savedProjects = localStorage.getItem('portfolioProjects');
@@ -275,7 +198,17 @@ function App() {
         <ScrollToTop />
         <Routes>
           {/* Admin Route - No Navigation/Footer */}
-          <Route path="/admin" element={<AdminPanel />} />
+          <Route path="/admin" element={
+            <Suspense fallback={
+              <div className="loading-screen">
+                <div className="loading-spinner"></div>
+                <h2>ZainCodes</h2>
+                <p>Loading Admin Dashboard...</p>
+              </div>
+            }>
+              <AdminPanel />
+            </Suspense>
+          } />
 
           {/* Main Site Routes */}
           <Route path="/*" element={

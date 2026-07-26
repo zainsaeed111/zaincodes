@@ -4,200 +4,97 @@ import './Skills.css';
 const Skills = () => {
   const skillsRef = useRef(null);
 
-  // Load skills data from localStorage (set via Admin Panel)
-  const savedSkills = (() => {
-    try {
-      const d = localStorage.getItem('skillsData');
-      return d ? JSON.parse(d) : null;
-    } catch { return null; }
-  })();
-
-  const skillCategories = savedSkills || [
-    {
-      title: "Web Development",
-      icon: "🌐",
-      skills: [
-        { name: "React / Next.js", level: 92, color: "#61DAFB" },
-        { name: "TypeScript", level: 88, color: "#3178C6" },
-        { name: "HTML / CSS", level: 95, color: "#E34F26" },
-        { name: "Tailwind CSS", level: 85, color: "#06B6D4" },
-        { name: "Node.js", level: 85, color: "#339933" }
-      ]
-    },
-    {
-      title: "Mobile Development",
-      icon: "📱",
-      skills: [
-        { name: "Android (Kotlin)", level: 95, color: "#3DDC84" },
-        { name: "Android (Java)", level: 90, color: "#F57C00" },
-        { name: "Flutter", level: 88, color: "#2196F3" },
-        { name: "React Native", level: 75, color: "#61DAFB" },
-        { name: "iOS (Swift)", level: 70, color: "#007AFF" }
-      ]
-    },
-    {
-      title: "Backend & Database",
-      icon: "⚙️",
-      skills: [
-        { name: "Firebase", level: 92, color: "#FFA000" },
-        { name: "PostgreSQL", level: 85, color: "#336791" },
-        { name: "REST APIs", level: 90, color: "#FF6B6B" },
-        { name: "MongoDB", level: 80, color: "#47A248" },
-        { name: "Docker", level: 75, color: "#2496ED" }
-      ]
-    },
-    {
-      title: "Tools & Design",
-      icon: "🎨",
-      skills: [
-        { name: "Git / GitHub", level: 90, color: "#F05032" },
-        { name: "Figma", level: 85, color: "#F24E1E" },
-        { name: "VS Code", level: 88, color: "#007ACC" },
-        { name: "CI/CD", level: 80, color: "#FF6B35" },
-        { name: "Material Design", level: 95, color: "#00C9A7" }
-      ]
-    }
-  ];
-
-  const achievements = [
-    {
-      title: "Google Play Store",
-      description: "15+ published apps",
-      icon: "🏆",
-      color: "#4CAF50"
-    },
-    {
-      title: "Client Satisfaction",
-      description: "100% positive feedback",
-      icon: "⭐",
-      color: "#FF9800"
-    },
-    {
-      title: "Code Quality",
-      description: "Clean, maintainable code",
-      icon: "💎",
-      color: "#2196F3"
-    },
-    {
-      title: "Performance",
-      description: "Optimized for speed",
-      icon: "⚡",
-      color: "#9C27B0"
-    }
-  ];
-
   useEffect(() => {
     const observer = new IntersectionObserver(
       (entries) => {
         entries.forEach((entry) => {
           if (entry.isIntersecting) {
             entry.target.classList.add('animate');
-            // Animate skill bars
-            const skillBars = entry.target.querySelectorAll('.skill-bar-fill');
-            skillBars.forEach((bar, index) => {
-              setTimeout(() => {
-                bar.style.width = bar.dataset.level + '%';
-              }, index * 100);
-            });
           }
         });
       },
       { threshold: 0.1 }
     );
 
-    if (skillsRef.current) {
-      observer.observe(skillsRef.current);
-    }
-
+    if (skillsRef.current) observer.observe(skillsRef.current);
     return () => observer.disconnect();
   }, []);
 
+  const capabilities = [
+    {
+      id: 'mobile',
+      title: 'Mobile Engineering',
+      description: 'Native Android with Kotlin and Jetpack Compose. Cross-platform Flutter with BLoC architecture. React Native for rapid prototyping.',
+      icon: (
+        <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+          <rect x="5" y="2" width="14" height="20" rx="2" ry="2"/>
+          <line x1="12" y1="18" x2="12.01" y2="18"/>
+        </svg>
+      )
+    },
+    {
+      id: 'web',
+      title: 'Web Platforms',
+      description: 'React and Next.js applications with SSR/SSG, optimized hydration, and component design systems. TypeScript for type safety.',
+      icon: (
+        <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+          <polyline points="16 18 22 12 16 6"/>
+          <polyline points="8 6 2 12 8 18"/>
+        </svg>
+      )
+    },
+    {
+      id: 'backend',
+      title: 'Backend Systems',
+      description: 'Node.js and Express API networks. PostgreSQL and MongoDB with schema optimization. Firebase for auth, firestore, and cloud functions.',
+      icon: (
+        <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+          <rect x="2" y="3" width="20" height="5" rx="1"/>
+          <rect x="2" y="10" width="20" height="5" rx="1"/>
+          <rect x="2" y="17" width="20" height="5" rx="1"/>
+          <circle cx="6" cy="5.5" r="1" fill="currentColor" stroke="none"/>
+          <circle cx="6" cy="12.5" r="1" fill="currentColor" stroke="none"/>
+          <circle cx="6" cy="19.5" r="1" fill="currentColor" stroke="none"/>
+        </svg>
+      )
+    },
+    {
+      id: 'delivery',
+      title: 'Product Delivery',
+      description: 'CI/CD pipelines, automated testing, App Store and Google Play submission. Monitoring, crash reporting, and post-launch maintenance.',
+      icon: (
+        <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+          <path d="M22 11.08V12a10 10 0 11-5.93-9.14"/>
+          <polyline points="22 4 12 14.01 9 11.01"/>
+        </svg>
+      )
+    }
+  ];
+
   return (
-    <section id="skills" className="skills" ref={skillsRef}>
+    <section id="skills" className="skills-section" ref={skillsRef}>
       <div className="container">
         <div className="section-header">
-          <h2 className="section-title">Skills & Expertise</h2>
-          <p className="section-subtitle">Technical skills and professional achievements</p>
+          <h2 className="section-title">Full-Stack <span>Capabilities</span></h2>
+          <p className="section-subtitle">
+            Engineering capabilities across the complete product development lifecycle
+          </p>
         </div>
 
-        <div className="skills-content">
-          <div className="skills-grid">
-            {skillCategories.map((category, categoryIndex) => (
-              <div key={categoryIndex} className="skill-category">
-                <div className="category-header">
-                  <div className="category-icon">{category.icon}</div>
-                  <h3>{category.title}</h3>
-                </div>
-                <div className="skills-list">
-                  {category.skills.map((skill, skillIndex) => (
-                    <div key={skillIndex} className="skill-item">
-                      <div className="skill-info">
-                        <span className="skill-name">{skill.name}</span>
-                        <span className="skill-percentage">{skill.level}%</span>
-                      </div>
-                      <div className="skill-bar">
-                        <div
-                          className="skill-bar-fill"
-                          data-level={skill.level}
-                          style={{
-                            '--skill-color': skill.color,
-                            width: '0%'
-                          }}
-                        ></div>
-                      </div>
-                    </div>
-                  ))}
-                </div>
+        <div className="capabilities-grid">
+          {capabilities.map((cap, index) => (
+            <div
+              key={cap.id}
+              className="capability-card"
+              style={{ '--delay': `${index * 0.1}s` }}
+            >
+              <div className="capability-icon">
+                {cap.icon}
               </div>
-            ))}
-          </div>
-
-          <div className="achievements-section">
-            <h3>Professional Achievements</h3>
-            <div className="achievements-grid">
-              {achievements.map((achievement, index) => (
-                <div key={index} className="achievement-card">
-                  <div
-                    className="achievement-icon"
-                    style={{ backgroundColor: achievement.color }}
-                  >
-                    {achievement.icon}
-                  </div>
-                  <div className="achievement-content">
-                    <h4>{achievement.title}</h4>
-                    <p>{achievement.description}</p>
-                  </div>
-                </div>
-              ))}
+              <h3>{cap.title}</h3>
+              <p>{cap.description}</p>
             </div>
-          </div>
-        </div>
-
-        <div className="certifications">
-          <h3>Certifications & Learning</h3>
-          <div className="cert-grid">
-            <div className="cert-item">
-              <div className="cert-icon">📜</div>
-              <div className="cert-content">
-                <h4>Google Android Developer Certification</h4>
-                <p>Associate Android Developer</p>
-              </div>
-            </div>
-            <div className="cert-item">
-              <div className="cert-icon">🎓</div>
-              <div className="cert-content">
-                <h4>Flutter Development Course</h4>
-                <p>Complete Flutter Development Bootcamp</p>
-              </div>
-            </div>
-            <div className="cert-item">
-              <div className="cert-icon">🏅</div>
-              <div className="cert-content">
-                <h4>Kotlin for Android</h4>
-                <p>JetBrains Kotlin Certification</p>
-              </div>
-            </div>
-          </div>
+          ))}
         </div>
       </div>
     </section>
