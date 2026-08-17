@@ -7,10 +7,11 @@ const ADMIN_PASSWORD = 'zaincodes2024'; // Change this to your password
 
 /* ── Default data (mirrors the hardcoded values in Hero / Skills / About) ── */
 const defaultHero = {
-    title: "Full-Stack Developer Specialized in Web & Mobile Apps",
+    title: "Product Engineer & Architect",
     greeting: "Hi, I'm Zain",
     description: "I build high-performance web platforms and mobile applications using React, Next.js, Android (Kotlin/Java) and Flutter. With a passion for clean architecture and pixel-perfect design, I transform ideas into scalable digital products that deliver real impact.",
     badge: "Available for new projects",
+    avatarUrl: "/Profile.webp",
     statApps: 50,
     statYears: 3,
     statSatisfaction: 100
@@ -114,7 +115,10 @@ const load = (key, fallback) => {
         return d ? JSON.parse(d) : fallback;
     } catch { return fallback; }
 };
-const save = (key, val) => localStorage.setItem(key, JSON.stringify(val));
+const save = (key, val) => {
+    localStorage.setItem(key, JSON.stringify(val));
+    window.dispatchEvent(new Event('portfolioDataUpdated'));
+};
 
 /* ═══════════════════════════════ COMPONENT ═══════════════════════════════ */
 const AdminPanel = () => {
@@ -475,6 +479,10 @@ const AdminPanel = () => {
                             <div className="form-group full-width">
                                 <label>Description</label>
                                 <textarea name="description" value={hero.description} onChange={handleHeroChange} rows="3" />
+                            </div>
+                            <div className="form-group full-width">
+                                <label>Profile / Avatar Image URL</label>
+                                <input name="avatarUrl" value={hero.avatarUrl || ''} onChange={handleHeroChange} placeholder="/Profile.webp or https://..." />
                             </div>
                             <div className="form-group">
                                 <label>Apps Built (stat number)</label>

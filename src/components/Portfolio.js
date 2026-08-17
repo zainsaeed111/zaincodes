@@ -1,14 +1,15 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import './Portfolio.css';
+import usePortfolioData from '../hooks/usePortfolioData';
 
-const Portfolio = ({ projects }) => {
+const Portfolio = () => {
+  const { portfolioProjects } = usePortfolioData();
   const [filter, setFilter] = useState('all');
-  const [animateCards, setAnimateCards] = useState(false);
   const portfolioRef = useRef(null);
   const navigate = useNavigate();
 
-  const filteredProjects = projects.filter(project =>
+  const filteredProjects = (portfolioProjects || []).filter(project =>
     filter === 'all' || project.category === filter
   );
 
@@ -18,7 +19,6 @@ const Portfolio = ({ projects }) => {
         entries.forEach((entry) => {
           if (entry.isIntersecting) {
             entry.target.classList.add('animate');
-            setAnimateCards(true);
           }
         });
       },
@@ -29,29 +29,24 @@ const Portfolio = ({ projects }) => {
     return () => observer.disconnect();
   }, []);
 
-  useEffect(() => {
-    setAnimateCards(false);
-    requestAnimationFrame(() => setAnimateCards(true));
-  }, [filter]);
-
   const handleProjectClick = (project) => {
     navigate(`/portfolio/${project.slug}`);
   };
 
   const filters = [
-    { id: 'all', label: 'All' },
-    { id: 'web', label: 'Web' },
-    { id: 'android', label: 'Android' },
-    { id: 'flutter', label: 'Flutter' }
+    { id: 'all', label: 'All Products' },
+    { id: 'web', label: 'Web Applications' },
+    { id: 'android', label: 'Android Native' },
+    { id: 'flutter', label: 'Flutter Mobile' }
   ];
 
   return (
-    <section id="portfolio" className="portfolio section-standard" ref={portfolioRef}>
+    <section id="portfolio" className="portfolio-section" ref={portfolioRef}>
       <div className="container-narrow">
-        <div className="section-header animate-on-scroll">
-          <h2 className="section-title">Selected <span>Products</span></h2>
+        <div className="section-header">
+          <h2 className="section-title">Featured <span className="text-gradient">Products</span></h2>
           <p className="section-subtitle">
-            A selection of products engineered from architecture to launch.
+            A selection of production-ready products engineered from architecture to launch.
           </p>
         </div>
 
@@ -67,52 +62,48 @@ const Portfolio = ({ projects }) => {
           ))}
         </div>
 
-        <div className="portfolio-list">
-          {filteredProjects.map((project, index) => (
+        <div className="portfolio-grid">
+          {filteredProjects.map((project) => (
             <div
               key={project.id}
-              className={`portfolio-item ${animateCards ? 'animate' : ''}`}
-              style={{ '--delay': `${index * 0.1}s` }}
+              className="project-card glass-card"
               onClick={() => handleProjectClick(project)}
             >
-              <div className="portfolio-item-visual">
-                {project.category === 'web' ? (
-                  <div className="device-browser portfolio-browser">
-                    <div className="device-browser-header">
-                      <div className="device-browser-dot" />
-                      <div className="device-browser-dot" />
-                      <div className="device-browser-dot" />
-                    </div>
-                    <div className="device-browser-content">
-                      <img src={project.thumbnail} alt={project.title} loading="lazy" />
-                    </div>
-                  </div>
-                ) : (
-                  <div className="device-phone portfolio-phone">
-                    <div className="device-phone-notch" />
-                    <div className="device-phone-screen">
-                      <img src={project.thumbnail} alt={project.title} loading="lazy" />
-                    </div>
-                  </div>
-                )}
+              <div className="project-thumb-container">
+                <img
+                  src={project.thumbnail || project.image}
+                  alt={project.title}
+                  className="project-thumb-img"
+                  loading="lazy"
+                />
+                <div className="project-category-badge">{project.category}</div>
+                <div className="project-overlay-glow" />
               </div>
-              <div className="portfolio-item-content">
-                <div className="portfolio-item-category">
-                  {project.category === 'android' ? 'Android' : project.category === 'flutter' ? 'Flutter' : 'Web'}
-                </div>
-                <h3 className="portfolio-item-title">{project.title}</h3>
-                <p className="portfolio-item-description">{project.description}</p>
+
+              <div className="project-card-body">
+                <h3 className="project-card-title">{project.title}</h3>
+                <p className="project-card-desc">{project.description}</p>
+
                 {project.highlights && project.highlights.length > 0 && (
-                  <div className="portfolio-item-highlights">
+                  <div className="project-highlights">
                     {project.highlights.slice(0, 2).map((h, idx) => (
-                      <span key={idx} className="portfolio-highlight-badge">{h}</span>
+                      <span key={idx} className="highlight-tag">{h}</span>
                     ))}
                   </div>
                 )}
-                <div className="portfolio-item-tech">
-                  {project.technologies.slice(0, 4).map((tech, idx) => (
-                    <span key={idx} className="portfolio-tech-tag">{tech}</span>
+
+                <div className="project-tech-stack">
+                  {(project.technologies || []).slice(0, 4).map((tech, idx) => (
+                    <span key={idx} className="tech-badge">{tech}</span>
                   ))}
+                </div>
+
+                <div className="project-view-link">
+                  <span>View Technical Case Study</span>
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                    <line x1="5" y1="12" x2="19" y2="12"></line>
+                    <polyline points="12 5 19 12 12 19"></polyline>
+                  </svg>
                 </div>
               </div>
             </div>

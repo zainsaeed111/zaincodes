@@ -1,223 +1,225 @@
-.about {
+.about-section {
   position: relative;
-  background: var(--bg-elevated);
-  overflow: visible;
+  padding: var(--section-padding) 0;
+  background: var(--bg-base);
+  z-index: 1;
 }
 
-.about::before {
-  content: '';
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  height: 1px;
-  background: linear-gradient(90deg, transparent, var(--border-default), transparent);
+.container-narrow {
+  width: 100%;
+  max-width: var(--container-narrow);
+  margin: 0 auto;
+  padding: 0 1.5rem;
 }
 
-/* ── Intro ── */
-.about-intro {
-  margin-bottom: 5rem;
+.section-header {
+  text-align: center;
+  margin-bottom: 3.5rem;
 }
 
-.about-intro h3 {
-  font-family: var(--font-display);
-  font-size: clamp(1.25rem, 1.8vw, 1.5rem);
-  font-weight: 700;
-  letter-spacing: -0.01em;
-  color: var(--text-primary);
+.section-title {
+  margin-bottom: 0.75rem;
+}
+
+.section-subtitle {
+  font-size: 1.05rem;
+  color: var(--text-tertiary);
+  max-width: 600px;
+  margin: 0 auto;
+}
+
+/* ── Intro Card ── */
+.about-intro-card {
+  padding: 2.5rem;
+  margin-bottom: 2.5rem;
+  position: relative;
+  overflow: hidden;
+}
+
+.intro-badge {
+  display: inline-block;
+  font-family: var(--font-mono);
+  font-size: 0.75rem;
+  color: var(--accent-cyan);
+  background: rgba(6, 182, 212, 0.1);
+  padding: 0.25rem 0.75rem;
+  border-radius: var(--radius-sm);
+  margin-bottom: 1rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.about-intro-card h3 {
+  font-size: 1.5rem;
   margin-bottom: 1rem;
 }
 
-.about-intro p {
-  font-size: 1.0625rem;
-  color: var(--text-secondary);
+.about-intro-card p {
+  font-size: 1.02rem;
   line-height: 1.75;
-  max-width: 720px;
+  color: var(--text-secondary);
 }
 
-/* ── Principles ── */
-.about-principles {
+.about-tech-pills {
   display: flex;
-  flex-direction: column;
-  gap: 3rem;
-  margin-bottom: 5rem;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+  margin-top: 1.5rem;
+  padding-top: 1.25rem;
+  border-top: 1px solid var(--border-subtle);
 }
 
-.about-principle {
-  display: grid;
-  grid-template-columns: 60px 1fr;
-  gap: 1.5rem;
-  align-items: start;
-  padding-bottom: 2.5rem;
-  border-bottom: 1px solid var(--border-subtle);
-}
-
-.about-principle:last-child {
-  border-bottom: none;
-  padding-bottom: 0;
-}
-
-.about-principle-num {
-  font-family: var(--font-display);
-  font-size: 1rem;
-  font-weight: 700;
-  color: var(--text-tertiary);
-  letter-spacing: -0.01em;
-}
-
-.about-principle-content h4 {
-  font-family: var(--font-display);
-  font-size: 1.25rem;
-  font-weight: 700;
-  letter-spacing: -0.01em;
+.tech-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.4rem 0.85rem;
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-full);
+  font-size: 0.85rem;
   color: var(--text-primary);
+  transition: all 0.2s ease;
+}
+
+.tech-pill:hover {
+  border-color: var(--pill-color);
+  box-shadow: 0 0 15px var(--pill-color);
+  transform: translateY(-2px);
+}
+
+/* ── Principles Grid ── */
+.about-principles-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 1.5rem;
+  margin-bottom: 2.5rem;
+}
+
+.principle-card {
+  padding: 2rem;
+  display: flex;
+  gap: 1.25rem;
+  align-items: flex-start;
+}
+
+.principle-num {
+  font-family: var(--font-display);
+  font-size: 2rem;
+  font-weight: 800;
+  line-height: 1;
+}
+
+.principle-content h4 {
+  font-size: 1.15rem;
   margin-bottom: 0.5rem;
 }
 
-.about-principle-content p {
-  font-size: 1rem;
-  color: var(--text-secondary);
-  line-height: 1.75;
-  margin: 0;
-  max-width: 640px;
-}
-
-/* ── Process ── */
-.about-process {
-  margin-bottom: 5rem;
-}
-
-.about-process-title {
-  font-family: var(--font-display);
-  font-size: 0.8125rem;
-  font-weight: 600;
-  letter-spacing: 0.06em;
-  text-transform: uppercase;
+.principle-content p {
+  font-size: 0.92rem;
   color: var(--text-tertiary);
+  line-height: 1.6;
+}
+
+/* ── Process Track ── */
+.about-process-container {
+  padding: 2.25rem;
+  margin-bottom: 2.5rem;
+}
+
+.process-header-title {
+  font-size: 1.2rem;
   margin-bottom: 1.5rem;
+  text-align: center;
 }
 
 .about-process-track {
   display: grid;
   grid-template-columns: repeat(4, 1fr);
-  gap: 1.5rem;
-  perspective: 1200px;
-  transform-style: preserve-3d;
+  gap: 1.25rem;
 }
 
-.about-process-step {
+.process-step-item {
   display: flex;
   flex-direction: column;
-  gap: 0.35rem;
-  padding: 1.25rem;
-  background: var(--bg-surface);
-  border: 1px solid var(--border-subtle);
-  border-radius: var(--radius-md);
-  transition: all var(--duration-normal) var(--ease-out);
-  transform-style: preserve-3d;
-  transform: translateZ(0);
+  align-items: center;
+  text-align: center;
+  gap: 0.5rem;
+  position: relative;
 }
 
-.about-process-step:hover {
-  border-color: var(--border-hover);
-  transform: translateY(-4px) translateZ(10px);
-  box-shadow: var(--shadow-2);
-}
-
-.about-process-name {
-  font-family: var(--font-display);
-  font-size: 1rem;
+.step-badge {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  background: var(--gradient-cyber);
+  color: #fff;
   font-weight: 700;
+  font-size: 0.9rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: var(--glow-cyan);
+}
+
+.process-name {
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: 1rem;
   color: var(--text-primary);
-  letter-spacing: -0.01em;
 }
 
-.about-process-desc {
-  font-size: 0.875rem;
-  color: var(--text-secondary);
-  line-height: 1.6;
+.process-desc {
+  font-size: 0.8rem;
+  color: var(--text-tertiary);
+  line-height: 1.4;
 }
 
-/* ── Trust Stats ── */
-.about-trust {
+/* ── Trust Bar ── */
+.about-trust-bar {
   display: grid;
   grid-template-columns: repeat(4, 1fr);
-  gap: 1.5rem;
-  padding-top: 2.5rem;
-  border-top: 1px solid var(--border-subtle);
+  gap: 1.25rem;
 }
 
-.about-trust-item {
+.trust-card {
+  padding: 1.5rem;
   text-align: center;
+  display: flex;
+  flex-direction: column;
+  gap: 0.3rem;
 }
 
-.about-trust-number {
+.trust-number {
   font-family: var(--font-display);
-  font-size: clamp(1.5rem, 2vw, 2rem);
+  font-size: 1.6rem;
   font-weight: 800;
-  letter-spacing: -0.02em;
-  color: var(--text-primary);
-  line-height: 1;
-  margin-bottom: 0.5rem;
 }
 
-.about-trust-label {
-  font-size: 0.8125rem;
+.trust-label {
+  font-size: 0.75rem;
   color: var(--text-tertiary);
-  font-weight: 500;
-  letter-spacing: 0.02em;
   text-transform: uppercase;
-}
-
-/* ── Animation ── */
-.animate-on-scroll {
-  opacity: 0;
-  transform: translateY(24px);
-  transition: all 0.7s var(--ease-out);
-}
-
-.animate-on-scroll.visible {
-  opacity: 1;
-  transform: translateY(0);
+  letter-spacing: 0.05em;
+  font-weight: 600;
 }
 
 /* ── Responsive ── */
-@media (max-width: 768px) {
-  .about-principles {
-    gap: 2rem;
-  }
-
-  .about-principle {
-    grid-template-columns: 40px 1fr;
-    gap: 1rem;
-  }
-
+@media (max-width: 868px) {
   .about-process-track {
     grid-template-columns: repeat(2, 1fr);
-    gap: 1rem;
+    gap: 2rem;
   }
-
-  .about-trust {
+  .about-trust-bar {
     grid-template-columns: repeat(2, 1fr);
-    gap: 1.5rem;
   }
 }
 
-@media (max-width: 480px) {
-  .about-principle-content h4 {
-    font-size: 1.1rem;
-  }
-
+@media (max-width: 540px) {
   .about-process-track {
     grid-template-columns: 1fr;
   }
-
-  .about-trust {
-    grid-template-columns: repeat(2, 1fr);
-    gap: 1.25rem;
-  }
-
-  .about-trust-number {
-    font-size: 1.35rem;
+  .about-trust-bar {
+    grid-template-columns: 1fr;
   }
 }

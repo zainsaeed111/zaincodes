@@ -2,6 +2,7 @@ import React, { useState, useEffect, Suspense } from 'react';
 import { BrowserRouter as Router, Routes, Route, useLocation } from 'react-router-dom';
 import './App.css';
 import Navigation from './components/Navigation';
+import Background3D from './components/Background3D';
 import Hero from './components/Hero';
 import About from './components/About';
 import Portfolio from './components/Portfolio';
@@ -195,6 +196,7 @@ function App() {
   return (
     <Router>
       <div className="App">
+        <Background3D />
         <ScrollToTop />
         <Routes>
           {/* Admin Route - No Navigation/Footer */}
