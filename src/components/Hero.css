@@ -405,9 +405,9 @@
     height: 320px;
   }
 
-  .badge-top-right { right: 0; }
-  .badge-bottom-left { left: 0; }
-  .badge-bottom-right { right: 0; }
+  .badge-top-right { right: -10px; top: 10px; }
+  .badge-bottom-left { left: -10px; bottom: 20px; }
+  .badge-bottom-right { right: -10px; bottom: -10px; }
 }
 
 @media (max-width: 600px) {
@@ -452,6 +452,11 @@
   .cyber-ring-inner { width: 260px; height: 260px; }
 
   .floating-badge {
-    padding: 0.5rem 0.75rem;
+    padding: 0.4rem 0.65rem;
+    font-size: 0.75rem;
   }
+
+  .badge-top-right { right: 5px; top: 0; }
+  .badge-bottom-left { left: 5px; bottom: 10px; }
+  .badge-bottom-right { display: none; }
 }
