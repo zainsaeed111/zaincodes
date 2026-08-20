@@ -18,8 +18,9 @@ export const pushToGitHub = async (newData) => {
         throw new Error('GitHub Token not found. Please add it in Admin Settings.');
     }
 
-    const cleanToken = rawToken.trim().replace(/^['"]|['"]$/g, '');
-    const authHeader = cleanToken.startsWith('github_pat_') || cleanToken.startsWith('ghp_') 
+    let cleanToken = rawToken.trim().replace(/^['"]|['"]$/g, '');
+    cleanToken = cleanToken.replace(/^(token|bearer)\s+/i, '');
+    const authHeader = cleanToken.startsWith('github_pat_') 
         ? `Bearer ${cleanToken}` 
         : `token ${cleanToken}`;
 
