@@ -73,6 +73,8 @@ const ProjectDetail = ({ projects }) => {
         .filter(p => p.category === project.category && p.id !== project.id)
         .slice(0, 2);
 
+    const isValidLink = (link) => link && typeof link === 'string' && link.trim() !== '' && link.trim() !== '#';
+
     return (
         <div className={`project-detail ${isVisible ? 'visible' : ''}`}>
             {/* Hero Section */}
@@ -90,14 +92,14 @@ const ProjectDetail = ({ projects }) => {
                     </Link>
                     <div className="project-meta">
                         <span className="project-category-badge">
-                            {project.category === 'android' ? 'Android' : project.category === 'flutter' ? 'Flutter' : 'Web'}
+                            {project.category === 'android' ? 'Android Native' : project.category === 'flutter' ? 'Flutter Mobile' : 'Web Platform'}
                         </span>
                     </div>
                     <h1 className="project-title">{project.title}</h1>
                     <p className="project-tagline">{project.description}</p>
 
                     <div className="project-actions">
-                        {project.liveLink && project.liveLink !== '#' && (
+                        {isValidLink(project.liveLink) && (
                             <a href={project.liveLink} className="btn-primary" target="_blank" rel="noopener noreferrer">
                                 <span>{project.category === 'web' ? 'View Live Demo' : 'View Application'}</span>
                                 <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
@@ -105,7 +107,7 @@ const ProjectDetail = ({ projects }) => {
                                 </svg>
                             </a>
                         )}
-                        {project.category !== 'web' && project.playStoreLink && project.playStoreLink !== '#' && (
+                        {project.category !== 'web' && isValidLink(project.playStoreLink) && (
                             <a href={project.playStoreLink} className="btn-primary" target="_blank" rel="noopener noreferrer">
                                 <span>View on Play Store</span>
                                 <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
@@ -113,7 +115,7 @@ const ProjectDetail = ({ projects }) => {
                                 </svg>
                             </a>
                         )}
-                        {project.githubLink && project.githubLink !== '#' && (
+                        {isValidLink(project.githubLink) && (
                             <a href={project.githubLink} className="btn-secondary" target="_blank" rel="noopener noreferrer">
                                 <span>View Source Code</span>
                             </a>

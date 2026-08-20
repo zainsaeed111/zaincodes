@@ -347,9 +347,9 @@ const AdminPanel = () => {
             technologies: formData.technologies.split(',').map(t => t.trim()).filter(Boolean),
             features: formData.features.split(',').map(f => f.trim()).filter(Boolean),
             highlights: formData.highlights.split(',').map(h => h.trim()).filter(Boolean),
-            playStoreLink: formData.playStoreLink || '#',
-            githubLink: formData.githubLink || '#',
-            liveLink: formData.liveLink || '#'
+            playStoreLink: formData.playStoreLink ? formData.playStoreLink.trim() : '',
+            githubLink: formData.githubLink ? formData.githubLink.trim() : '',
+            liveLink: formData.liveLink ? formData.liveLink.trim() : ''
         };
         const updated = editingProject ? projects.map(p => p.id === editingProject.id ? d : p) : [...projects, d];
         setProjects(updated); save('portfolioProjects', updated);
