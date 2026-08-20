@@ -169,28 +169,27 @@ const AdminPanel = () => {
         setTheme(newTheme);
         localStorage.setItem('siteTheme', newTheme);
         document.documentElement.className = newTheme === 'light' ? 'light-theme' : '';
-        saveTheme('siteTheme', newTheme);
         showToast(`Appearance updated to ${newTheme} mode!`);
         triggerGlobalSync();
     };
 
-    const triggerGlobalSync = async () => {
+    const triggerGlobalSync = async (overrides = {}) => {
         if (!githubToken) return;
 
         setIsSyncing(true);
         try {
             const fullData = {
-                heroData: hero,
-                aboutData: about,
-                skillsData: skills,
-                contactData: contact,
-                socialLinks: social,
-                portfolioProjects: projects,
-                resumeLink: resumeLink,
-                siteTheme: theme
+                heroData: overrides.heroData || hero,
+                aboutData: overrides.aboutData || about,
+                skillsData: overrides.skillsData || skills,
+                contactData: overrides.contactData || contact,
+                socialLinks: overrides.socialLinks || social,
+                portfolioProjects: overrides.portfolioProjects || projects,
+                resumeLink: overrides.resumeLink !== undefined ? overrides.resumeLink : resumeLink,
+                siteTheme: overrides.siteTheme || theme
             };
             await pushToGitHub(fullData);
-            showToast('Changes synced globally! Vercel is redeploying.');
+            showToast('Changes synced globally to GitHub! Vercel is redeploying.');
         } catch (err) {
             showToast('Sync failed: ' + err.message);
         } finally {
@@ -232,23 +231,31 @@ const AdminPanel = () => {
         const { name, value } = e.target;
         setHero(prev => ({ ...prev, [name]: name.startsWith('stat') ? Number(value) : value }));
     };
-    const saveHero = () => { save('heroData', hero); showToast('Hero section saved!'); triggerGlobalSync(); };
+    const saveHero = () => { save('heroData', hero); showToast('Hero section saved!'); triggerGlobalSync({ heroData: hero }); };
 
     /* ── About ── */
     const handleAboutChange = (e) => {
         const { name, value } = e.target;
         setAbout(prev => ({ ...prev, [name]: value }));
     };
-    const saveAbout = () => { save('aboutData', about); showToast('About section saved!'); triggerGlobalSync(); };
+    const saveAbout = () => { save('aboutData', about); showToast('About section saved!'); triggerGlobalSync({ aboutData: about }); };
     const addTech = () => {
         const name = prompt('Tech name (e.g. React)');
         if (!name) return;
         const icon = prompt('Emoji icon', '🔧');
         const color = prompt('Hex color', '#61DAFB');
-        setAbout(prev => ({ ...prev, techStack: [...prev.techStack, { name, icon, color }] }));
+        const updatedTech = [...about.techStack, { name, icon, color }];
+        const updatedAbout = { ...about, techStack: updatedTech };
+        setAbout(updatedAbout);
+        save('aboutData', updatedAbout);
+        triggerGlobalSync({ aboutData: updatedAbout });
     };
     const removeTech = (idx) => {
-        setAbout(prev => ({ ...prev, techStack: prev.techStack.filter((_, i) => i !== idx) }));
+        const updatedTech = about.techStack.filter((_, i) => i !== idx);
+        const updatedAbout = { ...about, techStack: updatedTech };
+        setAbout(updatedAbout);
+        save('aboutData', updatedAbout);
+        triggerGlobalSync({ aboutData: updatedAbout });
     };
 
     /* ── Contact ── */
@@ -256,7 +263,7 @@ const AdminPanel = () => {
         const { name, value } = e.target;
         setContact(prev => ({ ...prev, [name]: value }));
     };
-    const saveContact = () => { save('contactData', contact); showToast('Contact info saved!'); triggerGlobalSync(); };
+    const saveContact = () => { save('contactData', contact); showToast('Contact info saved!'); triggerGlobalSync({ contactData: contact }); };
 
     /* ── Social ── */
     const openSocialEditor = (idx) => {
@@ -275,7 +282,7 @@ const AdminPanel = () => {
         save('socialData', updated);
         setEditingSocial(null);
         showToast('Social link saved!');
-        triggerGlobalSync();
+        triggerGlobalSync({ socialLinks: updated });
     };
     const deleteSocialItem = (idx) => {
         if (!window.confirm('Remove this social link?')) return;
@@ -283,7 +290,7 @@ const AdminPanel = () => {
         setSocial(updated);
         save('socialData', updated);
         showToast('Social link removed');
-        triggerGlobalSync();
+        triggerGlobalSync({ socialLinks: updated });
     };
 
     /* ── Skills ── */
@@ -312,7 +319,7 @@ const AdminPanel = () => {
         save('skillsData', updated);
         setEditingSkillCat(null);
         showToast('Skill category saved!');
-        triggerGlobalSync();
+        triggerGlobalSync({ skillsData: updated });
     };
     const deleteSkillCategory = (idx) => {
         if (!window.confirm('Delete this skill category?')) return;
@@ -320,7 +327,7 @@ const AdminPanel = () => {
         setSkills(updated);
         save('skillsData', updated);
         showToast('Category deleted');
-        triggerGlobalSync();
+        triggerGlobalSync({ skillsData: updated });
     };
 
     /* ── Projects (existing logic preserved) ── */
@@ -347,7 +354,7 @@ const AdminPanel = () => {
         const updated = editingProject ? projects.map(p => p.id === editingProject.id ? d : p) : [...projects, d];
         setProjects(updated); save('portfolioProjects', updated);
         resetForm(); showToast(editingProject ? 'Project updated!' : 'Project added!');
-        triggerGlobalSync();
+        triggerGlobalSync({ portfolioProjects: updated });
     };
     const resetForm = () => {
         setFormData({
@@ -373,7 +380,7 @@ const AdminPanel = () => {
         if (!window.confirm('Delete this project?')) return;
         const updated = projects.filter(p => p.id !== id);
         setProjects(updated); save('portfolioProjects', updated);
-        triggerGlobalSync();
+        triggerGlobalSync({ portfolioProjects: updated });
     };
 
     /* ── Resume ── */

@@ -48,7 +48,7 @@ export const pushToGitHub = async (newData) => {
                 message: 'Update portfolio data via Admin Panel',
                 content: content,
                 sha: sha,
-                branch: 'main' // Ensure we target the production branch
+                branch: 'master' // Target the production branch
             })
         });
 
@@ -70,7 +70,7 @@ export const pushToGitHub = async (newData) => {
  */
 export const fetchLatestGitHubData = async () => {
     try {
-        const response = await fetch(`https://raw.githubusercontent.com/${GITHUB_REPO}/main/${DATA_PATH}`);
+        const response = await fetch(`https://raw.githubusercontent.com/${GITHUB_REPO}/master/${DATA_PATH}?t=${Date.now()}`);
         if (!response.ok) return null;
         return await response.json();
     } catch (error) {
