@@ -1,46 +1,37 @@
 import { useState, useEffect, useCallback } from 'react';
 import portfolioData from '../data/portfolioData.json';
 
-const defaultHero = portfolioData.heroData || {
-  title: "Product Engineer & Architect",
-  greeting: "Hi, I'm Zain",
-  description: "Engineering high-performance mobile products and web platforms from architecture to app store launch.",
-  badge: "Available for new projects",
-  avatarUrl: "/Profile.webp",
-  statApps: 50,
-  statYears: 3,
-  statSatisfaction: 100
-};
-
-const defaultAbout = portfolioData.aboutData || {
-  subtitle: "Passionate about building exceptional web & mobile experiences",
-  introTitle: "Zain Saeed — Mobile & Full-Stack Product Engineer",
-  introText: "Specialising in native Android (Kotlin/Jetpack Compose), Flutter cross-platform applications, and React web platforms.",
-  techStack: [
-    { name: "React", icon: "⚛️", color: "#61DAFB" },
-    { name: "Next.js", icon: "▶️", color: "#ffffff" },
-    { name: "Android", icon: "🤖", color: "#3DDC84" },
-    { name: "Flutter", icon: "💙", color: "#02569B" },
-    { name: "Node.js", icon: "🟢", color: "#339933" },
-    { name: "Firebase", icon: "🔥", color: "#FFCA28" },
-    { name: "TypeScript", icon: "📝", color: "#3178C6" },
-    { name: "UI/UX", icon: "🎨", color: "#FF6B6B" }
-  ]
-};
-
-const defaultSkills = portfolioData.skillsData || [];
-const defaultContact = portfolioData.contactData || {
-  email: "zain@zaincodes.dev",
-  phone: "+1 (555) 123-4567",
-  location: "San Francisco, CA"
-};
-const defaultSocial = portfolioData.socialLinks || [];
-const defaultProjects = portfolioData.portfolioProjects || [];
+const defaultHero = portfolioData.heroData;
+const defaultAbout = portfolioData.aboutData;
+const defaultSkills = portfolioData.skillsData;
+const defaultContact = portfolioData.contactData;
+const defaultSocial = portfolioData.socialLinks;
+const defaultProjects = portfolioData.portfolioProjects;
 
 const getItem = (key, fallback) => {
   try {
     const d = localStorage.getItem(key);
-    return d ? JSON.parse(d) : fallback;
+    if (!d) return fallback;
+    const parsed = JSON.parse(d);
+    
+    // Auto-update localStorage if cached data is stale compared to latest resume data
+    if (key === 'contactData' && parsed.email !== fallback.email) {
+      localStorage.setItem(key, JSON.stringify(fallback));
+      return fallback;
+    }
+    if (key === 'portfolioProjects' && parsed.length !== fallback.length) {
+      localStorage.setItem(key, JSON.stringify(fallback));
+      return fallback;
+    }
+    if (key === 'aboutData' && parsed.email !== fallback.email) {
+      localStorage.setItem(key, JSON.stringify(fallback));
+      return fallback;
+    }
+    if (key === 'heroData' && parsed.greeting !== fallback.greeting) {
+      localStorage.setItem(key, JSON.stringify(fallback));
+      return fallback;
+    }
+    return parsed;
   } catch {
     return fallback;
   }
@@ -70,7 +61,7 @@ export const usePortfolioData = () => {
   useEffect(() => {
     refreshData();
 
-    const handleStorageChange = (e) => {
+    const handleStorageChange = () => {
       refreshData();
     };
 
@@ -106,3 +97,4 @@ export const usePortfolioData = () => {
 };
 
 export default usePortfolioData;
+

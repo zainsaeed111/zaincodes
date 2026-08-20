@@ -14,9 +14,9 @@ const Contact = () => {
   const [submitStatus, setSubmitStatus] = useState(null);
   const contactRef = useRef(null);
 
-  const email = contactData?.email || 'zain@zaincodes.dev';
-  const phone = contactData?.phone || '+1 (555) 123-4567';
-  const location = contactData?.location || 'San Francisco, CA';
+  const email = contactData?.email || 'iamzainofficial4211@gmail.com';
+  const phone = contactData?.phone || '+92-304-9057852';
+  const location = contactData?.location || 'Lahore, Pakistan';
 
   const handleChange = (e) => {
     setFormData({
