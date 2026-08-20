@@ -1,471 +1,508 @@
 {
-    "heroData": {
-        "title": "Mobile Application & Full-Stack Developer",
-        "greeting": "Hi, I'm Zain Saeed",
-        "description": "Mobile Application Developer with 3+ years of experience building native Android (Kotlin/Java) and cross-platform Flutter (Dart) applications using MVVM and Clean Architecture. Experienced in shipping production Play Store apps & full-stack web platforms.",
-        "badge": "Available for new projects",
-        "statApps": 15,
-        "statYears": 3,
-        "statSatisfaction": 100
-    },
-    "aboutData": {
-        "subtitle": "Mobile Application Developer — Android & Flutter",
-        "introTitle": "Zain Saeed — Mobile & Full-Stack Engineer",
-        "introText": "Mobile Application Developer with 3+ years of experience building native Android (Kotlin/Java) and cross-platform Flutter (Dart) applications using MVVM and Clean Architecture. Track record of shipping production, Play Store–published apps across EdTech, FinTech, HealthTech, E-commerce, and Hospitality, alongside confidential client projects. Strong background in REST API integration, Firebase services, and state management.",
-        "location": "Lahore, Pakistan",
-        "email": "iamzainofficial4211@gmail.com",
-        "phone": "+92-304-9057852",
-        "company": "Kodex Technologies, Lahore, Pakistan",
-        "experience": "Sep 2022 – Present (3+ Years)",
-        "education": "BS Computer Science — Superior University Gold Campus, Lahore (2019 – 2023)",
-        "techStack": [
-            { "name": "Android (Kotlin)", "icon": "🤖", "color": "#3DDC84" },
-            { "name": "Flutter & Dart", "icon": "💙", "color": "#02569B" },
-            { "name": "Java Spring Boot", "icon": "⚡", "color": "#6DB33F" },
-            { "name": "Java (Android)", "icon": "☕", "color": "#F57C00" },
-            { "name": "Node.js", "icon": "🟢", "color": "#339933" },
-            { "name": "Next.js & React", "icon": "⚛️", "color": "#61DAFB" },
-            { "name": "Firebase", "icon": "🔥", "color": "#FFCA28" },
-            { "name": "REST APIs", "icon": "🌐", "color": "#FF6B6B" }
-        ]
-    },
-    "skillsData": [
+  "heroData": {
+    "title": "Mobile Application & Full-Stack Developer",
+    "greeting": "Hi, I'm Zain Saeed",
+    "description": "Mobile Application Developer with 3+ years of experience building native Android (Kotlin/Java) and cross-platform Flutter (Dart) applications using MVVM and Clean Architecture. Experienced in shipping production Play Store apps & full-stack web platforms.",
+    "badge": "Available for new projects",
+    "statApps": 15,
+    "statYears": 3,
+    "statSatisfaction": 100
+  },
+  "aboutData": {
+    "subtitle": "Mobile Application Developer — Android & Flutter",
+    "introTitle": "Zain Saeed — Mobile & Full-Stack Engineer",
+    "introText": "Mobile Application Developer with 3+ years of experience building native Android (Kotlin/Java) and cross-platform Flutter (Dart) applications using MVVM and Clean Architecture. Track record of shipping production, Play Store–published apps across EdTech, FinTech, HealthTech, E-commerce, and Hospitality, alongside confidential client projects. Strong background in REST API integration, Firebase services, and state management.",
+    "location": "Lahore, Pakistan",
+    "email": "iamzainofficial4211@gmail.com",
+    "phone": "+92-304-9057852",
+    "company": "Kodex Technologies, Lahore, Pakistan",
+    "experience": "Sep 2022 – Present (3+ Years)",
+    "education": "BS Computer Science — Superior University Gold Campus, Lahore (2019 – 2023)",
+    "techStack": [
+      {
+        "name": "Android (Kotlin)",
+        "icon": "🤖",
+        "color": "#3DDC84"
+      },
+      {
+        "name": "Flutter & Dart",
+        "icon": "💙",
+        "color": "#02569B"
+      },
+      {
+        "name": "Java Spring Boot",
+        "icon": "⚡",
+        "color": "#6DB33F"
+      },
+      {
+        "name": "Java (Android)",
+        "icon": "☕",
+        "color": "#F57C00"
+      },
+      {
+        "name": "Node.js",
+        "icon": "🟢",
+        "color": "#339933"
+      },
+      {
+        "name": "Next.js & React",
+        "icon": "⚛️",
+        "color": "#61DAFB"
+      },
+      {
+        "name": "Firebase",
+        "icon": "🔥",
+        "color": "#FFCA28"
+      },
+      {
+        "name": "REST APIs",
+        "icon": "🌐",
+        "color": "#FF6B6B"
+      }
+    ]
+  },
+  "skillsData": [
+    {
+      "title": "Mobile Development",
+      "icon": "📱",
+      "category": "mobile",
+      "skills": [
         {
-            "title": "Mobile Development",
-            "icon": "📱",
-            "category": "mobile",
-            "skills": [
-                {
-                    "name": "Android (Kotlin)",
-                    "level": 96,
-                    "color": "#3DDC84",
-                    "isMajor": true,
-                    "desc": "Native Android development with MVVM, Coroutines, Jetpack Compose, and Room DB."
-                },
-                {
-                    "name": "Flutter & Dart",
-                    "level": 92,
-                    "color": "#02569B",
-                    "isMajor": true,
-                    "desc": "Cross-platform mobile apps with BLoC state management and native integration."
-                },
-                {
-                    "name": "Android (Java)",
-                    "level": 90,
-                    "color": "#F57C00",
-                    "isMajor": false,
-                    "desc": "Legacy Android codebase maintenance, Java NDK & custom service integrations."
-                }
-            ]
+          "name": "Android (Kotlin)",
+          "level": 96,
+          "color": "#3DDC84",
+          "isMajor": true,
+          "desc": "Native Android development with MVVM, Coroutines, Jetpack Compose, and Room DB."
         },
         {
-            "title": "Backend Engineering",
-            "icon": "⚡",
-            "category": "backend",
-            "skills": [
-                {
-                    "name": "Java Spring Boot",
-                    "level": 90,
-                    "color": "#6DB33F",
-                    "isMajor": true,
-                    "desc": "Enterprise REST APIs, Spring Security, JPA/Hibernate, Microservices & PostgreSQL."
-                },
-                {
-                    "name": "Node.js / Express",
-                    "level": 85,
-                    "color": "#339933",
-                    "isMajor": false,
-                    "desc": "Scalable JavaScript runtime services and WebSocket communication."
-                },
-                {
-                    "name": "Firebase & REST APIs",
-                    "level": 92,
-                    "color": "#FFA000",
-                    "isMajor": false,
-                    "desc": "Firestore, Cloud Functions, Authentication, and push notification services."
-                }
-            ]
+          "name": "Flutter & Dart",
+          "level": 92,
+          "color": "#02569B",
+          "isMajor": true,
+          "desc": "Cross-platform mobile apps with BLoC state management and native integration."
         },
         {
-            "title": "Web Platforms",
-            "icon": "🌐",
-            "category": "web",
-            "skills": [
-                {
-                    "name": "React & Next.js",
-                    "level": 88,
-                    "color": "#61DAFB",
-                    "isMajor": false,
-                    "desc": "Modern SSR/SSG web interfaces, custom hooks, and dynamic state engines."
-                },
-                {
-                    "name": "WordPress",
-                    "level": 82,
-                    "color": "#21759B",
-                    "isMajor": false,
-                    "desc": "Custom theme customization, CMS management, and site optimization."
-                },
-                {
-                    "name": "HTML5 / CSS3 / JS",
-                    "level": 94,
-                    "color": "#E34F26",
-                    "isMajor": false,
-                    "desc": "Semantic web design, modern responsive layouts, and CSS animations."
-                }
-            ]
-        },
-        {
-            "title": "Developer Tools & AI",
-            "icon": "🛠️",
-            "category": "tools",
-            "skills": [
-                {
-                    "name": "VS Code & Cursor AI",
-                    "level": 95,
-                    "color": "#007ACC",
-                    "isMajor": false,
-                    "desc": "Accelerated AI-assisted workflow, custom tooling, and multi-file refactoring."
-                },
-                {
-                    "name": "Git & GitHub",
-                    "level": 92,
-                    "color": "#F05032",
-                    "isMajor": false,
-                    "desc": "Version control, feature branching, pull request code reviews, and actions."
-                },
-                {
-                    "name": "Android Studio & Gradle",
-                    "level": 94,
-                    "color": "#3DDC84",
-                    "isMajor": false,
-                    "desc": "APK/AAB profiling, Gradle build scripts, and device emulator diagnostics."
-                }
-            ]
+          "name": "Android (Java)",
+          "level": 90,
+          "color": "#F57C00",
+          "isMajor": false,
+          "desc": "Legacy Android codebase maintenance, Java NDK & custom service integrations."
         }
-    ],
-    "contactData": {
-        "email": "iamzainofficial4211@gmail.com",
-        "phone": "+92-304-9057852",
-        "location": "Lahore, Pakistan"
+      ]
     },
-    "socialLinks": [
+    {
+      "title": "Backend Engineering",
+      "icon": "⚡",
+      "category": "backend",
+      "skills": [
         {
-            "name": "GitHub",
-            "icon": "🐙",
-            "url": "https://github.com/zaincodes"
+          "name": "Java Spring Boot",
+          "level": 90,
+          "color": "#6DB33F",
+          "isMajor": true,
+          "desc": "Enterprise REST APIs, Spring Security, JPA/Hibernate, Microservices & PostgreSQL."
         },
         {
-            "name": "LinkedIn",
-            "icon": "💼",
-            "url": "https://linkedin.com/in/zaincodes"
+          "name": "Node.js / Express",
+          "level": 85,
+          "color": "#339933",
+          "isMajor": false,
+          "desc": "Scalable JavaScript runtime services and WebSocket communication."
         },
         {
-            "name": "Email",
-            "icon": "✉️",
-            "url": "mailto:iamzainofficial4211@gmail.com"
+          "name": "Firebase & REST APIs",
+          "level": 92,
+          "color": "#FFA000",
+          "isMajor": false,
+          "desc": "Firestore, Cloud Functions, Authentication, and push notification services."
         }
-    ],
-    "portfolioProjects": [
+      ]
+    },
+    {
+      "title": "Web Platforms",
+      "icon": "🌐",
+      "category": "web",
+      "skills": [
         {
-            "id": 1,
-            "slug": "campus-insight-ii-skans",
-            "title": "Campus Insight II — Skans Institute",
-            "category": "android",
-            "image": "https://images.unsplash.com/photo-1523240795612-9a054b0db644?w=800&h=600&fit=crop",
-            "thumbnail": "https://images.unsplash.com/photo-1523240795612-9a054b0db644?w=400&h=300&fit=crop",
-            "description": "Google Play Store published educational application featuring role-based access, video streaming, and real-time push notifications.",
-            "longDescription": "Built a full-featured educational application enabling digital learning through role-based access, video streaming, and real-time push notifications for Skans Institute.",
-            "problem": "Students and faculty needed a seamless digital learning portal with secure access control, low-latency video streaming, and immediate push announcements for academic updates.",
-            "solution": "Spearheaded the development of Campus Insight II using native Kotlin and MVVM Architecture. Integrated Retrofit for REST APIs, Firebase for Auth and Realtime Database, and OneSignal for instant notification dispatch.",
-            "architecture": "Clean MVVM Architecture, Repository pattern, Retrofit network abstraction layer, OneSignal push listener services.",
-            "technologies": [
-                "Kotlin",
-                "Firebase",
-                "Retrofit",
-                "MVVM",
-                "OneSignal",
-                "Android SDK"
-            ],
-            "features": [
-                "Role-based Student & Faculty Access",
-                "High-definition Video Streaming",
-                "Real-time Push Notifications via OneSignal",
-                "Google Play Store Live (10,000+ Downloads)"
-            ],
-            "highlights": [
-                "10,000+ Active Google Play Installs",
-                "Sub-300ms Push Notification Latency",
-                "Clean Architecture & MVVM Separation"
-            ],
-            "screenshots": [
-                "https://images.unsplash.com/photo-1523240795612-9a054b0db644?w=800&h=600&fit=crop"
-            ],
-            "playStoreLink": "https://play.google.com/store",
-            "githubLink": "https://github.com/zaincodes",
-            "liveLink": "https://play.google.com/store"
+          "name": "React & Next.js",
+          "level": 88,
+          "color": "#61DAFB",
+          "isMajor": false,
+          "desc": "Modern SSR/SSG web interfaces, custom hooks, and dynamic state engines."
         },
         {
-            "id": 2,
-            "slug": "rabbet-paylink-fintech",
-            "title": "Rabbet (Paylink) — FinTech App",
-            "category": "android",
-            "image": "https://images.unsplash.com/photo-1559526324-4b87b5e36e44?w=800&h=600&fit=crop",
-            "thumbnail": "https://images.unsplash.com/photo-1559526324-4b87b5e36e44?w=400&h=300&fit=crop",
-            "description": "Secure payment application with OTP-based authentication and payment workflows for the Egyptian market.",
-            "longDescription": "Built core features of a secure payment application with OTP-based authentication and seamless transaction workflows for the Egyptian market.",
-            "problem": "Financial users in Egypt required a reliable mobile payment mechanism with rapid OTP authentication, zero transaction dropouts, and encrypted payload delivery.",
-            "solution": "Engineered native Android payment workflows in Kotlin with Retrofit REST APIs and Firebase verification. Optimized payload encryption and network state management to guarantee financial transaction integrity.",
-            "architecture": "MVVM Architecture, Security Encryption Layer, Retrofit Interceptors, Firebase Authentication.",
-            "technologies": [
-                "Kotlin",
-                "Firebase",
-                "Retrofit",
-                "REST APIs",
-                "Android SDK"
-            ],
-            "features": [
-                "OTP-based Secure Authentication",
-                "Real-time Transaction Workflows",
-                "Bank & Gateway REST Integration",
-                "Google Play Live (1,000+ Downloads)"
-            ],
-            "highlights": [
-                "1,000+ Google Play Downloads",
-                "Zero Transaction Dropouts",
-                "Encrypted Payment Payload Layer"
-            ],
-            "screenshots": [
-                "https://images.unsplash.com/photo-1559526324-4b87b5e36e44?w=800&h=600&fit=crop"
-            ],
-            "playStoreLink": "https://play.google.com/store",
-            "githubLink": "https://github.com/zaincodes",
-            "liveLink": "https://play.google.com/store"
+          "name": "WordPress",
+          "level": 82,
+          "color": "#21759B",
+          "isMajor": false,
+          "desc": "Custom theme customization, CMS management, and site optimization."
         },
         {
-            "id": 3,
-            "slug": "parrotpal-ai-calorie-tracker",
-            "title": "ParrotPal — AI Calorie Tracking App",
-            "category": "android",
-            "image": "https://images.unsplash.com/photo-1498837167922-ddd27525d352?w=800&h=600&fit=crop",
-            "thumbnail": "https://images.unsplash.com/photo-1498837167922-ddd27525d352?w=400&h=300&fit=crop",
-            "description": "AI-powered health application for intelligent calorie tracking with QR barcode scanning and nutritional APIs.",
-            "longDescription": "Built an AI-powered health application for calorie tracking with QR code scanning and nutritional API integration.",
-            "problem": "Users needed an easy way to track dietary calories and scan meal barcodes without manually typing complex nutritional details.",
-            "solution": "Integrated Zxing barcode scanner with MVVM Architecture and Navigation Component in Kotlin. Connected to nutritional REST APIs for real-time meal analysis and calorie tracking.",
-            "architecture": "MVVM Architecture, Navigation Component, Zxing Barcode SDK, Retrofit network layer.",
-            "technologies": [
-                "Kotlin",
-                "Retrofit",
-                "MVVM",
-                "Navigation Component",
-                "Zxing Barcode SDK"
-            ],
-            "features": [
-                "AI-assisted Calorie Breakdown",
-                "Instant QR & Barcode Scanning",
-                "Nutritional Goal Analytics",
-                "Offline Meal Log Caching"
-            ],
-            "highlights": [
-                "Instant Barcode Recognition",
-                "Seamless Navigation Graph",
-                "High-performance Nutritional Search"
-            ],
-            "screenshots": [
-                "https://images.unsplash.com/photo-1498837167922-ddd27525d352?w=800&h=600&fit=crop"
-            ],
-            "playStoreLink": "#",
-            "githubLink": "https://github.com/zaincodes",
-            "liveLink": "#"
-        },
-        {
-            "id": 4,
-            "slug": "forsa-multivendor-ecommerce",
-            "title": "Forsa — Multivendor E-commerce App",
-            "category": "android",
-            "image": "https://images.unsplash.com/photo-1472851294608-062f824d29cc?w=800&h=600&fit=crop",
-            "thumbnail": "https://images.unsplash.com/photo-1472851294608-062f824d29cc?w=400&h=300&fit=crop",
-            "description": "Full-featured e-commerce application for buyers and vendors with REST API integration and dynamic product management.",
-            "longDescription": "Built a full-featured e-commerce application for buyers and vendors with REST API integration and dynamic product management.",
-            "problem": "Multivendor platforms require smooth image rendering, fast product filter catalogs, vendor stores, and robust session persistence.",
-            "solution": "Developed in Kotlin/Java with Retrofit, dynamic RecyclerView adapters, Navigation Component, and local SharedPreferences caching.",
-            "architecture": "MVVM with Java/Kotlin interop, Dynamic Adapter pattern, Retrofit HTTP client.",
-            "technologies": [
-                "Kotlin",
-                "Java",
-                "Retrofit",
-                "RecyclerView",
-                "Navigation Component",
-                "SharedPreferences"
-            ],
-            "features": [
-                "Multivendor Store Portals",
-                "Dynamic Product Management",
-                "Cart & Checkout Workflows",
-                "Session & Preference Persistence"
-            ],
-            "highlights": [
-                "Smooth Dynamic RecyclerViews",
-                "Multivendor API Synchronization",
-                "Clean Modular Codebase"
-            ],
-            "screenshots": [
-                "https://images.unsplash.com/photo-1472851294608-062f824d29cc?w=800&h=600&fit=crop"
-            ],
-            "playStoreLink": "#",
-            "githubLink": "https://github.com/zaincodes",
-            "liveLink": "#"
-        },
-        {
-            "id": 5,
-            "slug": "baby-sos-childcare",
-            "title": "Baby SOS — Childcare App",
-            "category": "flutter",
-            "image": "https://images.unsplash.com/photo-1516627145497-ae6968895b74?w=800&h=600&fit=crop",
-            "thumbnail": "https://images.unsplash.com/photo-1516627145497-ae6968895b74?w=400&h=300&fit=crop",
-            "description": "Confidential client childcare application built from scratch using Flutter, GetX, MVVM, and Clean Architecture.",
-            "longDescription": "Built a childcare application from scratch using GetX, MVVM, and Clean Architecture with robust API integration and error handling.",
-            "problem": "Parents needed a secure, highly responsive mobile app for emergency alerts, childcare scheduling, and real-time status updates.",
-            "solution": "Architected a Flutter solution using GetX state management and Clean Architecture. Implemented robust REST API handlers with graceful offline fallbacks.",
-            "architecture": "Flutter Clean Architecture, GetX Reactive Controllers, Repositories, REST API Services.",
-            "technologies": [
-                "Flutter",
-                "Dart",
-                "GetX",
-                "REST APIs",
-                "Clean Architecture"
-            ],
-            "features": [
-                "Emergency SOS & Parent Alerts",
-                "Child Care Schedule Logging",
-                "Reactive GetX State Updates",
-                "Robust API Error Handling"
-            ],
-            "highlights": [
-                "Built 100% from scratch",
-                "60FPS Smooth Flutter UI",
-                "GetX Reactive Controllers"
-            ],
-            "screenshots": [
-                "https://images.unsplash.com/photo-1516627145497-ae6968895b74?w=800&h=600&fit=crop"
-            ],
-            "playStoreLink": "#",
-            "githubLink": "https://github.com/zaincodes",
-            "liveLink": "#"
-        },
-        {
-            "id": 6,
-            "slug": "jkl-therapy-medical",
-            "title": "JKL Therapy — Medical App",
-            "category": "flutter",
-            "image": "https://images.unsplash.com/photo-1576091160399-112ba8d25d1d?w=800&h=600&fit=crop",
-            "thumbnail": "https://images.unsplash.com/photo-1576091160399-112ba8d25d1d?w=400&h=300&fit=crop",
-            "description": "Medical therapy application featuring secure authentication, dashboard implementation, and API integration using Provider.",
-            "longDescription": "Built a medical therapy application featuring secure authentication, dashboard implementation, and API integration using Provider.",
-            "problem": "Therapy patients needed a clean, therapeutic UI dashboard to track session schedules, physician notes, and therapy progress.",
-            "solution": "Engineered in Flutter with Provider state management. Integrated secure Auth tokens and responsive patient metrics cards.",
-            "architecture": "Flutter Provider Pattern, Modular Screen Components, Secure Token Storage.",
-            "technologies": [
-                "Flutter",
-                "Dart",
-                "Provider",
-                "REST APIs",
-                "Secure Storage"
-            ],
-            "features": [
-                "Secure Patient Authentication",
-                "Interactive Therapy Dashboards",
-                "Session Scheduling & Reminders",
-                "Medical Record Summaries"
-            ],
-            "highlights": [
-                "Therapeutic UI Design System",
-                "Provider State Management",
-                "Encrypted Local Storage"
-            ],
-            "screenshots": [
-                "https://images.unsplash.com/photo-1576091160399-112ba8d25d1d?w=800&h=600&fit=crop"
-            ],
-            "playStoreLink": "#",
-            "githubLink": "https://github.com/zaincodes",
-            "liveLink": "#"
-        },
-        {
-            "id": 7,
-            "slug": "foxtinn-hotel-operations",
-            "title": "FoxtINN — Hotel Operations Platform",
-            "category": "web",
-            "image": "https://images.unsplash.com/photo-1566073771259-6a8506099945?w=800&h=600&fit=crop",
-            "thumbnail": "https://images.unsplash.com/photo-1566073771259-6a8506099945?w=400&h=300&fit=crop",
-            "description": "End-to-end full-stack hotel operations platform: Next.js (React) web app, Node.js backend, and Flutter mobile app with geofencing & tasks.",
-            "longDescription": "Built a full-stack hotel operations platform end-to-end — Next.js (React) web app, Node.js backend, and Flutter mobile app — covering scheduling, geofenced time clock, tasks, housekeeping, maintenance, and guest requests.",
-            "problem": "Hotels struggled with fragmented staff schedules, manual timekeeping, delayed housekeeping tasks, and untracked guest requests.",
-            "solution": "Built an integrated platform featuring Next.js web dashboard for managers, Node.js backend with Socket.io for live synchronization, and a Flutter mobile app with GPS geofenced time clock for staff.",
-            "architecture": "Full-Stack Microservices & Monorepo: Next.js Frontend, Node/Express Backend, Flutter Mobile App, Socket.io Realtime Layer.",
-            "technologies": [
-                "Next.js",
-                "React",
-                "Node.js",
-                "Flutter",
-                "REST APIs",
-                "Socket Integration",
-                "GPS Geofencing"
-            ],
-            "features": [
-                "Geofenced Mobile Staff Time Clock",
-                "Live Housekeeping & Task Sync",
-                "Guest Request Ticket Engine",
-                "Live Manager Web Dashboard (foxtinn.com)"
-            ],
-            "highlights": [
-                "Full-Stack End-to-End System",
-                "Realtime Socket.io Sync",
-                "Live at foxtinn.com"
-            ],
-            "screenshots": [
-                "https://images.unsplash.com/photo-1566073771259-6a8506099945?w=800&h=600&fit=crop"
-            ],
-            "playStoreLink": "#",
-            "githubLink": "https://github.com/zaincodes",
-            "liveLink": "https://foxtinn.com"
-        },
-        {
-            "id": 8,
-            "slug": "flutter-web-ecommerce",
-            "title": "Flutter Web E-commerce Application",
-            "category": "flutter",
-            "image": "https://images.unsplash.com/photo-1531403009284-440f080d1e12?w=800&h=600&fit=crop",
-            "thumbnail": "https://images.unsplash.com/photo-1531403009284-440f080d1e12?w=400&h=300&fit=crop",
-            "description": "Responsive web-based e-commerce application in Flutter Web optimizing multi-device layouts and performance.",
-            "longDescription": "Enhanced a responsive web-based e-commerce application by resolving UI issues and optimizing layouts across devices.",
-            "problem": "Web layout inconsistencies across desktop monitors, tablets, and mobile browsers hampered user conversions.",
-            "solution": "Refactored Flutter Web layout engine with responsive breakpoints, state optimization using Provider, and image caching.",
-            "architecture": "Flutter Web Responsive Architecture, Provider pattern, LayoutBuilder breakpoint system.",
-            "technologies": [
-                "Flutter Web",
-                "Dart",
-                "Provider",
-                "Responsive UI"
-            ],
-            "features": [
-                "Responsive Multi-Device Layouts",
-                "Provider State Management",
-                "Optimized Web Load Speeds",
-                "Cross-Browser Compatibility"
-            ],
-            "highlights": [
-                "Multi-device Breakpoint Support",
-                "Fast Flutter Web Rendering",
-                "Fluid Shopping Cart Experience"
-            ],
-            "screenshots": [
-                "https://images.unsplash.com/photo-1531403009284-440f080d1e12?w=800&h=600&fit=crop"
-            ],
-            "playStoreLink": "#",
-            "githubLink": "https://github.com/zaincodes",
-            "liveLink": "#"
+          "name": "HTML5 / CSS3 / JS",
+          "level": 94,
+          "color": "#E34F26",
+          "isMajor": false,
+          "desc": "Semantic web design, modern responsive layouts, and CSS animations."
         }
-    ],
-    "resumeLink": "",
-    "siteTheme": "dark"
+      ]
+    },
+    {
+      "title": "Developer Tools & AI",
+      "icon": "🛠️",
+      "category": "tools",
+      "skills": [
+        {
+          "name": "VS Code & Cursor AI",
+          "level": 95,
+          "color": "#007ACC",
+          "isMajor": false,
+          "desc": "Accelerated AI-assisted workflow, custom tooling, and multi-file refactoring."
+        },
+        {
+          "name": "Git & GitHub",
+          "level": 92,
+          "color": "#F05032",
+          "isMajor": false,
+          "desc": "Version control, feature branching, pull request code reviews, and actions."
+        },
+        {
+          "name": "Android Studio & Gradle",
+          "level": 94,
+          "color": "#3DDC84",
+          "isMajor": false,
+          "desc": "APK/AAB profiling, Gradle build scripts, and device emulator diagnostics."
+        }
+      ]
+    }
+  ],
+  "contactData": {
+    "email": "iamzainofficial4211@gmail.com",
+    "phone": "+92-304-9057852",
+    "location": "Lahore, Pakistan"
+  },
+  "socialLinks": [
+    {
+      "name": "GitHub",
+      "icon": "🐙",
+      "url": "https://github.com/zaincodes"
+    },
+    {
+      "name": "LinkedIn",
+      "icon": "💼",
+      "url": "https://linkedin.com/in/zaincodes"
+    },
+    {
+      "name": "Twitter",
+      "icon": "🐦",
+      "url": "https://twitter.com/zaincodes"
+    },
+    {
+      "name": "Instagram",
+      "icon": "📸",
+      "url": "https://instagram.com/zaincodes"
+    }
+  ],
+  "portfolioProjects": [
+    {
+      "id": 1,
+      "slug": "campus-insight-ii-skans",
+      "title": "Campus Insight II — Skans Institute",
+      "category": "android",
+      "image": "https://images.unsplash.com/photo-1523240795612-9a054b0db644?w=800&h=600&fit=crop",
+      "thumbnail": "https://images.unsplash.com/photo-1523240795612-9a054b0db644?w=400&h=300&fit=crop",
+      "description": "Google Play Store published educational application featuring role-based access, video streaming, and real-time push notifications.",
+      "longDescription": "Built a full-featured educational application enabling digital learning through role-based access, video streaming, and real-time push notifications for Skans Institute.",
+      "problem": "Students and faculty needed a seamless digital learning portal with secure access control, low-latency video streaming, and immediate push announcements for academic updates.",
+      "solution": "Spearheaded the development of Campus Insight II using native Kotlin and MVVM Architecture. Integrated Retrofit for REST APIs, Firebase for Auth and Realtime Database, and OneSignal for instant notification dispatch.",
+      "architecture": "Clean MVVM Architecture, Repository pattern, Retrofit network abstraction layer, OneSignal push listener services.",
+      "technologies": [
+        "Kotlin",
+        "Firebase",
+        "Retrofit",
+        "MVVM",
+        "OneSignal",
+        "Android SDK"
+      ],
+      "features": [
+        "Role-based Student & Faculty Access",
+        "High-definition Video Streaming",
+        "Real-time Push Notifications via OneSignal",
+        "Google Play Store Live (10,000+ Downloads)"
+      ],
+      "highlights": [
+        "10,000+ Active Google Play Installs",
+        "Sub-300ms Push Notification Latency",
+        "Clean Architecture & MVVM Separation"
+      ],
+      "screenshots": [
+        "https://images.unsplash.com/photo-1523240795612-9a054b0db644?w=800&h=600&fit=crop"
+      ],
+      "playStoreLink": "https://play.google.com/store",
+      "githubLink": "https://github.com/zaincodes",
+      "liveLink": "https://play.google.com/store"
+    },
+    {
+      "id": 2,
+      "slug": "rabbet-paylink-fintech",
+      "title": "Rabbet (Paylink) — FinTech App",
+      "category": "android",
+      "image": "https://images.unsplash.com/photo-1559526324-4b87b5e36e44?w=800&h=600&fit=crop",
+      "thumbnail": "https://images.unsplash.com/photo-1559526324-4b87b5e36e44?w=400&h=300&fit=crop",
+      "description": "Secure payment application with OTP-based authentication and payment workflows for the Egyptian market.",
+      "longDescription": "Built core features of a secure payment application with OTP-based authentication and seamless transaction workflows for the Egyptian market.",
+      "problem": "Financial users in Egypt required a reliable mobile payment mechanism with rapid OTP authentication, zero transaction dropouts, and encrypted payload delivery.",
+      "solution": "Engineered native Android payment workflows in Kotlin with Retrofit REST APIs and Firebase verification. Optimized payload encryption and network state management to guarantee financial transaction integrity.",
+      "architecture": "MVVM Architecture, Security Encryption Layer, Retrofit Interceptors, Firebase Authentication.",
+      "technologies": [
+        "Kotlin",
+        "Firebase",
+        "Retrofit",
+        "REST APIs",
+        "Android SDK"
+      ],
+      "features": [
+        "OTP-based Secure Authentication",
+        "Real-time Transaction Workflows",
+        "Bank & Gateway REST Integration",
+        "Google Play Live (1,000+ Downloads)"
+      ],
+      "highlights": [
+        "1,000+ Google Play Downloads",
+        "Zero Transaction Dropouts",
+        "Encrypted Payment Payload Layer"
+      ],
+      "screenshots": [
+        "https://images.unsplash.com/photo-1559526324-4b87b5e36e44?w=800&h=600&fit=crop"
+      ],
+      "playStoreLink": "https://play.google.com/store",
+      "githubLink": "https://github.com/zaincodes",
+      "liveLink": "https://play.google.com/store"
+    },
+    {
+      "id": 3,
+      "slug": "parrotpal-ai-calorie-tracker",
+      "title": "ParrotPal — AI Calorie Tracking App",
+      "category": "android",
+      "image": "https://images.unsplash.com/photo-1498837167922-ddd27525d352?w=800&h=600&fit=crop",
+      "thumbnail": "https://images.unsplash.com/photo-1498837167922-ddd27525d352?w=400&h=300&fit=crop",
+      "description": "AI-powered health application for intelligent calorie tracking with QR barcode scanning and nutritional APIs.",
+      "longDescription": "Built an AI-powered health application for calorie tracking with QR code scanning and nutritional API integration.",
+      "problem": "Users needed an easy way to track dietary calories and scan meal barcodes without manually typing complex nutritional details.",
+      "solution": "Integrated Zxing barcode scanner with MVVM Architecture and Navigation Component in Kotlin. Connected to nutritional REST APIs for real-time meal analysis and calorie tracking.",
+      "architecture": "MVVM Architecture, Navigation Component, Zxing Barcode SDK, Retrofit network layer.",
+      "technologies": [
+        "Kotlin",
+        "Retrofit",
+        "MVVM",
+        "Navigation Component",
+        "Zxing Barcode SDK"
+      ],
+      "features": [
+        "AI-assisted Calorie Breakdown",
+        "Instant QR & Barcode Scanning",
+        "Nutritional Goal Analytics",
+        "Offline Meal Log Caching"
+      ],
+      "highlights": [
+        "Instant Barcode Recognition",
+        "Seamless Navigation Graph",
+        "High-performance Nutritional Search"
+      ],
+      "screenshots": [
+        "https://images.unsplash.com/photo-1498837167922-ddd27525d352?w=800&h=600&fit=crop"
+      ],
+      "playStoreLink": "#",
+      "githubLink": "https://github.com/zaincodes",
+      "liveLink": "#"
+    },
+    {
+      "id": 4,
+      "slug": "forsa-multivendor-ecommerce",
+      "title": "Forsa — Multivendor E-commerce App",
+      "category": "android",
+      "image": "https://images.unsplash.com/photo-1472851294608-062f824d29cc?w=800&h=600&fit=crop",
+      "thumbnail": "https://images.unsplash.com/photo-1472851294608-062f824d29cc?w=400&h=300&fit=crop",
+      "description": "Full-featured e-commerce application for buyers and vendors with REST API integration and dynamic product management.",
+      "longDescription": "Built a full-featured e-commerce application for buyers and vendors with REST API integration and dynamic product management.",
+      "problem": "Multivendor platforms require smooth image rendering, fast product filter catalogs, vendor stores, and robust session persistence.",
+      "solution": "Developed in Kotlin/Java with Retrofit, dynamic RecyclerView adapters, Navigation Component, and local SharedPreferences caching.",
+      "architecture": "MVVM with Java/Kotlin interop, Dynamic Adapter pattern, Retrofit HTTP client.",
+      "technologies": [
+        "Kotlin",
+        "Java",
+        "Retrofit",
+        "RecyclerView",
+        "Navigation Component",
+        "SharedPreferences"
+      ],
+      "features": [
+        "Multivendor Store Portals",
+        "Dynamic Product Management",
+        "Cart & Checkout Workflows",
+        "Session & Preference Persistence"
+      ],
+      "highlights": [
+        "Smooth Dynamic RecyclerViews",
+        "Multivendor API Synchronization",
+        "Clean Modular Codebase"
+      ],
+      "screenshots": [
+        "https://images.unsplash.com/photo-1472851294608-062f824d29cc?w=800&h=600&fit=crop"
+      ],
+      "playStoreLink": "#",
+      "githubLink": "https://github.com/zaincodes",
+      "liveLink": "#"
+    },
+    {
+      "id": 5,
+      "slug": "baby-sos-childcare",
+      "title": "Baby SOS — Childcare App",
+      "category": "flutter",
+      "image": "https://images.unsplash.com/photo-1516627145497-ae6968895b74?w=800&h=600&fit=crop",
+      "thumbnail": "https://images.unsplash.com/photo-1516627145497-ae6968895b74?w=400&h=300&fit=crop",
+      "description": "Confidential client childcare application built from scratch using Flutter, GetX, MVVM, and Clean Architecture.",
+      "longDescription": "Built a childcare application from scratch using GetX, MVVM, and Clean Architecture with robust API integration and error handling.",
+      "problem": "Parents needed a secure, highly responsive mobile app for emergency alerts, childcare scheduling, and real-time status updates.",
+      "solution": "Architected a Flutter solution using GetX state management and Clean Architecture. Implemented robust REST API handlers with graceful offline fallbacks.",
+      "architecture": "Flutter Clean Architecture, GetX Reactive Controllers, Repositories, REST API Services.",
+      "technologies": [
+        "Flutter",
+        "Dart",
+        "GetX",
+        "REST APIs",
+        "Clean Architecture"
+      ],
+      "features": [
+        "Emergency SOS & Parent Alerts",
+        "Child Care Schedule Logging",
+        "Reactive GetX State Updates",
+        "Robust API Error Handling"
+      ],
+      "highlights": [
+        "Built 100% from scratch",
+        "60FPS Smooth Flutter UI",
+        "GetX Reactive Controllers"
+      ],
+      "screenshots": [
+        "https://images.unsplash.com/photo-1516627145497-ae6968895b74?w=800&h=600&fit=crop"
+      ],
+      "playStoreLink": "#",
+      "githubLink": "https://github.com/zaincodes",
+      "liveLink": "#"
+    },
+    {
+      "id": 6,
+      "slug": "jkl-therapy-medical",
+      "title": "JKL Therapy — Medical App",
+      "category": "flutter",
+      "image": "https://images.unsplash.com/photo-1576091160399-112ba8d25d1d?w=800&h=600&fit=crop",
+      "thumbnail": "https://images.unsplash.com/photo-1576091160399-112ba8d25d1d?w=400&h=300&fit=crop",
+      "description": "Medical therapy application featuring secure authentication, dashboard implementation, and API integration using Provider.",
+      "longDescription": "Built a medical therapy application featuring secure authentication, dashboard implementation, and API integration using Provider.",
+      "problem": "Therapy patients needed a clean, therapeutic UI dashboard to track session schedules, physician notes, and therapy progress.",
+      "solution": "Engineered in Flutter with Provider state management. Integrated secure Auth tokens and responsive patient metrics cards.",
+      "architecture": "Flutter Provider Pattern, Modular Screen Components, Secure Token Storage.",
+      "technologies": [
+        "Flutter",
+        "Dart",
+        "Provider",
+        "REST APIs",
+        "Secure Storage"
+      ],
+      "features": [
+        "Secure Patient Authentication",
+        "Interactive Therapy Dashboards",
+        "Session Scheduling & Reminders",
+        "Medical Record Summaries"
+      ],
+      "highlights": [
+        "Therapeutic UI Design System",
+        "Provider State Management",
+        "Encrypted Local Storage"
+      ],
+      "screenshots": [
+        "https://images.unsplash.com/photo-1576091160399-112ba8d25d1d?w=800&h=600&fit=crop"
+      ],
+      "playStoreLink": "#",
+      "githubLink": "https://github.com/zaincodes",
+      "liveLink": "#"
+    },
+    {
+      "id": 7,
+      "slug": "foxtinn-hotel-operations",
+      "title": "FoxtINN — Hotel Operations Platform",
+      "category": "web",
+      "image": "https://images.unsplash.com/photo-1566073771259-6a8506099945?w=800&h=600&fit=crop",
+      "thumbnail": "https://images.unsplash.com/photo-1566073771259-6a8506099945?w=400&h=300&fit=crop",
+      "description": "End-to-end full-stack hotel operations platform: Next.js (React) web app, Node.js backend, and Flutter mobile app with geofencing & tasks.",
+      "longDescription": "Built a full-stack hotel operations platform end-to-end — Next.js (React) web app, Node.js backend, and Flutter mobile app — covering scheduling, geofenced time clock, tasks, housekeeping, maintenance, and guest requests.",
+      "problem": "Hotels struggled with fragmented staff schedules, manual timekeeping, delayed housekeeping tasks, and untracked guest requests.",
+      "solution": "Built an integrated platform featuring Next.js web dashboard for managers, Node.js backend with Socket.io for live synchronization, and a Flutter mobile app with GPS geofenced time clock for staff.",
+      "architecture": "Full-Stack Microservices & Monorepo: Next.js Frontend, Node/Express Backend, Flutter Mobile App, Socket.io Realtime Layer.",
+      "technologies": [
+        "Next.js",
+        "React",
+        "Node.js",
+        "Flutter",
+        "REST APIs",
+        "Socket Integration",
+        "GPS Geofencing"
+      ],
+      "features": [
+        "Geofenced Mobile Staff Time Clock",
+        "Live Housekeeping & Task Sync",
+        "Guest Request Ticket Engine",
+        "Live Manager Web Dashboard (foxtinn.com)"
+      ],
+      "highlights": [
+        "Full-Stack End-to-End System",
+        "Realtime Socket.io Sync",
+        "Live at foxtinn.com"
+      ],
+      "screenshots": [
+        "https://images.unsplash.com/photo-1566073771259-6a8506099945?w=800&h=600&fit=crop"
+      ],
+      "playStoreLink": "#",
+      "githubLink": "https://github.com/zaincodes",
+      "liveLink": "https://foxtinn.com"
+    },
+    {
+      "id": 8,
+      "slug": "flutter-web-ecommerce",
+      "title": "Flutter Web E-commerce Application",
+      "category": "flutter",
+      "image": "https://images.unsplash.com/photo-1531403009284-440f080d1e12?w=800&h=600&fit=crop",
+      "thumbnail": "https://images.unsplash.com/photo-1531403009284-440f080d1e12?w=400&h=300&fit=crop",
+      "description": "Responsive web-based e-commerce application in Flutter Web optimizing multi-device layouts and performance.",
+      "longDescription": "Enhanced a responsive web-based e-commerce application by resolving UI issues and optimizing layouts across devices.",
+      "problem": "Web layout inconsistencies across desktop monitors, tablets, and mobile browsers hampered user conversions.",
+      "solution": "Refactored Flutter Web layout engine with responsive breakpoints, state optimization using Provider, and image caching.",
+      "architecture": "Flutter Web Responsive Architecture, Provider pattern, LayoutBuilder breakpoint system.",
+      "technologies": [
+        "Flutter Web",
+        "Dart",
+        "Provider",
+        "Responsive UI"
+      ],
+      "features": [
+        "Responsive Multi-Device Layouts",
+        "Provider State Management",
+        "Optimized Web Load Speeds",
+        "Cross-Browser Compatibility"
+      ],
+      "highlights": [
+        "Multi-device Breakpoint Support",
+        "Fast Flutter Web Rendering",
+        "Fluid Shopping Cart Experience"
+      ],
+      "screenshots": [
+        "https://images.unsplash.com/photo-1531403009284-440f080d1e12?w=800&h=600&fit=crop"
+      ],
+      "playStoreLink": "#",
+      "githubLink": "https://github.com/zaincodes",
+      "liveLink": "#"
+    }
+  ],
+  "resumeLink": "\"\"",
+  "siteTheme": "\"dark\""
 }
