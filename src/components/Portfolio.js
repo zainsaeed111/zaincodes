@@ -40,13 +40,23 @@ const Portfolio = () => {
     { id: 'flutter', label: 'Flutter Mobile' }
   ];
 
+  const getCategoryInfo = (cat) => {
+    switch(cat) {
+      case 'android': return { label: 'Android Native', icon: '🤖', badgeClass: 'badge-android' };
+      case 'flutter': return { label: 'Flutter Mobile', icon: '💙', badgeClass: 'badge-flutter' };
+      case 'web': return { label: 'Web Platform', icon: '🌐', badgeClass: 'badge-web' };
+      default: return { label: cat, icon: '🚀', badgeClass: 'badge-default' };
+    }
+  };
+
   return (
     <section id="portfolio" className="portfolio-section" ref={portfolioRef}>
       <div className="container-narrow">
-        <div className="section-header">
-          <h2 className="section-title">Featured <span className="text-gradient">Products</span></h2>
+        <div className="section-header text-center">
+          <span className="section-badge">PRODUCTION PORTFOLIO</span>
+          <h2 className="section-title">Featured <span className="text-gradient">Products & Apps</span></h2>
           <p className="section-subtitle">
-            A selection of production-ready products engineered from architecture to launch.
+            Enterprise-grade mobile applications and full-stack web platforms engineered from architecture to Play Store & Production deployment.
           </p>
         </div>
 
@@ -63,51 +73,76 @@ const Portfolio = () => {
         </div>
 
         <div className="portfolio-grid">
-          {filteredProjects.map((project) => (
-            <div
-              key={project.id}
-              className="project-card glass-card"
-              onClick={() => handleProjectClick(project)}
-            >
-              <div className="project-thumb-container">
-                <img
-                  src={project.thumbnail || project.image}
-                  alt={project.title}
-                  className="project-thumb-img"
-                  loading="lazy"
-                />
-                <div className="project-category-badge">{project.category}</div>
-                <div className="project-overlay-glow" />
-              </div>
+          {filteredProjects.map((project) => {
+            const catInfo = getCategoryInfo(project.category);
+            const hasPlayStore = project.playStoreLink && project.playStoreLink !== '#';
+            const hasLiveDemo = project.liveLink && project.liveLink !== '#';
 
-              <div className="project-card-body">
-                <h3 className="project-card-title">{project.title}</h3>
-                <p className="project-card-desc">{project.description}</p>
+            return (
+              <div
+                key={project.id}
+                className="project-card glass-card"
+                onClick={() => handleProjectClick(project)}
+              >
+                <div className="project-thumb-container">
+                  <img
+                    src={project.thumbnail || project.image}
+                    alt={project.title}
+                    className="project-thumb-img"
+                    loading="lazy"
+                  />
+                  <div className={`project-category-badge ${catInfo.badgeClass}`}>
+                    <span className="badge-icon-mini">{catInfo.icon}</span>
+                    <span>{catInfo.label}</span>
+                  </div>
 
-                {project.highlights && project.highlights.length > 0 && (
-                  <div className="project-highlights">
-                    {project.highlights.slice(0, 2).map((h, idx) => (
-                      <span key={idx} className="highlight-tag">{h}</span>
+                  {hasPlayStore && (
+                    <div className="project-live-indicator">
+                      <span className="live-dot green-dot" />
+                      <span>Play Store Published</span>
+                    </div>
+                  )}
+                  {!hasPlayStore && hasLiveDemo && (
+                    <div className="project-live-indicator">
+                      <span className="live-dot blue-dot" />
+                      <span>Live Production</span>
+                    </div>
+                  )}
+
+                  <div className="project-overlay-glow" />
+                </div>
+
+                <div className="project-card-body">
+                  <h3 className="project-card-title">{project.title}</h3>
+                  <p className="project-card-desc">{project.description}</p>
+
+                  {project.highlights && project.highlights.length > 0 && (
+                    <div className="project-highlights">
+                      {project.highlights.slice(0, 2).map((h, idx) => (
+                        <span key={idx} className="highlight-tag">✨ {h}</span>
+                      ))}
+                    </div>
+                  )}
+
+                  <div className="project-tech-stack">
+                    {(project.technologies || []).slice(0, 4).map((tech, idx) => (
+                      <span key={idx} className="tech-badge">{tech}</span>
                     ))}
                   </div>
-                )}
 
-                <div className="project-tech-stack">
-                  {(project.technologies || []).slice(0, 4).map((tech, idx) => (
-                    <span key={idx} className="tech-badge">{tech}</span>
-                  ))}
-                </div>
-
-                <div className="project-view-link">
-                  <span>View Technical Case Study</span>
-                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                    <line x1="5" y1="12" x2="19" y2="12"></line>
-                    <polyline points="12 5 19 12 12 19"></polyline>
-                  </svg>
+                  <div className="project-card-footer">
+                    <div className="project-view-link">
+                      <span>Explore Case Study</span>
+                      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
+                        <line x1="5" y1="12" x2="19" y2="12"></line>
+                        <polyline points="12 5 19 12 12 19"></polyline>
+                      </svg>
+                    </div>
+                  </div>
                 </div>
               </div>
-            </div>
-          ))}
+            );
+          })}
         </div>
       </div>
     </section>

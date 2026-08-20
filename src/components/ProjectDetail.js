@@ -113,9 +113,14 @@ const ProjectDetail = ({ projects }) => {
                                 </svg>
                             </a>
                         )}
-                        <a href={project.githubLink} className="btn-secondary" target="_blank" rel="noopener noreferrer">
-                            <span>View Source Code</span>
-                        </a>
+                        {project.githubLink && project.githubLink !== '#' && (
+                            <a href={project.githubLink} className="btn-secondary" target="_blank" rel="noopener noreferrer">
+                                <span>View Source Code</span>
+                            </a>
+                        )}
+                        <button className={`btn-secondary ${copied ? 'copied' : ''}`} onClick={copyLink}>
+                            <span>{copied ? '✓ Link Copied' : '🔗 Share Direct Link'}</span>
+                        </button>
                     </div>
                 </div>
             </section>

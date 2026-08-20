@@ -129,7 +129,7 @@ const Hero = () => {
               <span className="badge-icon">⚡</span>
               <div className="badge-text">
                 <strong>Clean Architecture</strong>
-                <small>MVVM &amp; BLoC</small>
+                <small>Android &amp; Flutter</small>
               </div>
             </div>
 

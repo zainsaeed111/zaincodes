@@ -453,11 +453,19 @@
   .cyber-ring-inner { width: 260px; height: 260px; }
 
   .floating-badge {
-    padding: 0.4rem 0.65rem;
+    padding: 0.45rem 0.75rem;
     font-size: 0.75rem;
   }
 
-  .badge-top-right { right: 5px; top: 0; }
-  .badge-bottom-left { left: 5px; bottom: 10px; }
-  .badge-bottom-right { display: none; }
+  .badge-text strong {
+    font-size: 0.75rem;
+  }
+
+  .badge-text small {
+    font-size: 0.65rem;
+  }
+
+  .badge-top-right { right: 0; top: 0; }
+  .badge-bottom-left { left: 0; bottom: 15px; }
+  .badge-bottom-right { right: 0; bottom: -5px; }
 }
