@@ -144,6 +144,7 @@
           "isMajor": false,
           "desc": "Semantic web design, modern responsive layouts, and CSS animations."
         }
+<<<<<<< HEAD
       ]
     },
     {
@@ -503,6 +504,6 @@
       "liveLink": "#"
     }
   ],
-  "resumeLink": "\"\"",
-  "siteTheme": "dark"
+  "resumeLink": "",
+  "siteTheme": "light"
 }

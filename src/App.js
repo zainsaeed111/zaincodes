@@ -67,7 +67,7 @@ function App() {
         { key: 'socialLinks', data: portfolioData.socialLinks },
         { key: 'portfolioProjects', data: portfolioData.portfolioProjects },
         { key: 'resumeLink', data: portfolioData.resumeLink },
-        { key: 'siteTheme', data: portfolioData.siteTheme || 'dark' }
+        { key: 'siteTheme', data: portfolioData.siteTheme || 'light' }
       ];
 
       keys.forEach(({ key, data }) => {
@@ -113,7 +113,7 @@ function App() {
   /* Theme state and application */
   useEffect(() => {
     const applyTheme = () => {
-      const savedTheme = localStorage.getItem('siteTheme') || 'dark';
+      const savedTheme = localStorage.getItem('siteTheme') || 'light';
       document.body.className = savedTheme === 'light' ? 'light-theme' : '';
     };
 
@@ -127,7 +127,7 @@ function App() {
 
     // Also check for same-tab updates
     const themeSync = setInterval(() => {
-      const savedTheme = localStorage.getItem('siteTheme') || 'dark';
+      const savedTheme = localStorage.getItem('siteTheme') || 'light';
       const isCurrentlyLight = document.body.classList.contains('light-theme');
       if (savedTheme === 'light' && !isCurrentlyLight) applyTheme();
       if (savedTheme === 'dark' && isCurrentlyLight) applyTheme();

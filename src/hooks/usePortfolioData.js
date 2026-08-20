@@ -45,7 +45,7 @@ export const usePortfolioData = () => {
   const [socialLinks, setSocialLinks] = useState(() => getItem('socialData', getItem('socialLinks', defaultSocial)));
   const [portfolioProjects, setPortfolioProjects] = useState(() => getItem('portfolioProjects', defaultProjects));
   const [resumeLink, setResumeLink] = useState(() => localStorage.getItem('resumeLink') || portfolioData.resumeLink || '');
-  const [siteTheme, setSiteTheme] = useState(() => localStorage.getItem('siteTheme') || portfolioData.siteTheme || 'dark');
+  const [siteTheme, setSiteTheme] = useState(() => localStorage.getItem('siteTheme') || portfolioData.siteTheme || 'light');
 
   const refreshData = useCallback(() => {
     setHeroData(getItem('heroData', defaultHero));
@@ -55,7 +55,7 @@ export const usePortfolioData = () => {
     setSocialLinks(getItem('socialData', getItem('socialLinks', defaultSocial)));
     setPortfolioProjects(getItem('portfolioProjects', defaultProjects));
     setResumeLink(localStorage.getItem('resumeLink') || portfolioData.resumeLink || '');
-    setSiteTheme(localStorage.getItem('siteTheme') || portfolioData.siteTheme || 'dark');
+    setSiteTheme(localStorage.getItem('siteTheme') || portfolioData.siteTheme || 'light');
   }, []);
 
   useEffect(() => {
