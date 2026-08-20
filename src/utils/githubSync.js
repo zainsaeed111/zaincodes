@@ -12,23 +12,36 @@ const DATA_PATH = 'src/data/portfolioData.json';
  * @returns {Promise<Object>} - Result of the operation
  */
 export const pushToGitHub = async (newData) => {
-    const token = localStorage.getItem('REACT_APP_GITHUB_TOKEN') || process.env.REACT_APP_GITHUB_TOKEN;
+    const rawToken = localStorage.getItem('REACT_APP_GITHUB_TOKEN') || process.env.REACT_APP_GITHUB_TOKEN;
 
-    if (!token) {
-        throw new Error('GitHub Token not found. Please add it in Admin Settings or Vercel Environment Variables.');
+    if (!rawToken || !rawToken.trim()) {
+        throw new Error('GitHub Token not found. Please add it in Admin Settings.');
     }
+
+    const cleanToken = rawToken.trim().replace(/^['"]|['"]$/g, '');
+    const authHeader = cleanToken.startsWith('github_pat_') || cleanToken.startsWith('ghp_') 
+        ? `Bearer ${cleanToken}` 
+        : `token ${cleanToken}`;
 
     try {
         // 1. Get the current file's SHA (required by GitHub API for updates)
-        const getFileResponse = await fetch(`https://api.github.com/repos/${GITHUB_REPO}/contents/${DATA_PATH}`, {
+        const getFileResponse = await fetch(`https://api.github.com/repos/${GITHUB_REPO}/contents/${DATA_PATH}?ref=master`, {
             headers: {
-                'Authorization': `token ${token}`,
+                'Authorization': authHeader,
                 'Accept': 'application/vnd.github.v3+json'
             }
         });
 
         if (!getFileResponse.ok) {
-            throw new Error('Failed to fetch current data from GitHub.');
+            const errJson = await getFileResponse.json().catch(() => ({}));
+            const errMsg = errJson.message || `HTTP ${getFileResponse.status} ${getFileResponse.statusText}`;
+            if (getFileResponse.status === 401) {
+                throw new Error('Invalid GitHub Token (Bad credentials). Please generate a new Personal Access Token with repo scope.');
+            }
+            if (getFileResponse.status === 403 || getFileResponse.status === 404) {
+                throw new Error(`GitHub Access Error (${errMsg}). Ensure your token has 'repo' scope permissions.`);
+            }
+            throw new Error(`Failed to fetch from GitHub: ${errMsg}`);
         }
 
         const fileData = await getFileResponse.json();
@@ -40,7 +53,7 @@ export const pushToGitHub = async (newData) => {
         const updateResponse = await fetch(`https://api.github.com/repos/${GITHUB_REPO}/contents/${DATA_PATH}`, {
             method: 'PUT',
             headers: {
-                'Authorization': `token ${token}`,
+                'Authorization': authHeader,
                 'Content-Type': 'application/json',
                 'Accept': 'application/vnd.github.v3+json'
             },
@@ -53,8 +66,8 @@ export const pushToGitHub = async (newData) => {
         });
 
         if (!updateResponse.ok) {
-            const error = await updateResponse.json();
-            throw new Error(error.message || 'Failed to push updates to GitHub.');
+            const error = await updateResponse.json().catch(() => ({}));
+            throw new Error(error.message || `Failed to push updates to GitHub (Status ${updateResponse.status}).`);
         }
 
         return await updateResponse.json();
