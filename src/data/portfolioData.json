@@ -1,16 +1,16 @@
 {
   "heroData": {
-    "title": "Mobile Application & Full-Stack Developer",
+    "title": "Android & Flutter Mobile Application Developer",
     "greeting": "Hi, I'm Zain Saeed",
-    "description": "Mobile Application Developer with 3+ years of experience building native Android (Kotlin/Java) and cross-platform Flutter (Dart) applications using MVVM and Clean Architecture. Experienced in shipping production Play Store apps & full-stack web platforms.",
-    "badge": "Available for new projects",
+    "description": "Mobile Application Developer with 3+ years of experience building native Android (Kotlin/Java) and cross-platform Flutter (Dart) applications using MVVM and Clean Architecture. Specialized in shipping production Play Store apps & mobile-driven backend services.",
+    "badge": "Available for new mobile projects",
     "statApps": 15,
     "statYears": 3,
     "statSatisfaction": 100
   },
   "aboutData": {
-    "subtitle": "Mobile Application Developer — Android & Flutter",
-    "introTitle": "Zain Saeed — Mobile & Full-Stack Engineer",
+    "subtitle": "Native Android & Flutter Mobile Application Developer",
+    "introTitle": "Zain Saeed — Android & Flutter Mobile Specialist",
     "introText": "Mobile Application Developer with 3+ years of experience building native Android (Kotlin/Java) and cross-platform Flutter (Dart) applications using MVVM and Clean Architecture. Track record of shipping production, Play Store–published apps across EdTech, FinTech, HealthTech, E-commerce, and Hospitality, alongside confidential client projects. Strong background in REST API integration, Firebase services, and state management.",
     "location": "Lahore, Pakistan",
     "email": "iamzainofficial4211@gmail.com",
@@ -40,17 +40,7 @@
         "color": "#F57C00"
       },
       {
-        "name": "Node.js",
-        "icon": "🟢",
-        "color": "#339933"
-      },
-      {
-        "name": "Next.js & React",
-        "icon": "⚛️",
-        "color": "#61DAFB"
-      },
-      {
-        "name": "Firebase",
+        "name": "Firebase Services",
         "icon": "🔥",
         "color": "#FFCA28"
       },
@@ -58,12 +48,22 @@
         "name": "REST APIs",
         "icon": "🌐",
         "color": "#FF6B6B"
+      },
+      {
+        "name": "Node.js Backend",
+        "icon": "🟢",
+        "color": "#339933"
+      },
+      {
+        "name": "React / Next.js",
+        "icon": "⚛️",
+        "color": "#61DAFB"
       }
     ]
   },
   "skillsData": [
     {
-      "title": "Mobile Development",
+      "title": "Mobile Application Engineering",
       "icon": "📱",
       "category": "mobile",
       "skills": [
@@ -72,26 +72,26 @@
           "level": 96,
           "color": "#3DDC84",
           "isMajor": true,
-          "desc": "Native Android development with MVVM, Coroutines, Jetpack Compose, and Room DB."
+          "desc": "Native Android development with MVVM, Coroutines, Jetpack Compose, Room DB, and Play Store publishing."
         },
         {
           "name": "Flutter & Dart",
           "level": 92,
           "color": "#02569B",
           "isMajor": true,
-          "desc": "Cross-platform mobile apps with BLoC state management and native integration."
+          "desc": "Cross-platform mobile apps with Provider & GetX state management, native channel bridges, and pixel-perfect UI."
         },
         {
           "name": "Android (Java)",
           "level": 90,
           "color": "#F57C00",
           "isMajor": false,
-          "desc": "Legacy Android codebase maintenance, Java NDK & custom service integrations."
+          "desc": "Legacy Android codebase maintenance, Java NDK, background services & custom SDK integrations."
         }
       ]
     },
     {
-      "title": "Backend Engineering",
+      "title": "Backend & Mobile APIs",
       "icon": "⚡",
       "category": "backend",
       "skills": [
@@ -100,26 +100,26 @@
           "level": 90,
           "color": "#6DB33F",
           "isMajor": true,
-          "desc": "Enterprise REST APIs, Spring Security, JPA/Hibernate, Microservices & PostgreSQL."
+          "desc": "Enterprise REST APIs for mobile applications, Spring Security, JPA/Hibernate & PostgreSQL."
+        },
+        {
+          "name": "Firebase & Push Notifications",
+          "level": 92,
+          "color": "#FFA000",
+          "isMajor": false,
+          "desc": "Firestore, Cloud Messaging (FCM), OneSignal, Authentication & real-time app sync."
         },
         {
           "name": "Node.js / Express",
           "level": 85,
           "color": "#339933",
           "isMajor": false,
-          "desc": "Scalable JavaScript runtime services and WebSocket communication."
-        },
-        {
-          "name": "Firebase & REST APIs",
-          "level": 92,
-          "color": "#FFA000",
-          "isMajor": false,
-          "desc": "Firestore, Cloud Functions, Authentication, and push notification services."
+          "desc": "Scalable REST microservices and WebSocket real-time communication for mobile backends."
         }
       ]
     },
     {
-      "title": "Web Platforms",
+      "title": "Web & Admin Portals",
       "icon": "🌐",
       "category": "web",
       "skills": [
@@ -128,21 +128,21 @@
           "level": 88,
           "color": "#61DAFB",
           "isMajor": false,
-          "desc": "Modern SSR/SSG web interfaces, custom hooks, and dynamic state engines."
+          "desc": "Web admin dashboards, web management platforms, and companion landing pages."
         },
         {
           "name": "WordPress",
           "level": 82,
           "color": "#21759B",
           "isMajor": false,
-          "desc": "Custom theme customization, CMS management, and site optimization."
+          "desc": "Custom theme integration, CMS management, and site optimization."
         },
         {
           "name": "HTML5 / CSS3 / JS",
           "level": 94,
           "color": "#E34F26",
           "isMajor": false,
-          "desc": "Semantic web design, modern responsive layouts, and CSS animations."
+          "desc": "Semantic web layouts, modern responsive interfaces, and CSS animations."
         }
       ]
     },
@@ -184,22 +184,17 @@
     {
       "name": "GitHub",
       "icon": "🐙",
-      "url": "https://github.com/zaincodes"
+      "url": "https://github.com/zainsaeed111"
     },
     {
       "name": "LinkedIn",
       "icon": "💼",
-      "url": "https://linkedin.com/in/zaincodes"
-    },
-    {
-      "name": "Twitter",
-      "icon": "🐦",
-      "url": "https://twitter.com/zaincodes"
+      "url": "https://www.linkedin.com/in/zainsaeeddeveloper/"
     },
     {
       "name": "Instagram",
       "icon": "📸",
-      "url": "https://instagram.com/zaincodes"
+      "url": "https://www.instagram.com/zain__world"
     }
   ],
   "portfolioProjects": [
@@ -238,7 +233,7 @@
         "https://images.unsplash.com/photo-1523240795612-9a054b0db644?w=800&h=600&fit=crop"
       ],
       "playStoreLink": "https://play.google.com/store",
-      "githubLink": "https://github.com/zaincodes",
+      "githubLink": "https://github.com/zainsaeed111",
       "liveLink": "https://play.google.com/store"
     },
     {
@@ -275,7 +270,7 @@
         "https://images.unsplash.com/photo-1559526324-4b87b5e36e44?w=800&h=600&fit=crop"
       ],
       "playStoreLink": "https://play.google.com/store",
-      "githubLink": "https://github.com/zaincodes",
+      "githubLink": "https://github.com/zainsaeed111",
       "liveLink": "https://play.google.com/store"
     },
     {
@@ -312,7 +307,7 @@
         "https://images.unsplash.com/photo-1498837167922-ddd27525d352?w=800&h=600&fit=crop"
       ],
       "playStoreLink": "#",
-      "githubLink": "https://github.com/zaincodes",
+      "githubLink": "https://github.com/zainsaeed111",
       "liveLink": "#"
     },
     {
@@ -350,7 +345,7 @@
         "https://images.unsplash.com/photo-1472851294608-062f824d29cc?w=800&h=600&fit=crop"
       ],
       "playStoreLink": "#",
-      "githubLink": "https://github.com/zaincodes",
+      "githubLink": "https://github.com/zainsaeed111",
       "liveLink": "#"
     },
     {
@@ -387,7 +382,7 @@
         "https://images.unsplash.com/photo-1516627145497-ae6968895b74?w=800&h=600&fit=crop"
       ],
       "playStoreLink": "#",
-      "githubLink": "https://github.com/zaincodes",
+      "githubLink": "https://github.com/zainsaeed111",
       "liveLink": "#"
     },
     {
@@ -424,7 +419,7 @@
         "https://images.unsplash.com/photo-1576091160399-112ba8d25d1d?w=800&h=600&fit=crop"
       ],
       "playStoreLink": "#",
-      "githubLink": "https://github.com/zaincodes",
+      "githubLink": "https://github.com/zainsaeed111",
       "liveLink": "#"
     },
     {
@@ -463,7 +458,7 @@
         "https://images.unsplash.com/photo-1566073771259-6a8506099945?w=800&h=600&fit=crop"
       ],
       "playStoreLink": "#",
-      "githubLink": "https://github.com/zaincodes",
+      "githubLink": "https://github.com/zainsaeed111",
       "liveLink": "https://foxtinn.com"
     },
     {
@@ -499,7 +494,7 @@
         "https://images.unsplash.com/photo-1531403009284-440f080d1e12?w=800&h=600&fit=crop"
       ],
       "playStoreLink": "#",
-      "githubLink": "https://github.com/zaincodes",
+      "githubLink": "https://github.com/zainsaeed111",
       "liveLink": "#"
     }
   ],

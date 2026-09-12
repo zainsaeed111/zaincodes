@@ -60,17 +60,17 @@ const Contact = () => {
     <section id="contact" className="contact-section" ref={contactRef}>
       <div className="container-narrow">
         <div className="section-header">
-          <h2 className="section-title">Schedule <span className="text-gradient">Discovery Call</span></h2>
+          <h2 className="section-title">Schedule <span className="text-gradient">Mobile Discovery Call</span></h2>
           <p className="section-subtitle">
-            Describe your software requirements and we will schedule a technical discovery call within 24 hours.
+            Have an Android or Flutter mobile application project? Describe your app requirements to schedule a technical call within 24 hours.
           </p>
         </div>
 
         <div className="contact-grid">
           {/* Contact Info Card */}
           <div className="contact-info-card glass-card">
-            <h3>Direct Contact</h3>
-            <p>Ready to engineer your product? Reach out directly or send an enquiry form.</p>
+            <h3>Direct Mobile Project Enquiry</h3>
+            <p>Ready to build your Android or Flutter mobile app? Reach out directly or send an enquiry form below.</p>
 
             <div className="contact-details-list">
               <div className="detail-item">
@@ -159,11 +159,11 @@ const Contact = () => {
                   required
                 >
                   <option value="">Select Platform Track</option>
-                  <option value="android">Android Native (Kotlin)</option>
-                  <option value="flutter">Flutter (Cross-Platform)</option>
-                  <option value="web">Web Platform (React/Next)</option>
-                  <option value="backend">Backend &amp; API Infrastructure</option>
-                  <option value="fullstack">Full Product Lifecycle</option>
+                  <option value="android">Android Native (Kotlin / Java)</option>
+                  <option value="flutter">Flutter Mobile (Android &amp; iOS)</option>
+                  <option value="backend">Mobile Backend APIs (Spring Boot / Firebase)</option>
+                  <option value="web">Web Admin Portal &amp; Companion Web App</option>
+                  <option value="full_mobile">End-to-End Mobile App Lifecycle</option>
                 </select>
               </div>
 

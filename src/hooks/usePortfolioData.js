@@ -14,7 +14,7 @@ const getItem = (key, fallback) => {
     if (!d) return fallback;
     const parsed = JSON.parse(d);
     
-    // Auto-update localStorage if cached data is stale compared to latest resume data
+    // Auto-update localStorage if cached data is stale compared to latest data
     if (key === 'contactData' && parsed.email !== fallback.email) {
       localStorage.setItem(key, JSON.stringify(fallback));
       return fallback;
@@ -23,11 +23,15 @@ const getItem = (key, fallback) => {
       localStorage.setItem(key, JSON.stringify(fallback));
       return fallback;
     }
-    if (key === 'aboutData' && parsed.email !== fallback.email) {
+    if (key === 'aboutData' && (parsed.email !== fallback.email || parsed.introTitle !== fallback.introTitle)) {
       localStorage.setItem(key, JSON.stringify(fallback));
       return fallback;
     }
-    if (key === 'heroData' && parsed.greeting !== fallback.greeting) {
+    if (key === 'heroData' && (parsed.greeting !== fallback.greeting || parsed.title !== fallback.title)) {
+      localStorage.setItem(key, JSON.stringify(fallback));
+      return fallback;
+    }
+    if ((key === 'socialLinks' || key === 'socialData') && (!parsed[0]?.url || parsed[0]?.url !== fallback[0]?.url)) {
       localStorage.setItem(key, JSON.stringify(fallback));
       return fallback;
     }

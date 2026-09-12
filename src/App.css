@@ -19,13 +19,38 @@
   gap: 1.5rem;
 }
 
-.loading-spinner {
-  width: 48px;
-  height: 48px;
-  border: 2px solid var(--border-subtle);
-  border-top-color: var(--accent);
+.loader-bubbles {
+  display: flex;
+  gap: 0.6rem;
+  margin-bottom: 0.5rem;
+}
+
+.loader-bubbles .bubble {
+  width: 16px;
+  height: 16px;
   border-radius: 50%;
-  animation: spin 0.8s linear infinite;
+  background: var(--accent);
+  animation: bounce 1.4s infinite ease-in-out both;
+  box-shadow: 0 0 10px var(--accent);
+}
+
+.loader-bubbles .bubble:nth-child(1) {
+  animation-delay: -0.32s;
+}
+
+.loader-bubbles .bubble:nth-child(2) {
+  animation-delay: -0.16s;
+}
+
+@keyframes bounce {
+  0%, 80%, 100% {
+    transform: scale(0);
+    opacity: 0.3;
+  }
+  40% {
+    transform: scale(1);
+    opacity: 1;
+  }
 }
 
 .loading-screen h2 {

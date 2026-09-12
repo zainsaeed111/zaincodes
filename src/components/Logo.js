@@ -1,13 +1,35 @@
 import React from 'react';
 import './Logo.css';
+import darkLogo from '../assets/zaincodes-icon-dark-transparent.svg';
+import lightLogo from '../assets/zaincodes-icon-light-transparent.svg';
 
-const Logo = ({ className = '' }) => {
+const Logo = ({ className = '', showText = true, size = 'medium', onClick }) => {
   return (
-    <div className={`logo-mark ${className}`}>
-      <svg viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
-        <rect x="1.5" y="1.5" width="29" height="29" rx="8" stroke="currentColor" strokeWidth="2.5" />
-        <path d="M9 8h13M22 8v16M9 24h13" stroke="currentColor" strokeWidth="2.8" strokeLinecap="round" strokeLinejoin="round" />
-      </svg>
+    <div 
+      className={`logo-container logo-${size} ${className}`}
+      onClick={onClick}
+      role={onClick ? "button" : undefined}
+      tabIndex={onClick ? 0 : undefined}
+    >
+      <div className="logo-icon-wrapper">
+        <img
+          src={darkLogo}
+          alt="ZainCodes Logo Dark"
+          className="logo-icon-img logo-icon-dark"
+        />
+        <img
+          src={lightLogo}
+          alt="ZainCodes Logo Light"
+          className="logo-icon-img logo-icon-light"
+        />
+      </div>
+
+      {showText && (
+        <span className="logo-text">
+          <span className="logo-text-zain">Zain</span>
+          <span className="logo-text-codes">Codes</span>
+        </span>
+      )}
     </div>
   );
 };

@@ -29,7 +29,7 @@ const Skills = () => {
       id: 'android-kotlin',
       name: 'Android Development',
       techs: 'Kotlin & Java',
-      level: '96%',
+      level: 'Expert',
       badge: 'Core Specialization',
       color: '#3DDC84',
       bgGlow: 'rgba(61, 220, 132, 0.15)',
@@ -47,12 +47,12 @@ const Skills = () => {
       id: 'flutter-dart',
       name: 'Flutter & Dart',
       techs: 'Cross-Platform Framework',
-      level: '92%',
+      level: 'Expert',
       badge: 'Cross-Platform Core',
       color: '#02569B',
       bgGlow: 'rgba(2, 86, 155, 0.18)',
-      description: 'Fluid, high-performance cross-platform mobile apps with BLoC state management, native channel bridges & pixel-perfect UI.',
-      highlights: ['BLoC & Provider State', 'Native Method Channels', 'Custom UI Animations', 'iOS & Android Dual Release'],
+      description: 'Fluid, high-performance cross-platform mobile apps with GetX & Provider state management, native channel bridges & pixel-perfect UI.',
+      highlights: ['GetX & Provider State', 'Native Method Channels', 'Custom UI Animations', 'iOS & Android Dual Release'],
       icon: (
         <svg width="34" height="34" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
           <path d="M12 2L2 12l5 5 13-13H12z"/>
@@ -63,13 +63,13 @@ const Skills = () => {
     {
       id: 'spring-boot',
       name: 'Java Spring Boot',
-      techs: 'Enterprise Backend',
-      level: '90%',
-      badge: 'Backend Architecture',
+      techs: 'Enterprise Backend & APIs',
+      level: 'Advanced',
+      badge: 'Mobile API Backend',
       color: '#6DB33F',
       bgGlow: 'rgba(109, 179, 63, 0.18)',
-      description: 'Enterprise RESTful web services, Spring Security, Hibernate/JPA, microservices, and high-concurrency database management.',
-      highlights: ['RESTful API Engineering', 'Spring Security & JWT', 'PostgreSQL & JPA/Hibernate', 'Microservices Architecture'],
+      description: 'Enterprise RESTful services and APIs engineered to power native Android and Flutter mobile applications with Spring Security & PostgreSQL.',
+      highlights: ['RESTful Mobile API Engineering', 'Spring Security & OAuth', 'PostgreSQL & JPA/Hibernate', 'Scalable Mobile Backends'],
       icon: (
         <svg width="34" height="34" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
           <path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/>
@@ -80,17 +80,16 @@ const Skills = () => {
 
   // Fallback skills list if skillsData is empty or updated
   const allSkillsList = [
-    { name: 'Android (Kotlin)', level: 96, category: 'mobile', isMajor: true, color: '#3DDC84', icon: '🤖', desc: 'Native Android apps, MVVM, Compose & Room DB.' },
-    { name: 'Flutter & Dart', level: 92, category: 'mobile', isMajor: true, color: '#2196F3', icon: '💙', desc: 'Cross-platform apps with BLoC & 60FPS UI.' },
-    { name: 'Java Spring Boot', level: 90, category: 'backend', isMajor: true, color: '#6DB33F', icon: '⚡', desc: 'Enterprise REST APIs, Spring Security & PostgreSQL.' },
-    { name: 'Android (Java)', level: 90, category: 'mobile', isMajor: false, color: '#F57C00', icon: '☕', desc: 'Core Java Android SDK, services & legacy refactoring.' },
-    { name: 'React & Next.js', level: 88, category: 'web', isMajor: false, color: '#61DAFB', icon: '⚛️', desc: 'Modern SSR/SSG web interfaces & component systems.' },
-    { name: 'Node.js & Express', level: 85, category: 'backend', isMajor: false, color: '#339933', icon: '🟢', desc: 'Event-driven APIs, WebSockets & serverless routes.' },
-    { name: 'WordPress', level: 82, category: 'web', isMajor: false, color: '#21759B', icon: '📰', desc: 'Custom theme integration, CMS setup & optimization.' },
-    { name: 'VS Code & Cursor AI', level: 95, category: 'tools', isMajor: false, color: '#007ACC', icon: '💻', desc: 'AI-assisted rapid prototyping & code refinement.' },
-    { name: 'Git & GitHub', level: 92, category: 'tools', isMajor: false, color: '#F05032', icon: '🐙', desc: 'Version control, PR workflows & CI/CD automation.' },
-    { name: 'Firebase & REST APIs', level: 92, category: 'backend', isMajor: false, color: '#FFA000', icon: '🔥', desc: 'Realtime database, Cloud Messaging & OAuth.' },
-    { name: 'HTML5 & CSS3', level: 94, category: 'web', isMajor: false, color: '#E34F26', icon: '🎨', desc: 'Responsive glassmorphism design & animations.' }
+    { name: 'Android (Kotlin)', level: 96, category: 'mobile', isMajor: true, color: '#3DDC84', icon: '🤖', desc: 'Native Android apps, MVVM, Jetpack Compose, Room DB & Play Store release.' },
+    { name: 'Flutter & Dart', level: 92, category: 'mobile', isMajor: true, color: '#02569B', icon: '💙', desc: 'Cross-platform mobile apps with 60FPS UI and GetX/Provider.' },
+    { name: 'Java Spring Boot', level: 90, category: 'backend', isMajor: true, color: '#6DB33F', icon: '⚡', desc: 'Enterprise REST APIs for mobile applications & PostgreSQL.' },
+    { name: 'Android (Java)', level: 90, category: 'mobile', isMajor: false, color: '#F57C00', icon: '☕', desc: 'Core Java Android SDK, services & legacy codebase refactoring.' },
+    { name: 'Firebase & Push Notifications', level: 92, category: 'backend', isMajor: false, color: '#FFA000', icon: '🔥', desc: 'Realtime Database, FCM Push, OneSignal & Cloud Messaging.' },
+    { name: 'Node.js & Express', level: 85, category: 'backend', isMajor: false, color: '#339933', icon: '🟢', desc: 'REST microservices & real-time socket communication for mobile.' },
+    { name: 'React & Next.js', level: 88, category: 'web', isMajor: false, color: '#61DAFB', icon: '⚛️', desc: 'Mobile web admin dashboards & companion web management portals.' },
+    { name: 'Git & GitHub', level: 92, category: 'tools', isMajor: false, color: '#F05032', icon: '🐙', desc: 'Version control, feature branching & CI/CD for mobile builds.' },
+    { name: 'Android Studio & Gradle', level: 94, category: 'tools', isMajor: false, color: '#3DDC84', icon: '💻', desc: 'APK/AAB build profiling, Gradle scripts & emulator testing.' },
+    { name: 'VS Code & Cursor AI', level: 95, category: 'tools', isMajor: false, color: '#007ACC', icon: '🛠️', desc: 'Accelerated mobile code refactoring and rapid prototyping.' }
   ];
 
   // Helper to extract skills array from custom hooks or default
@@ -171,7 +170,7 @@ const Skills = () => {
                     <h4>{item.name}</h4>
                     <span className="major-tech-sub">{item.techs}</span>
                   </div>
-                  <div className="major-level-pill" style={{ color: item.color }}>
+                  <div className="major-level-pill" style={{ color: item.color, borderColor: `${item.color}40`, background: `${item.color}12` }}>
                     {item.level}
                   </div>
                 </div>
@@ -187,9 +186,7 @@ const Skills = () => {
                   ))}
                 </div>
 
-                <div className="major-progress-bg">
-                  <div className="major-progress-fill" style={{ width: item.level, background: `linear-gradient(90deg, ${item.color}, #06b6d4)` }}></div>
-                </div>
+
               </div>
             ))}
           </div>
@@ -243,20 +240,12 @@ const Skills = () => {
                       </h4>
                     </div>
                   </div>
-                  <span className="skill-level-number">{skill.level}%</span>
+
                 </div>
 
               {skill.desc && <p className="skill-card-desc">{skill.desc}</p>}
 
-              <div className="skill-meter-track">
-                <div 
-                  className="skill-meter-fill"
-                  style={{ 
-                    width: `${skill.level}%`, 
-                    background: `linear-gradient(90deg, ${skill.color || '#6366f1'}, #06b6d4)` 
-                  }}
-                />
-              </div>
+
             </div>
           );
         })}

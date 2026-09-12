@@ -43,9 +43,9 @@ const Portfolio = () => {
 
   const getCategoryMeta = (cat) => {
     switch (cat) {
-      case 'android': return { label: 'Android Native', color: '#3DDC84', icon: '🤖' };
-      case 'flutter': return { label: 'Flutter Mobile', color: '#0284c7', icon: '💙' };
-      case 'web': return { label: 'Web Platform', color: '#8b5cf6', icon: '🌐' };
+      case 'android': return { label: 'Android Native App', color: '#3DDC84', icon: '🤖' };
+      case 'flutter': return { label: 'Flutter Mobile App', color: '#0284c7', icon: '💙' };
+      case 'web': return { label: 'Web & Admin Dashboard', color: '#8b5cf6', icon: '🌐' };
       default: return { label: cat, color: '#6366f1', icon: '🚀' };
     }
   };
@@ -59,14 +59,14 @@ const Portfolio = () => {
         <div className="portfolio-header">
           <div className="portfolio-header-badge">
             <span className="header-badge-dot" />
-            <span>PRODUCTION PORTFOLIO</span>
+            <span>MOBILE PRODUCTION PORTFOLIO</span>
           </div>
           <h2 className="portfolio-title">
-            Shipped Products &<br />
+            Shipped Apps &<br />
             <span className="text-gradient">Case Studies</span>
           </h2>
           <p className="portfolio-subtitle">
-            Real-world mobile apps and web platforms — architected, built, and deployed to production.
+            Published Android apps, Flutter cross-platform solutions, and mobile backend platforms — architected, built, and deployed.
           </p>
         </div>
 

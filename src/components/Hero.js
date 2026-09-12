@@ -8,13 +8,13 @@ const Hero = () => {
   const stageRef = useRef(null);
   const [imgError, setImgError] = useState(false);
 
-  const badge = heroData?.badge || 'Available for Q3/Q4 Projects';
-  const greeting = heroData?.greeting || "Hi, I'm Zain";
-  const title = heroData?.title || 'Product Engineer & Architect';
-  const description = heroData?.description || 'Engineering high-performance mobile products and web platforms from architecture to app store launch.';
+  const badge = heroData?.badge || 'Available for Android & Flutter Projects';
+  const greeting = heroData?.greeting || "Hi, I'm Zain Saeed";
+  const title = heroData?.title || 'Android & Flutter Mobile Application Developer';
+  const description = heroData?.description || 'Building high-performance native Android (Kotlin/Java) and cross-platform Flutter (Dart) mobile applications from architecture to Play Store launch.';
   const avatarUrl = heroData?.avatarUrl || '/Profile.webp';
 
-  const statApps = heroData?.statApps ?? 50;
+  const statApps = heroData?.statApps ?? 15;
   const statYears = heroData?.statYears ?? 3;
   const statSatisfaction = heroData?.statSatisfaction ?? 100;
 
@@ -134,10 +134,10 @@ const Hero = () => {
             </div>
 
             <div className="floating-badge badge-bottom-left">
-              <span className="badge-icon">🚀</span>
+              <span className="badge-icon">📱</span>
               <div className="badge-text">
-                <strong>Product Engineer</strong>
-                <small>Web &amp; Mobile</small>
+                <strong>Mobile Specialist</strong>
+                <small>Android &amp; Flutter</small>
               </div>
             </div>
 
@@ -145,7 +145,7 @@ const Hero = () => {
               <span className="badge-icon">🛡️</span>
               <div className="badge-text">
                 <strong>99.9% Crash-Free</strong>
-                <small>Production Quality</small>
+                <small>Production Apps</small>
               </div>
             </div>
 
@@ -154,7 +154,7 @@ const Hero = () => {
               {!imgError ? (
                 <img
                   src={avatarUrl}
-                  alt="Zain Saeed — Product Engineer"
+                  alt="Zain Saeed — Android & Flutter Developer"
                   className="hero-portrait-img"
                   onError={() => setImgError(true)}
                   loading="eager"
@@ -162,9 +162,9 @@ const Hero = () => {
                 />
               ) : (
                 <div className="avatar-fallback-3d">
-                  <div className="fallback-avatar-icon">👨‍💻</div>
+                  <div className="fallback-avatar-icon">📱</div>
                   <div className="fallback-avatar-name">Zain Saeed</div>
-                  <div className="fallback-avatar-sub">Product Architect</div>
+                  <div className="fallback-avatar-sub">Android &amp; Flutter Specialist</div>
                 </div>
               )}
               <div className="scanline-overlay" />

@@ -83,10 +83,9 @@ const defaultContact = {
 };
 
 const defaultSocial = [
-    { name: 'GitHub', icon: '🐙', url: 'https://github.com/zaincodes' },
-    { name: 'LinkedIn', icon: '💼', url: 'https://linkedin.com/in/zaincodes' },
-    { name: 'Twitter', icon: '🐦', url: 'https://twitter.com/zaincodes' },
-    { name: 'Instagram', icon: '📸', url: 'https://instagram.com/zaincodes' }
+    { name: 'GitHub', icon: '🐙', url: 'https://github.com/zainsaeed111' },
+    { name: 'LinkedIn', icon: '💼', url: 'https://www.linkedin.com/in/zainsaeeddeveloper/' },
+    { name: 'Instagram', icon: '📸', url: 'https://www.instagram.com/zain__world' }
 ];
 
 const defaultProjects = [

@@ -25,34 +25,34 @@ const About = () => {
   const statApps = heroData?.statApps ?? 50;
   const statYears = heroData?.statYears ?? 3;
 
-  const subtitle = aboutData?.subtitle || 'End-to-end mobile and web product development — from architecture to app store launch';
-  const introTitle = aboutData?.introTitle || 'Zain Saeed — Mobile & Full-Stack Product Engineer';
-  const introText = aboutData?.introText || 'Specialising in native Android (Kotlin/Jetpack Compose), Flutter cross-platform applications, and React web platforms. I work with startups and growing companies to ship validated digital products — handling architecture, implementation, and store deployment as a single engineering partner.';
+  const subtitle = aboutData?.subtitle || 'End-to-end Mobile Application Development — Android (Kotlin/Java) & Flutter (Dart)';
+  const introTitle = aboutData?.introTitle || 'Zain Saeed — Native Android & Flutter Mobile Developer';
+  const introText = aboutData?.introText || 'Specializing in native Android (Kotlin/Java, Jetpack Compose) and cross-platform Flutter (Dart) mobile applications. I work with startups and enterprise clients to ship production, Play Store-published apps — handling architecture, MVVM state management, offline sync, and REST API integration as a dedicated mobile engineering partner.';
   const techStack = aboutData?.techStack || [];
 
   const principles = [
     {
       num: '01',
-      title: 'System Architecture First',
-      description: 'Every product begins with data flow diagrams, database schemas, and API contracts. We design the skeleton before writing the interface.'
+      title: 'Mobile Architecture First',
+      description: 'Every app begins with robust offline caching, clean data flow models, and REST/GraphQL API contracts built for mobile performance.'
     },
     {
       num: '02',
       title: 'Offline-First Reliability',
-      description: 'Mobile users live in low-connectivity areas. We engineer local-first caching, background sync, and conflict resolution from day one.'
+      description: 'Mobile users operate in real-world network conditions. We engineer local-first database sync, background workers, and caching from day one.'
     },
     {
       num: '03',
-      title: 'Performance as a Feature',
-      description: 'Sub-500ms database writes, 60FPS UI rendering, and optimized bundle sizes are mandatory requirements for high retention.'
+      title: '60FPS Native Performance',
+      description: 'Sub-300ms API responses, 60FPS UI rendering, and crash-free Play Store deployments are mandatory standards for mobile retention.'
     }
   ];
 
   const process = [
-    { step: 'Discovery', desc: 'Technical scoping, platform selection, architecture review' },
-    { step: 'Architecture', desc: 'Database design, API contracts, state management strategy' },
-    { step: 'Build', desc: 'Sprint-based development, CI/CD pipelines, automated testing' },
-    { step: 'Launch', desc: 'App Store submission, monitoring setup, handoff documentation' }
+    { step: 'Discovery', desc: 'App requirements, target OS, architecture strategy' },
+    { step: 'Architecture', desc: 'MVVM setup, database schemas, REST API endpoints' },
+    { step: 'Build', desc: 'Sprint development, Android UI/Flutter widgets, CI/CD' },
+    { step: 'Play Store Launch', desc: 'Google Play console submission, AAB build, monitoring' }
   ];
 
   return (
@@ -64,7 +64,7 @@ const About = () => {
         </div>
 
         <div className="about-intro-card glass-card">
-          <div className="intro-badge">About Architect</div>
+          <div className="intro-badge">Mobile App Specialist</div>
           <h3>{introTitle}</h3>
           <p>{introText}</p>
 
@@ -115,8 +115,8 @@ const About = () => {
             <div className="trust-label">Clean Architecture</div>
           </div>
           <div className="trust-card glass-card">
-            <div className="trust-number text-gradient">BLoC</div>
-            <div className="trust-label">State Management</div>
+            <div className="trust-number text-gradient">REST API</div>
+            <div className="trust-label">Integration</div>
           </div>
           <div className="trust-card glass-card">
             <div className="trust-number text-emerald-gradient">{statYears}+ Years</div>

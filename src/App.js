@@ -186,9 +186,13 @@ function App() {
   if (isLoading) {
     return (
       <div className="loading-screen">
-        <div className="loading-spinner"></div>
+        <div className="loader-bubbles">
+          <div className="bubble"></div>
+          <div className="bubble"></div>
+          <div className="bubble"></div>
+        </div>
         <h2>ZainCodes</h2>
-        <p>Loading amazing digital experiences...</p>
+        <p>Engineering premium digital products...</p>
       </div>
     );
   }

@@ -1,12 +1,110 @@
-.logo-mark {
+.logo-container {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  user-select: none;
+  cursor: pointer;
+  transition: transform var(--duration-fast) ease;
+}
+
+.logo-container:hover {
+  transform: translateY(-1px);
+}
+
+/* Icon Wrapper */
+.logo-icon-wrapper {
+  position: relative;
   display: flex;
   align-items: center;
   justify-content: center;
+  background: transparent;
+  flex-shrink: 0;
+}
+
+.logo-icon-img {
+  display: block;
+  width: auto;
+  height: 100%;
+  object-fit: contain;
+  filter: drop-shadow(0 0 6px rgba(34, 211, 238, 0.4));
+  transition: filter var(--duration-normal) ease, transform var(--duration-normal) ease;
+}
+
+.logo-container:hover .logo-icon-img {
+  filter: drop-shadow(0 0 14px rgba(34, 211, 238, 0.75)) drop-shadow(0 0 24px rgba(99, 102, 241, 0.55));
+  transform: scale(1.04);
+}
+
+/* Theme Switching Logic */
+.logo-icon-dark {
+  display: block;
+}
+
+.logo-icon-light {
+  display: none;
+}
+
+.light-theme .logo-icon-dark {
+  display: none;
+}
+
+.light-theme .logo-icon-light {
+  display: block;
+}
+
+/* Sizing Options with Fitted Proportions */
+.logo-small .logo-icon-wrapper {
+  height: 32px;
+}
+
+.logo-medium .logo-icon-wrapper {
+  height: 40px;
+}
+
+.logo-large .logo-icon-wrapper {
+  height: 52px;
+}
+
+/* Typography for ZainCodes */
+.logo-text {
+  font-family: var(--font-display);
+  font-weight: 800;
+  letter-spacing: -0.03em;
+  display: flex;
+  align-items: center;
+  line-height: 1;
+}
+
+.logo-small .logo-text {
+  font-size: 1.35rem;
+}
+
+.logo-medium .logo-text {
+  font-size: 1.6rem;
+}
+
+.logo-large .logo-text {
+  font-size: 2.1rem;
+}
+
+.logo-text-zain {
   color: var(--text-primary);
   transition: color var(--duration-fast) ease;
 }
 
-.logo-mark svg {
-  width: 32px;
-  height: 32px;
+.logo-text-codes {
+  background: linear-gradient(135deg, #22d3ee 0%, #38bdf8 45%, #6366f1 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  margin-left: 1px;
+  filter: drop-shadow(0 0 10px rgba(34, 211, 238, 0.35));
+  transition: filter var(--duration-fast) ease;
+}
+
+.logo-container:hover .logo-text-codes {
+  filter: drop-shadow(0 0 16px rgba(34, 211, 238, 0.65));
+}
+
+.light-theme .logo-text-zain {
+  color: #0b0f19;
 }
