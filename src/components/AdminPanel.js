@@ -153,7 +153,7 @@ const AdminPanel = () => {
     const [isUploadingResume, setIsUploadingResume] = useState(false);
 
     /* ── GitHub Sync ── */
-    const [githubToken, setGithubToken] = useState(() => localStorage.getItem('REACT_APP_GITHUB_TOKEN') || '');
+    const [githubToken, setGithubToken] = useState(() => localStorage.getItem('REACT_APP_GITHUB_TOKEN') || process.env.REACT_APP_GITHUB_TOKEN || '');
     const [showGithubToken, setShowGithubToken] = useState(false);
     const [isSyncing, setIsSyncing] = useState(false);
 
@@ -243,6 +243,14 @@ const AdminPanel = () => {
         document.body.className = currentTheme === 'light' ? 'light-theme' : '';
 
         setResumeLink(localStorage.getItem('resumeLink') || '');
+
+        const activeToken = localStorage.getItem('REACT_APP_GITHUB_TOKEN') || process.env.REACT_APP_GITHUB_TOKEN || '';
+        if (activeToken) {
+            setGithubToken(activeToken);
+            if (!localStorage.getItem('REACT_APP_GITHUB_TOKEN')) {
+                localStorage.setItem('REACT_APP_GITHUB_TOKEN', activeToken);
+            }
+        }
     }, []);
 
     /* ── Auth handlers ── */
