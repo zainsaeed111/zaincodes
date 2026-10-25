@@ -1,10 +1,10 @@
 /* ═══════════════════════════════════════════════════════
-   PORTFOLIO GALLERY — Ultra Premium Showcase
+   PORTFOLIO GALLERY — Ultra Premium Multi-Image Showcase
    ═══════════════════════════════════════════════════════ */
 
 .portfolio-section {
   position: relative;
-  padding: 7rem 0 8rem;
+  padding: 6.5rem 0 7.5rem;
   background: var(--bg-base);
   z-index: 1;
   overflow: hidden;
@@ -18,10 +18,10 @@
   left: -10%;
   width: 600px;
   height: 600px;
-  background: radial-gradient(circle, rgba(99, 102, 241, 0.06) 0%, transparent 70%);
+  background: radial-gradient(circle, rgba(99, 102, 241, 0.08) 0%, transparent 70%);
   border-radius: 50%;
   pointer-events: none;
-  filter: blur(80px);
+  filter: blur(90px);
 }
 
 .portfolio-section::after {
@@ -31,10 +31,10 @@
   right: -8%;
   width: 500px;
   height: 500px;
-  background: radial-gradient(circle, rgba(6, 182, 212, 0.05) 0%, transparent 70%);
+  background: radial-gradient(circle, rgba(6, 182, 212, 0.06) 0%, transparent 70%);
   border-radius: 50%;
   pointer-events: none;
-  filter: blur(80px);
+  filter: blur(90px);
 }
 
 .portfolio-container {
@@ -56,17 +56,18 @@
   display: inline-flex;
   align-items: center;
   gap: 0.6rem;
-  padding: 0.4rem 1rem;
+  padding: 0.45rem 1.1rem;
   background: var(--bg-surface);
   border: 1px solid var(--border-subtle);
   border-radius: var(--radius-full);
   font-family: var(--font-mono);
-  font-size: 0.72rem;
-  font-weight: 600;
+  font-size: 0.75rem;
+  font-weight: 700;
   color: var(--accent-cyan);
   letter-spacing: 0.1em;
   text-transform: uppercase;
   margin-bottom: 1.5rem;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
 }
 
 .header-badge-dot {
@@ -84,7 +85,7 @@
 
 .portfolio-title {
   font-family: var(--font-display);
-  font-size: clamp(2.2rem, 4.5vw, 3.2rem);
+  font-size: clamp(2.2rem, 4.5vw, 3.4rem);
   font-weight: 800;
   letter-spacing: -0.04em;
   line-height: 1.15;
@@ -93,9 +94,9 @@
 }
 
 .portfolio-subtitle {
-  font-size: 1.08rem;
+  font-size: 1.1rem;
   color: var(--text-tertiary);
-  max-width: 560px;
+  max-width: 620px;
   margin: 0 auto;
   line-height: 1.7;
 }
@@ -104,70 +105,63 @@
 .portfolio-filter-bar {
   display: flex;
   justify-content: center;
-  gap: 0.6rem;
+  gap: 0.65rem;
   flex-wrap: wrap;
-  margin-bottom: 3rem;
+  margin-bottom: 3.25rem;
 }
 
 .pf-filter-chip {
   display: inline-flex;
   align-items: center;
-  gap: 0.45rem;
-  padding: 0.55rem 1.2rem;
+  gap: 0.5rem;
+  padding: 0.55rem 1.25rem;
   background: var(--bg-card);
   border: 1px solid var(--border-subtle);
   border-radius: var(--radius-full);
   font-family: var(--font-display);
   font-size: 0.85rem;
   font-weight: 600;
-  color: var(--text-muted);
+  color: var(--text-secondary);
   cursor: pointer;
-  transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+  transition: all 0.25s ease;
 }
 
 .pf-filter-chip:hover {
+  border-color: var(--accent);
   color: var(--text-primary);
-  border-color: var(--border-default);
-  background: var(--bg-card-hover);
-  transform: translateY(-1px);
+  transform: translateY(-2px);
 }
 
 .pf-filter-chip.active {
   background: var(--gradient-cyber);
   border-color: transparent;
   color: #ffffff;
-  box-shadow: var(--glow-cyan);
-  transform: translateY(-1px);
-}
-
-.pf-filter-icon {
-  font-size: 0.95rem;
+  box-shadow: 0 4px 20px rgba(99, 102, 241, 0.35);
 }
 
 .pf-filter-count {
-  font-size: 0.7rem;
+  font-family: var(--font-mono);
+  font-size: 0.75rem;
   font-weight: 700;
   background: rgba(255, 255, 255, 0.22);
-  padding: 0.1rem 0.45rem;
+  padding: 0.1rem 0.5rem;
   border-radius: var(--radius-full);
-  min-width: 20px;
-  text-align: center;
 }
 
 /* ═══════ GALLERY GRID ═══════ */
 .portfolio-gallery {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(340px, 1fr));
-  gap: 1.75rem;
+  gap: 2rem;
 }
 
-/* ═══════ CARD ═══════ */
+/* ═══════ CARD (ULTRA LUXURY REDESIGN) ═══════ */
 .pf-card {
   --card-accent: #6366f1;
   position: relative;
   display: flex;
   flex-direction: column;
-  border-radius: 20px;
+  border-radius: 22px;
   background: var(--bg-card);
   border: 1px solid var(--border-subtle);
   overflow: hidden;
@@ -177,6 +171,7 @@
               box-shadow 0.4s ease;
   animation: cardFadeIn 0.5s var(--ease-out) backwards;
   animation-delay: var(--card-delay, 0s);
+  box-shadow: 0 10px 30px -10px rgba(0, 0, 0, 0.4);
 }
 
 @keyframes cardFadeIn {
@@ -194,31 +189,47 @@
   transform: translateY(-8px);
   border-color: var(--card-accent);
   box-shadow:
-    0 20px 50px rgba(0, 0, 0, 0.12),
-    0 0 0 1px var(--card-accent),
-    0 0 40px color-mix(in srgb, var(--card-accent) 20%, transparent);
+    0 24px 55px -12px rgba(0, 0, 0, 0.6),
+    0 0 0 1.5px var(--card-accent),
+    0 0 35px color-mix(in srgb, var(--card-accent) 25%, transparent);
 }
 
-/* ─── Card Visual / Image ─── */
+/* ─── Card Visual & Dynamic Slideshow ─── */
 .pf-card-visual {
   position: relative;
   width: 100%;
-  height: 240px;
+  height: 250px;
   overflow: hidden;
-  background: var(--bg-elevated);
+  background: #0f172a;
+}
+
+.pf-card-slider {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
 }
 
 .pf-card-img {
+  position: absolute;
+  inset: 0;
   width: 100%;
   height: 100%;
   object-fit: cover;
-  transition: transform 0.65s cubic-bezier(0.16, 1, 0.3, 1),
-              filter 0.4s ease;
+  opacity: 0;
+  transform: scale(1.02);
+  transition: opacity 0.7s cubic-bezier(0.16, 1, 0.3, 1), transform 0.7s cubic-bezier(0.16, 1, 0.3, 1);
+  pointer-events: none;
 }
 
-.pf-card:hover .pf-card-img {
-  transform: scale(1.08);
-  filter: brightness(0.92);
+.pf-card-img.is-active {
+  opacity: 1;
+  transform: scale(1);
+  pointer-events: auto;
+}
+
+.pf-card:hover .pf-card-img.is-active {
+  transform: scale(1.06);
 }
 
 .pf-card-img-overlay {
@@ -226,42 +237,36 @@
   inset: 0;
   background: linear-gradient(
     180deg,
-    transparent 30%,
-    rgba(7, 10, 18, 0.55) 75%,
-    rgba(7, 10, 18, 0.85) 100%
+    rgba(15, 23, 42, 0.15) 0%,
+    transparent 35%,
+    rgba(9, 13, 22, 0.6) 75%,
+    rgba(9, 13, 22, 0.92) 100%
   );
   transition: opacity 0.3s ease;
+  pointer-events: none;
 }
 
-.light-theme .pf-card-img-overlay {
-  background: linear-gradient(
-    180deg,
-    transparent 40%,
-    rgba(255, 255, 255, 0.6) 80%,
-    rgba(255, 255, 255, 0.92) 100%
-  );
-}
-
-/* ─── Category Badge ─── */
+/* ─── Top Left: Category Badge ─── */
 .pf-card-category {
   position: absolute;
-  top: 16px;
-  left: 16px;
+  top: 14px;
+  left: 14px;
   display: inline-flex;
   align-items: center;
   gap: 0.4rem;
-  padding: 0.32rem 0.75rem;
-  background: rgba(15, 23, 42, 0.8);
+  padding: 0.35rem 0.8rem;
+  background: rgba(15, 23, 42, 0.82);
   backdrop-filter: blur(14px);
   -webkit-backdrop-filter: blur(14px);
-  border: 1px solid rgba(255, 255, 255, 0.1);
-  border-radius: 8px;
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  border-radius: var(--radius-full);
   font-size: 0.72rem;
   font-weight: 700;
-  letter-spacing: 0.6px;
+  letter-spacing: 0.04em;
   text-transform: uppercase;
   color: var(--cat-color, #fff);
-  z-index: 3;
+  z-index: 4;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
   transition: transform 0.25s ease;
 }
 
@@ -269,24 +274,36 @@
   transform: scale(1.04);
 }
 
-/* ─── Status Indicator ─── */
-.pf-card-status {
+/* ─── Top Right Badges ─── */
+.pf-card-top-badges {
   position: absolute;
-  top: 16px;
-  right: 16px;
+  top: 14px;
+  right: 14px;
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  z-index: 4;
+}
+
+.pf-card-status {
   display: inline-flex;
   align-items: center;
   gap: 0.4rem;
-  padding: 0.28rem 0.65rem;
-  background: rgba(15, 23, 42, 0.78);
-  backdrop-filter: blur(12px);
-  border: 1px solid rgba(255, 255, 255, 0.1);
-  border-radius: 20px;
-  font-size: 0.68rem;
+  padding: 0.32rem 0.75rem;
+  background: rgba(15, 23, 42, 0.82);
+  backdrop-filter: blur(14px);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  border-radius: var(--radius-full);
+  font-size: 0.72rem;
   font-weight: 700;
   color: #ffffff;
-  z-index: 3;
-  letter-spacing: 0.3px;
+  letter-spacing: 0.02em;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+}
+
+.pf-status-video {
+  border-color: rgba(239, 68, 68, 0.4);
+  color: #ef4444;
 }
 
 .pf-status-pulse {
@@ -299,52 +316,136 @@
 }
 
 .pf-status-pulse.blue {
-  background: #06b6d4;
-  box-shadow: 0 0 8px #06b6d4;
+  background: #0284c7;
+  box-shadow: 0 0 8px #0284c7;
 }
 
-/* ─── Hover Arrow ─── */
-.pf-card-arrow {
+/* ─── Slide Controls (Dots & Arrows) ─── */
+.pf-card-slide-controls {
   position: absolute;
-  bottom: 16px;
-  right: 16px;
-  width: 44px;
-  height: 44px;
+  bottom: 12px;
+  left: 14px;
+  right: 14px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  z-index: 4;
+  pointer-events: auto;
+}
+
+.pf-slide-dots {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  background: rgba(15, 23, 42, 0.65);
+  backdrop-filter: blur(10px);
+  padding: 4px 8px;
+  border-radius: var(--radius-full);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+}
+
+.pf-slide-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.45);
+  cursor: pointer;
+  transition: all 0.25s ease;
+}
+
+.pf-slide-dot:hover {
+  background: rgba(255, 255, 255, 0.8);
+}
+
+.pf-slide-dot.active {
+  width: 16px;
+  border-radius: 8px;
+  background: var(--card-accent);
+  box-shadow: 0 0 10px var(--card-accent);
+}
+
+.pf-slide-arrow {
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  background: rgba(15, 23, 42, 0.75);
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  color: #ffffff;
+  font-size: 18px;
+  line-height: 1;
   display: flex;
   align-items: center;
   justify-content: center;
-  background: rgba(255, 255, 255, 0.12);
-  backdrop-filter: blur(10px);
-  border: 1px solid rgba(255, 255, 255, 0.18);
-  border-radius: 50%;
-  color: #ffffff;
-  z-index: 3;
+  cursor: pointer;
   opacity: 0;
-  transform: translate(8px, 8px) scale(0.8);
+  transition: opacity 0.25s ease, transform 0.25s ease, background 0.2s ease;
+}
+
+.pf-card:hover .pf-slide-arrow {
+  opacity: 1;
+}
+
+.pf-slide-arrow:hover {
+  background: var(--card-accent);
+  transform: scale(1.15);
+}
+
+.pf-screens-counter {
+  font-size: 0.68rem;
+  font-family: var(--font-mono);
+  font-weight: 700;
+  background: rgba(15, 23, 42, 0.75);
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  color: #ffffff;
+  padding: 0.2rem 0.55rem;
+  border-radius: var(--radius-full);
+}
+
+/* ─── Hover Reveal Diagonal Arrow ─── */
+.pf-card-arrow {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%) scale(0.6);
+  opacity: 0;
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  background: var(--card-accent);
+  color: #ffffff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 0 25px var(--card-accent);
   transition: all 0.35s cubic-bezier(0.16, 1, 0.3, 1);
+  pointer-events: none;
+  z-index: 5;
 }
 
 .pf-card:hover .pf-card-arrow {
-  opacity: 1;
-  transform: translate(0, 0) scale(1);
+  opacity: 0.95;
+  transform: translate(-50%, -50%) scale(1);
 }
 
 /* ─── Card Content ─── */
 .pf-card-content {
-  padding: 1.5rem 1.5rem 1.6rem;
+  padding: 1.5rem;
   display: flex;
   flex-direction: column;
-  gap: 0.75rem;
   flex: 1;
+  gap: 0.75rem;
 }
 
 .pf-card-title {
   font-family: var(--font-display);
-  font-size: 1.18rem;
-  font-weight: 700;
-  letter-spacing: -0.02em;
-  line-height: 1.35;
+  font-size: 1.25rem;
+  font-weight: 800;
+  letter-spacing: -0.025em;
   color: var(--text-primary);
+  line-height: 1.3;
+  margin: 0;
   transition: color 0.2s ease;
 }
 
@@ -353,52 +454,47 @@
 }
 
 .pf-card-desc {
-  font-size: 0.88rem;
-  color: var(--text-tertiary);
+  font-size: 0.925rem;
   line-height: 1.65;
+  color: var(--text-secondary);
+  margin: 0;
   display: -webkit-box;
   -webkit-line-clamp: 2;
-  line-clamp: 2;
   -webkit-box-orient: vertical;
   overflow: hidden;
 }
 
-/* ─── Tech Pills ─── */
+/* ─── Tech Stack Pills ─── */
 .pf-card-tech {
   display: flex;
   flex-wrap: wrap;
-  gap: 0.35rem;
-  margin-top: auto;
-  padding-top: 0.5rem;
+  gap: 0.45rem;
+  margin-top: 0.25rem;
 }
 
 .pf-tech-pill {
-  font-size: 0.72rem;
+  font-size: 0.75rem;
   font-weight: 600;
-  padding: 0.2rem 0.55rem;
+  font-family: var(--font-mono);
+  padding: 0.25rem 0.65rem;
+  border-radius: 6px;
   background: var(--bg-surface);
   border: 1px solid var(--border-subtle);
-  border-radius: 6px;
   color: var(--text-secondary);
-  transition: border-color 0.2s ease, color 0.2s ease;
-}
-
-.pf-card:hover .pf-tech-pill {
-  border-color: color-mix(in srgb, var(--card-accent) 30%, transparent);
+  transition: all 0.2s ease;
 }
 
 .pf-tech-more {
-  color: var(--accent-cyan);
-  border-color: rgba(6, 182, 212, 0.25);
-  background: rgba(6, 182, 212, 0.08);
+  color: var(--accent);
+  font-weight: 700;
 }
 
-/* ─── Metrics ─── */
+/* ─── Metrics Strip ─── */
 .pf-card-metrics {
   display: flex;
   flex-direction: column;
   gap: 0.35rem;
-  padding: 0.65rem 0;
+  padding-top: 0.75rem;
   border-top: 1px solid var(--border-subtle);
 }
 
@@ -406,22 +502,23 @@
   display: flex;
   align-items: center;
   gap: 0.5rem;
-  font-size: 0.78rem;
-  font-weight: 500;
+  font-size: 0.8rem;
+  font-weight: 600;
   color: var(--text-secondary);
 }
 
 .pf-metric-icon {
   color: var(--card-accent);
-  font-size: 0.65rem;
+  font-size: 0.75rem;
 }
 
-/* ─── CTA ─── */
+/* ─── Card CTA Footer ─── */
 .pf-card-cta {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding-top: 0.75rem;
+  padding-top: 0.85rem;
+  margin-top: auto;
   border-top: 1px solid var(--border-subtle);
 }
 
@@ -439,53 +536,171 @@
 
 .pf-cta-arrow {
   font-size: 1.1rem;
+  font-weight: 700;
   color: var(--text-muted);
   transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1), color 0.2s ease;
 }
 
 .pf-card:hover .pf-cta-arrow {
-  transform: translateX(4px);
+  transform: translateX(5px);
   color: var(--card-accent);
 }
 
-/* ═══════ LIGHT THEME REFINEMENTS ═══════ */
+/* ═════════════════════════════════════════════════════════
+   DAY / LIGHT THEME REVOLUTION (ULTRA CRISP & LUXURY)
+   ═════════════════════════════════════════════════════════ */
 .light-theme .pf-card {
-  background: rgba(255, 255, 255, 0.96);
-  border-color: rgba(15, 23, 42, 0.08);
-  box-shadow: 0 2px 8px rgba(15, 23, 42, 0.04);
+  background: #ffffff;
+  border: 1px solid rgba(226, 232, 240, 0.95);
+  box-shadow: 0 4px 20px -2px rgba(15, 23, 42, 0.05), 0 2px 6px -1px rgba(15, 23, 42, 0.03);
 }
 
 .light-theme .pf-card:hover {
+  border-color: var(--card-accent);
   box-shadow:
-    0 20px 50px rgba(15, 23, 42, 0.1),
-    0 0 0 1px var(--card-accent),
-    0 0 40px color-mix(in srgb, var(--card-accent) 12%, transparent);
+    0 24px 50px -12px rgba(15, 23, 42, 0.16),
+    0 0 0 1.5px var(--card-accent),
+    0 0 35px color-mix(in srgb, var(--card-accent) 15%, transparent);
 }
 
-.light-theme .pf-card-visual {
-  background: var(--bg-surface);
+.light-theme .pf-card-img-overlay {
+  background: linear-gradient(
+    180deg,
+    rgba(255, 255, 255, 0.1) 0%,
+    transparent 40%,
+    rgba(255, 255, 255, 0.7) 80%,
+    rgba(255, 255, 255, 0.95) 100%
+  );
 }
 
-.light-theme .pf-card-arrow {
-  background: rgba(15, 23, 42, 0.08);
-  border-color: rgba(15, 23, 42, 0.12);
-  color: var(--text-primary);
+/* Light Theme Badges on Image (Frosted White Glass) */
+.light-theme .pf-card-category {
+  background: rgba(255, 255, 255, 0.95);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 1px solid rgba(15, 23, 42, 0.08);
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
+  color: var(--cat-color);
+  font-weight: 800;
+}
+
+.light-theme .pf-card-status {
+  background: rgba(255, 255, 255, 0.95);
+  backdrop-filter: blur(16px);
+  border: 1px solid rgba(16, 185, 129, 0.35);
+  color: #047857;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
+}
+
+.light-theme .pf-status-video {
+  border-color: rgba(239, 68, 68, 0.4);
+  color: #ef4444;
+}
+
+/* Light Theme Slide Controls */
+.light-theme .pf-slide-dots {
+  background: rgba(255, 255, 255, 0.9);
+  border-color: rgba(15, 23, 42, 0.1);
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.06);
+}
+
+.light-theme .pf-slide-dot {
+  background: rgba(15, 23, 42, 0.25);
+}
+
+.light-theme .pf-slide-dot.active {
+  background: var(--card-accent);
+  box-shadow: 0 0 10px var(--card-accent);
+}
+
+.light-theme .pf-slide-arrow {
+  background: rgba(255, 255, 255, 0.92);
+  border-color: rgba(15, 23, 42, 0.1);
+  color: #0f172a;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+}
+
+.light-theme .pf-slide-arrow:hover {
+  background: var(--card-accent);
+  color: #ffffff;
+}
+
+.light-theme .pf-screens-counter {
+  background: rgba(255, 255, 255, 0.92);
+  border-color: rgba(15, 23, 42, 0.1);
+  color: #0f172a;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.06);
+}
+
+/* Light Theme Card Typography */
+.light-theme .pf-card-title {
+  color: #0f172a;
+  font-weight: 800;
+}
+
+.light-theme .pf-card:hover .pf-card-title {
+  color: var(--card-accent);
+}
+
+.light-theme .pf-card-desc {
+  color: #475569;
+}
+
+.light-theme .pf-tech-pill {
+  background: #f1f5f9;
+  border-color: #e2e8f0;
+  color: #1e293b;
+  font-weight: 600;
+}
+
+.light-theme .pf-tech-pill:hover {
+  background: #e2e8f0;
+  color: #0f172a;
+}
+
+.light-theme .pf-metric {
+  color: #1e293b;
+  font-weight: 600;
+}
+
+.light-theme .pf-card-metrics,
+.light-theme .pf-card-cta {
+  border-top-color: #f1f5f9;
+}
+
+.light-theme .pf-cta-text {
+  color: #64748b;
+  font-weight: 700;
+}
+
+.light-theme .pf-card:hover .pf-cta-text {
+  color: var(--card-accent);
 }
 
 .light-theme .pf-filter-chip {
-  background: rgba(255, 255, 255, 0.9);
-  border-color: rgba(15, 23, 42, 0.1);
+  background: #ffffff;
+  border-color: #e2e8f0;
+  color: #475569;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
 }
 
 .light-theme .pf-filter-chip:hover {
-  background: #ffffff;
-  box-shadow: 0 2px 8px rgba(15, 23, 42, 0.06);
+  background: #f8fafc;
+  color: #0f172a;
+  border-color: #cbd5e1;
+}
+
+.light-theme .pf-filter-chip.active {
+  background: var(--gradient-cyber);
+  color: #ffffff;
+  border-color: transparent;
+  box-shadow: 0 4px 15px rgba(99, 102, 241, 0.35);
 }
 
 .light-theme .portfolio-header-badge {
-  background: rgba(255, 255, 255, 0.9);
-  border-color: rgba(15, 23, 42, 0.1);
-  box-shadow: 0 2px 8px rgba(15, 23, 42, 0.04);
+  background: #ffffff;
+  border-color: #e2e8f0;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
 }
 
 /* ═══════ RESPONSIVE ═══════ */
@@ -503,52 +718,18 @@
 
   .portfolio-gallery {
     grid-template-columns: 1fr;
-    gap: 1.25rem;
+    gap: 1.5rem;
   }
 
   .portfolio-title {
     font-size: clamp(1.8rem, 6vw, 2.4rem);
   }
 
-  .portfolio-filter-bar {
-    gap: 0.4rem;
-    margin-bottom: 2rem;
-  }
-
-  .pf-filter-chip {
-    padding: 0.5rem 0.9rem;
-    font-size: 0.8rem;
-  }
-
   .pf-card-visual {
-    height: 200px;
+    height: 220px;
   }
 
-  .pf-card-content {
-    padding: 1.25rem;
-  }
-
-  .pf-card-arrow {
-    display: none;
-  }
-}
-
-@media (max-width: 480px) {
-  .portfolio-header-badge {
-    font-size: 0.65rem;
-    padding: 0.3rem 0.75rem;
-  }
-
-  .pf-card-category {
-    font-size: 0.65rem;
-    padding: 0.25rem 0.6rem;
-  }
-
-  .pf-card-status {
-    font-size: 0.62rem;
-  }
-
-  .pf-card-title {
-    font-size: 1.05rem;
+  .pf-slide-arrow {
+    opacity: 1; /* Always visible on touch screens */
   }
 }

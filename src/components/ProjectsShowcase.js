@@ -1,8 +1,102 @@
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import usePortfolioData from '../hooks/usePortfolioData';
 import { normalizeScreenshots } from '../utils/mediaHelper';
 import './ProjectsShowcase.css';
+
+// Dynamic multi-image card media preview
+const ShowcaseCardMedia = ({ project, meta }) => {
+  const images = useMemo(() => {
+    const list = [];
+    if (project.thumbnail) list.push(project.thumbnail);
+    if (project.image && !list.includes(project.image)) list.push(project.image);
+    const extra = normalizeScreenshots(project.screenshots);
+    extra.forEach(img => {
+      if (!list.includes(img)) list.push(img);
+    });
+    return list.length > 0 ? list : ['/Profile.webp'];
+  }, [project]);
+
+  const [activeIdx, setActiveIdx] = useState(0);
+
+  useEffect(() => {
+    if (images.length <= 1) return;
+    const timer = setInterval(() => {
+      setActiveIdx(prev => (prev + 1) % images.length);
+    }, 4000);
+    return () => clearInterval(timer);
+  }, [images.length]);
+
+  const handlePrev = (e) => {
+    e.stopPropagation();
+    setActiveIdx(prev => (prev > 0 ? prev - 1 : images.length - 1));
+  };
+
+  const handleNext = (e) => {
+    e.stopPropagation();
+    setActiveIdx(prev => (prev + 1) % images.length);
+  };
+
+  const hasVideo = Boolean(project.videoUrl || project.videoLink || project.demoVideo);
+
+  return (
+    <div className="card-media-wrapper">
+      <div className="card-slider-stack">
+        {images.map((img, i) => (
+          <img
+            key={i}
+            src={img}
+            alt={`${project.title} Preview ${i + 1}`}
+            className={`card-slide-image ${i === activeIdx ? 'is-active' : ''}`}
+            loading="lazy"
+            onError={(e) => { e.target.src = '/Profile.webp'; }}
+          />
+        ))}
+      </div>
+      <div className="media-overlay" />
+
+      {/* Category Badge */}
+      <span className="card-category-badge" style={{ borderColor: meta.color, color: meta.color }}>
+        <span className="badge-ico">{meta.icon}</span>
+        <span>{meta.label}</span>
+      </span>
+
+      {/* Media Indicators (Video & Screenshots count) */}
+      <div className="card-media-indicators">
+        {hasVideo && (
+          <span className="card-video-pill" title="Interactive Video Demo Available">
+            <span>▶</span>
+            <span>Video</span>
+          </span>
+        )}
+        {images.length > 1 && (
+          <span className="card-screens-pill" title="Multiple Screenshots Available">
+            <span>📸</span>
+            <span>{activeIdx + 1}/{images.length}</span>
+          </span>
+        )}
+      </div>
+
+      {/* Micro Navigation Dots & Arrows */}
+      {images.length > 1 && (
+        <div className="showcase-card-slide-controls" onClick={(e) => e.stopPropagation()}>
+          <button className="sc-slide-arrow prev" onClick={handlePrev} aria-label="Previous image">‹</button>
+          <div className="sc-slide-dots">
+            {images.map((_, i) => (
+              <span
+                key={i}
+                className={`sc-dot ${i === activeIdx ? 'active' : ''}`}
+                onClick={(e) => { e.stopPropagation(); setActiveIdx(i); }}
+                title={`Go to image ${i + 1}`}
+              />
+            ))}
+          </div>
+          <button className="sc-slide-arrow next" onClick={handleNext} aria-label="Next image">›</button>
+        </div>
+      )}
+    </div>
+  );
+};
 
 const ProjectsShowcase = () => {
   const { portfolioProjects } = usePortfolioData();
@@ -22,7 +116,7 @@ const ProjectsShowcase = () => {
   const getCategoryMeta = (cat) => {
     switch (cat?.toLowerCase()) {
       case 'android':
-        return { label: 'Android (Kotlin/Java)', color: '#3DDC84', icon: '🤖', glow: 'rgba(61, 220, 132, 0.25)' };
+        return { label: 'Android (Kotlin/Java)', color: '#10b981', icon: '🤖', glow: 'rgba(16, 185, 129, 0.25)' };
       case 'flutter':
         return { label: 'Flutter (Dart)', color: '#0284c7', icon: '💙', glow: 'rgba(2, 132, 199, 0.25)' };
       case 'web':
@@ -78,24 +172,24 @@ const ProjectsShowcase = () => {
           <div className="showcase-breadcrumb">
             <span>Portfolio</span>
             <span className="sep">/</span>
-            <span className="current">Projects Showcase</span>
+            <span className="current">All Projects Showcase</span>
           </div>
         </div>
 
-        {/* Hero Section of Showcase */}
+        {/* Showcase Header */}
         <header className="showcase-header">
           <div className="showcase-badge">
             <span className="badge-pulse" />
-            <span>Curated Software Engineering Portfolio</span>
+            <span>Complete Production Portfolio</span>
           </div>
           <h1 className="showcase-headline">
-            Production Apps & <span className="text-gradient">Case Studies</span>
+            Explore All <span className="text-gradient">Shipped Applications</span>
           </h1>
           <p className="showcase-subhead">
-            Browse published Android Play Store apps, cross-platform Flutter solutions, and full-stack platforms engineered with clean MVVM architecture, high reliability, and pixel-perfect design.
+            Deep dive into technical case studies, production Play Store metrics, Clean Architecture patterns, and live systems engineered by Zain Saeed.
           </p>
 
-          {/* Metrics Strip */}
+          {/* Quick Metrics Strip */}
           <div className="showcase-stats-strip">
             <div className="stat-card">
               <span className="stat-val">{stats.total}</span>
@@ -174,7 +268,7 @@ const ProjectsShowcase = () => {
           </div>
         </div>
 
-        {/* Filter Categories */}
+        {/* Filter Category Tabs */}
         <div className="showcase-category-chips">
           {categories.map((cat) => (
             <button
@@ -182,9 +276,9 @@ const ProjectsShowcase = () => {
               className={`cat-chip ${selectedCategory === cat.id ? 'active' : ''}`}
               onClick={() => setSelectedCategory(cat.id)}
             >
-              <span className="cat-icon">{cat.icon}</span>
-              <span className="cat-label">{cat.label}</span>
-              <span className="cat-count">
+              <span className="cat-chip-icon">{cat.icon}</span>
+              <span>{cat.label}</span>
+              <span className="cat-chip-count">
                 {cat.id === 'all'
                   ? portfolioProjects?.length || 0
                   : (portfolioProjects || []).filter(p => p.category === cat.id).length}
@@ -207,7 +301,6 @@ const ProjectsShowcase = () => {
           <div className={`showcase-projects-grid ${viewMode === 'list' ? 'is-list-view' : ''}`}>
             {filteredProjects.map((project, idx) => {
               const meta = getCategoryMeta(project.category);
-              const previewImg = project.image || project.screenshots?.[0] || '/logo192.png';
 
               return (
                 <article
@@ -216,35 +309,8 @@ const ProjectsShowcase = () => {
                   style={{ '--card-accent': meta.color, '--card-glow': meta.glow }}
                   onClick={() => navigate(`/portfolio/${project.slug}`)}
                 >
-                  {/* Card Media Preview */}
-                  <div className="card-media-wrapper">
-                    <img
-                      src={previewImg}
-                      alt={project.title}
-                      loading="lazy"
-                      onError={(e) => { e.target.src = '/logo192.png'; }}
-                    />
-                    <div className="media-overlay" />
-                    <span className="card-category-badge" style={{ borderColor: meta.color, color: meta.color }}>
-                      <span className="badge-ico">{meta.icon}</span>
-                      <span>{meta.label}</span>
-                    </span>
-
-                    <div className="card-media-indicators">
-                      {Boolean(project.videoUrl || project.videoLink || project.demoVideo) && (
-                        <span className="card-video-pill" title="Interactive Video Demo Available">
-                          <span>▶</span>
-                          <span>Video</span>
-                        </span>
-                      )}
-                      {normalizeScreenshots(project.screenshots).length > 1 && (
-                        <span className="card-screens-pill" title="Multiple Screenshots Available">
-                          <span>📸</span>
-                          <span>{normalizeScreenshots(project.screenshots).length}</span>
-                        </span>
-                      )}
-                    </div>
-                  </div>
+                  {/* Dynamic Multi-Image Carousel Media Header */}
+                  <ShowcaseCardMedia project={project} meta={meta} />
 
                   {/* Card Body */}
                   <div className="card-body">
@@ -285,28 +351,36 @@ const ProjectsShowcase = () => {
                             target="_blank"
                             rel="noopener noreferrer"
                             className="ext-link"
-                            title="Play Store / Live Preview"
-                            aria-label="Live Demo"
+                            title="Live Demo"
                           >
-                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                              <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path>
-                              <polyline points="15 3 21 3 21 9"></polyline>
-                              <line x1="10" y1="14" x2="21" y2="3"></line>
+                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                              <path d="M18 13v6a2 2 0 01-2 2H5a2 2 0 01-2-2V8a2 2 0 012-2h6M15 3h6v6M10 14L21 3" />
                             </svg>
                           </a>
                         )}
-
-                        {project.githubUrl && project.githubUrl !== '#' && (
+                        {project.playStoreLink && (
+                          <a
+                            href={project.playStoreLink}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="ext-link"
+                            title="Google Play Store"
+                          >
+                            <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor">
+                              <polygon points="5 3 19 12 5 21 5 3"></polygon>
+                            </svg>
+                          </a>
+                        )}
+                        {project.githubUrl && (
                           <a
                             href={project.githubUrl}
                             target="_blank"
                             rel="noopener noreferrer"
                             className="ext-link"
-                            title="GitHub Source"
-                            aria-label="GitHub Repository"
+                            title="Source Code"
                           >
-                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                              <path d="M9 19c-5 1.5-5-2.5-7-3m14 6v-3.87a3.37 3.37 0 0 0-.94-2.61c3.14-.35 6.44-1.54 6.44-7A5.44 5.44 0 0 0 20 4.77 5.07 5.07 0 0 0 19.91 1S18.73.65 16 2.48a13.38 13.38 0 0 0-7 0C6.27.65 5.09 1 5.09 1A5.07 5.07 0 0 0 5 4.77a5.44 5.44 0 0 0-1.5 3.78c0 5.42 3.3 6.61 6.44 7A3.37 3.37 0 0 0 9 18.13V22"></path>
+                            <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor">
+                              <path d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z" />
                             </svg>
                           </a>
                         )}

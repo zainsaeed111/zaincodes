@@ -1,7 +1,120 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
 import './Portfolio.css';
 import usePortfolioData from '../hooks/usePortfolioData';
+import { normalizeScreenshots } from '../utils/mediaHelper';
+
+// Subcomponent for interactive auto-rotating screenshot preview
+const PortfolioCardVisual = ({ project, meta, isValidLink }) => {
+  const images = useMemo(() => {
+    const list = [];
+    if (project.thumbnail) list.push(project.thumbnail);
+    if (project.image && !list.includes(project.image)) list.push(project.image);
+    const extra = normalizeScreenshots(project.screenshots);
+    extra.forEach(img => {
+      if (!list.includes(img)) list.push(img);
+    });
+    return list.length > 0 ? list : ['/Profile.webp'];
+  }, [project]);
+
+  const [activeIdx, setActiveIdx] = useState(0);
+
+  // Auto-rotate screenshots every 3.8s if multiple images exist
+  useEffect(() => {
+    if (images.length <= 1) return;
+    const timer = setInterval(() => {
+      setActiveIdx(prev => (prev + 1) % images.length);
+    }, 3800);
+    return () => clearInterval(timer);
+  }, [images.length]);
+
+  const handlePrev = (e) => {
+    e.stopPropagation();
+    setActiveIdx(prev => (prev > 0 ? prev - 1 : images.length - 1));
+  };
+
+  const handleNext = (e) => {
+    e.stopPropagation();
+    setActiveIdx(prev => (prev + 1) % images.length);
+  };
+
+  const hasVideo = Boolean(project.videoUrl || project.videoLink || project.demoVideo);
+
+  return (
+    <div className="pf-card-visual">
+      {/* Sliding Images with Smooth Crossfade */}
+      <div className="pf-card-slider">
+        {images.map((img, i) => (
+          <img
+            key={i}
+            src={img}
+            alt={`${project.title} Preview ${i + 1}`}
+            className={`pf-card-img ${i === activeIdx ? 'is-active' : ''}`}
+            loading="lazy"
+            onError={(e) => { e.target.src = '/Profile.webp'; }}
+          />
+        ))}
+      </div>
+
+      <div className="pf-card-img-overlay" />
+
+      {/* Category Pill */}
+      <div className="pf-card-category" style={{ '--cat-color': meta.color }}>
+        <span className="cat-icon">{meta.icon}</span>
+        <span className="cat-label">{meta.label}</span>
+      </div>
+
+      {/* Top Right Badges */}
+      <div className="pf-card-top-badges">
+        {hasVideo && (
+          <div className="pf-card-status pf-status-video" title="Interactive Video Demo Available">
+            <span>▶</span>
+            <span>Video</span>
+          </div>
+        )}
+        {isValidLink(project.playStoreLink) && (
+          <div className="pf-card-status pf-status-live">
+            <span className="pf-status-pulse" />
+            <span>Published</span>
+          </div>
+        )}
+        {!isValidLink(project.playStoreLink) && isValidLink(project.liveLink) && (
+          <div className="pf-card-status pf-status-production">
+            <span className="pf-status-pulse blue" />
+            <span>Live</span>
+          </div>
+        )}
+      </div>
+
+      {/* Interactive Micro Slideshow Controls (Arrows & Dot Indicators) */}
+      {images.length > 1 && (
+        <div className="pf-card-slide-controls" onClick={(e) => e.stopPropagation()}>
+          <button className="pf-slide-arrow prev" onClick={handlePrev} aria-label="Previous image">‹</button>
+          <div className="pf-slide-dots">
+            {images.map((_, i) => (
+              <span
+                key={i}
+                className={`pf-slide-dot ${i === activeIdx ? 'active' : ''}`}
+                onClick={(e) => { e.stopPropagation(); setActiveIdx(i); }}
+                title={`Go to image ${i + 1}`}
+              />
+            ))}
+          </div>
+          <button className="pf-slide-arrow next" onClick={handleNext} aria-label="Next image">›</button>
+          <span className="pf-screens-counter">📸 {activeIdx + 1}/{images.length}</span>
+        </div>
+      )}
+
+      {/* Hover Reveal Diagonal Arrow */}
+      <div className="pf-card-arrow">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+          <line x1="7" y1="17" x2="17" y2="7" />
+          <polyline points="7 7 17 7 17 17" />
+        </svg>
+      </div>
+    </div>
+  );
+};
 
 const Portfolio = () => {
   const { portfolioProjects } = usePortfolioData();
@@ -36,16 +149,16 @@ const Portfolio = () => {
 
   const filters = [
     { id: 'all', label: 'All', icon: '◆' },
-    { id: 'android', label: 'Android', icon: '🤖' },
-    { id: 'flutter', label: 'Flutter', icon: '💙' },
-    { id: 'web', label: 'Web', icon: '🌐' }
+    { id: 'android', label: 'Android Native', icon: '🤖' },
+    { id: 'flutter', label: 'Flutter Apps', icon: '💙' },
+    { id: 'web', label: 'Web Platform', icon: '🌐' }
   ];
 
   const getCategoryMeta = (cat) => {
     switch (cat) {
-      case 'android': return { label: 'Android Native App', color: '#3DDC84', icon: '🤖' };
+      case 'android': return { label: 'Android Native App', color: '#10b981', icon: '🤖' };
       case 'flutter': return { label: 'Flutter Mobile App', color: '#0284c7', icon: '💙' };
-      case 'web': return { label: 'Web & Admin Dashboard', color: '#8b5cf6', icon: '🌐' };
+      case 'web': return { label: 'Web & Cloud Dashboard', color: '#8b5cf6', icon: '🌐' };
       default: return { label: cat, color: '#6366f1', icon: '🚀' };
     }
   };
@@ -62,11 +175,11 @@ const Portfolio = () => {
             <span>MOBILE PRODUCTION PORTFOLIO</span>
           </div>
           <h2 className="portfolio-title">
-            Shipped Apps &<br />
-            <span className="text-gradient">Case Studies</span>
+            Featured Apps &amp;<br />
+            <span className="text-gradient">Production Case Studies</span>
           </h2>
           <p className="portfolio-subtitle">
-            Published Android apps, Flutter cross-platform solutions, and mobile backend platforms — architected, built, and deployed.
+            Published Android apps, Flutter cross-platform applications, and high-performance cloud backends — architected, tested, and deployed to millions of devices.
           </p>
         </div>
 
@@ -93,58 +206,26 @@ const Portfolio = () => {
 
             return (
               <article
-                key={project.id}
+                key={project.id || idx}
                 className={`pf-card ${isHovered ? 'is-hovered' : ''}`}
                 style={{ '--card-accent': meta.color, '--card-delay': `${idx * 0.08}s` }}
                 onClick={() => handleProjectClick(project)}
                 onMouseEnter={() => setHoveredId(project.id)}
                 onMouseLeave={() => setHoveredId(null)}
               >
-                {/* Image */}
-                <div className="pf-card-visual">
-                  <img
-                    src={project.thumbnail || project.image}
-                    alt={project.title}
-                    className="pf-card-img"
-                    loading="lazy"
-                  />
-                  <div className="pf-card-img-overlay" />
+                {/* Visual Image Carousel Header */}
+                <PortfolioCardVisual
+                  project={project}
+                  meta={meta}
+                  isValidLink={isValidLink}
+                />
 
-                  {/* Category Pill */}
-                  <div className="pf-card-category" style={{ '--cat-color': meta.color }}>
-                    <span>{meta.icon}</span>
-                    <span>{meta.label}</span>
-                  </div>
-
-                  {/* Status Indicator */}
-                  {isValidLink(project.playStoreLink) && (
-                    <div className="pf-card-status pf-status-live">
-                      <span className="pf-status-pulse" />
-                      <span>Published</span>
-                    </div>
-                  )}
-                  {!isValidLink(project.playStoreLink) && isValidLink(project.liveLink) && (
-                    <div className="pf-card-status pf-status-production">
-                      <span className="pf-status-pulse blue" />
-                      <span>Live</span>
-                    </div>
-                  )}
-
-                  {/* Hover Reveal Arrow */}
-                  <div className="pf-card-arrow">
-                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-                      <line x1="7" y1="17" x2="17" y2="7" />
-                      <polyline points="7 7 17 7 17 17" />
-                    </svg>
-                  </div>
-                </div>
-
-                {/* Content */}
+                {/* Content Body */}
                 <div className="pf-card-content">
                   <h3 className="pf-card-title">{project.title}</h3>
                   <p className="pf-card-desc">{project.description}</p>
 
-                  {/* Tech */}
+                  {/* Tech Stack Pills */}
                   <div className="pf-card-tech">
                     {(project.technologies || []).slice(0, 4).map((tech, i) => (
                       <span key={i} className="pf-tech-pill">{tech}</span>
@@ -154,7 +235,7 @@ const Portfolio = () => {
                     )}
                   </div>
 
-                  {/* Metrics */}
+                  {/* Highlights / Metrics */}
                   {project.highlights && project.highlights.length > 0 && (
                     <div className="pf-card-metrics">
                       {project.highlights.slice(0, 2).map((h, i) => (
@@ -166,9 +247,9 @@ const Portfolio = () => {
                     </div>
                   )}
 
-                  {/* CTA */}
+                  {/* Card CTA Footer */}
                   <div className="pf-card-cta">
-                    <span className="pf-cta-text">Explore Case Study</span>
+                    <span className="pf-cta-text">Explore Full Case Study</span>
                     <span className="pf-cta-arrow">→</span>
                   </div>
                 </div>
