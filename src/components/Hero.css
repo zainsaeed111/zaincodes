@@ -470,25 +470,44 @@
   .badge-bottom-right { right: 0; bottom: -5px; }
 }
 
-/* -- Hero Actions Precision Alignment -- */
+/* -- Hero Actions Precision Alignment (Single Line Guaranteed) -- */
 .hero-actions {
-  display: flex;
+  display: inline-flex;
   align-items: center;
-  gap: 1.25rem;
-  flex-wrap: wrap;
-  margin-top: 0.75rem;
+  gap: 1.15rem;
+  flex-wrap: nowrap;
+  margin-top: 1.25rem;
 }
 
 .hero-actions .btn-primary,
 .hero-actions .btn-resume {
+  height: 52px;
   min-height: 52px;
-  padding: 0.85rem 1.8rem;
+  max-height: 52px;
+  padding: 0 1.85rem;
   display: inline-flex;
   align-items: center;
   justify-content: center;
   gap: 0.65rem;
   box-sizing: border-box;
+  font-family: var(--font-display);
   font-size: 0.95rem;
   font-weight: 600;
   line-height: 1;
+  border-radius: var(--radius-full);
+  white-space: nowrap;
+  cursor: pointer;
+  transition: all var(--duration-fast) var(--ease-out);
+}
+
+@media (max-width: 600px) {
+  .hero-actions {
+    flex-direction: column;
+    width: 100%;
+    gap: 0.85rem;
+  }
+  .hero-actions .btn-primary,
+  .hero-actions .btn-resume {
+    width: 100%;
+  }
 }

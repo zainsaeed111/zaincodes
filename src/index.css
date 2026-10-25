@@ -325,3 +325,18 @@ img {
   transform: translateY(-2px);
   color: #ffffff;
 }
+
+
+/* Light Theme Resume Button */
+.light-theme .btn-resume {
+  background: rgba(16, 185, 129, 0.08);
+  border-color: rgba(16, 185, 129, 0.4);
+  color: #047857;
+}
+
+.light-theme .btn-resume:hover {
+  background: #059669;
+  border-color: #059669;
+  color: #ffffff;
+  box-shadow: 0 4px 15px rgba(5, 150, 105, 0.35);
+}

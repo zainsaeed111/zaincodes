@@ -333,3 +333,23 @@
   font-size: 0.72rem;
   color: var(--text-muted);
 }
+
+
+/* Light Theme Dropdown Submenu */
+.light-theme .nav-submenu-dropdown {
+  background: #ffffff;
+  border-color: rgba(0, 0, 0, 0.12);
+  box-shadow: 0 15px 35px rgba(0, 0, 0, 0.12);
+}
+
+.light-theme .submenu-item:hover {
+  background: rgba(99, 102, 241, 0.08);
+}
+
+.light-theme .submenu-text strong {
+  color: #0f172a;
+}
+
+.light-theme .submenu-text small {
+  color: #64748b;
+}

@@ -82,24 +82,6 @@ const Navigation = () => {
         </div>
 
         <div className={`nav-menu ${isMobileMenuOpen ? 'active' : ''}`}>
-          {/* Home */}
-          <a
-            href="#home"
-            onClick={(e) => { e.preventDefault(); scrollToSection('home'); }}
-            className={`nav-link ${activeSection === 'home' && isHomePage ? 'active' : ''}`}
-          >
-            Home
-          </a>
-
-          {/* About */}
-          <a
-            href="#about"
-            onClick={(e) => { e.preventDefault(); scrollToSection('about'); }}
-            className={`nav-link ${activeSection === 'about' && isHomePage ? 'active' : ''}`}
-          >
-            About
-          </a>
-
           {/* Work / Projects with Submenu Dropdown */}
           <div
             className="nav-dropdown-wrapper"
@@ -150,22 +132,22 @@ const Navigation = () => {
             )}
           </div>
 
-          {/* Skills */}
+          {/* About */}
+          <a
+            href="#about"
+            onClick={(e) => { e.preventDefault(); scrollToSection('about'); }}
+            className={`nav-link ${activeSection === 'about' && isHomePage ? 'active' : ''}`}
+          >
+            About
+          </a>
+
+          {/* Skills / Expertise */}
           <a
             href="#skills"
             onClick={(e) => { e.preventDefault(); scrollToSection('skills'); }}
             className={`nav-link ${activeSection === 'skills' && isHomePage ? 'active' : ''}`}
           >
             Expertise
-          </a>
-
-          {/* Contact */}
-          <a
-            href="#contact"
-            onClick={(e) => { e.preventDefault(); scrollToSection('contact'); }}
-            className={`nav-link ${activeSection === 'contact' && isHomePage ? 'active' : ''}`}
-          >
-            Contact
           </a>
 
           {/* Quick Resume Download Pill */}
@@ -186,7 +168,7 @@ const Navigation = () => {
             <span>Resume</span>
           </button>
 
-          {/* Start a Project CTA */}
+          {/* Get In Touch CTA */}
           <a
             href="#contact"
             onClick={(e) => {
@@ -195,7 +177,7 @@ const Navigation = () => {
             }}
             className="nav-cta"
           >
-            Start a Project
+            Get In Touch
           </a>
 
           {/* Dark / Light Theme Toggle */}
