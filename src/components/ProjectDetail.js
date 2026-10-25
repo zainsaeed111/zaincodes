@@ -1,6 +1,7 @@
-import React, { useEffect, useState, useRef } from 'react';
+import React, { useEffect, useState, useRef, useMemo } from 'react';
 import { useParams, useNavigate, Link } from 'react-router-dom';
 import './ProjectDetail.css';
+import { getVideoEmbedInfo, normalizeScreenshots } from '../utils/mediaHelper';
 
 const ProjectDetail = ({ projects }) => {
     const { slug } = useParams();
@@ -9,7 +10,36 @@ const ProjectDetail = ({ projects }) => {
     const [isVisible, setIsVisible] = useState(false);
     const contentRef = useRef(null);
 
-    const project = projects.find(p => p.slug === slug);
+    const project = (projects || []).find(p => p.slug === slug);
+
+    // Media states
+    const videoInfo = useMemo(() => {
+        if (!project) return null;
+        return getVideoEmbedInfo(project.videoUrl || project.videoLink || project.demoVideo);
+    }, [project]);
+
+    const mediaList = useMemo(() => {
+        if (!project) return [];
+        const list = [];
+        // 1. Cover
+        const cover = project.thumbnail || project.image;
+        if (cover) list.push({ type: 'image', url: cover, label: 'Cover' });
+
+        // 2. Extra screenshots
+        const extra = normalizeScreenshots(project.screenshots);
+        extra.forEach((url, i) => {
+            if (url !== cover) {
+                list.push({ type: 'image', url, label: `Screen ${i + 1}` });
+            }
+        });
+
+        return list;
+    }, [project]);
+
+    // Default to video if available, else first screenshot
+    const [activeTab, setActiveTab] = useState('video'); // 'video' | 'gallery'
+    const [activeImageIdx, setActiveImageIdx] = useState(0);
+    const [lightboxImage, setLightboxImage] = useState(null);
 
     useEffect(() => {
         if (!project) {
@@ -17,12 +47,17 @@ const ProjectDetail = ({ projects }) => {
         } else {
             document.title = `${project.title} | Zain Saeed Case Study`;
             setTimeout(() => setIsVisible(true), 100);
+            if (!videoInfo && mediaList.length > 0) {
+                setActiveTab('gallery');
+            } else if (videoInfo) {
+                setActiveTab('video');
+            }
         }
 
         return () => {
             document.title = "Zain Saeed | Mobile App & Full-Stack Developer";
         };
-    }, [project, navigate]);
+    }, [project, navigate, videoInfo, mediaList]);
 
     useEffect(() => {
         const observer = new IntersectionObserver(
@@ -69,31 +104,50 @@ const ProjectDetail = ({ projects }) => {
         window.open(`https://www.linkedin.com/sharing/share-offsite/?url=${encodeURIComponent(url)}`, '_blank');
     };
 
-    const relatedProjects = projects
+    const relatedProjects = (projects || [])
         .filter(p => p.category === project.category && p.id !== project.id)
         .slice(0, 2);
 
     const isValidLink = (link) => link && typeof link === 'string' && link.trim() !== '' && link.trim() !== '#';
+
+    const handlePrevImage = () => {
+        if (mediaList.length === 0) return;
+        setActiveImageIdx((prev) => (prev > 0 ? prev - 1 : mediaList.length - 1));
+        setActiveTab('gallery');
+    };
+
+    const handleNextImage = () => {
+        if (mediaList.length === 0) return;
+        setActiveImageIdx((prev) => (prev < mediaList.length - 1 ? prev + 1 : 0));
+        setActiveTab('gallery');
+    };
+
+    const activeImage = mediaList[activeImageIdx] || mediaList[0];
 
     return (
         <div className={`project-detail ${isVisible ? 'visible' : ''}`}>
             {/* Hero Section */}
             <section className="project-hero">
                 <div className="hero-background">
-                    <img src={project.image} alt={project.title} className="hero-bg-image" />
+                    <img src={project.image || project.thumbnail || '/Profile.webp'} alt={project.title} className="hero-bg-image" />
                     <div className="hero-overlay"></div>
                 </div>
                 <div className="container hero-content">
-                    <Link to="/#portfolio" className="back-link">
+                    <Link to="/projects" className="back-link">
                         <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
                             <path d="M19 12H5M12 19l-7-7 7-7" />
                         </svg>
-                        Back to Portfolio
+                        Back to Projects Showcase
                     </Link>
                     <div className="project-meta">
                         <span className="project-category-badge">
-                            {project.category === 'android' ? 'Android Native' : project.category === 'flutter' ? 'Flutter Mobile' : 'Web Platform'}
+                            {project.category === 'android' ? '🤖 Android Native' : project.category === 'flutter' ? '💙 Flutter Mobile' : '🌐 Web Platform'}
                         </span>
+                        {videoInfo && (
+                            <span className="project-category-badge" style={{ marginLeft: '0.5rem', borderColor: '#ef4444', color: '#ef4444' }}>
+                                🎬 Video Demo Attached
+                            </span>
+                        )}
                     </div>
                     <h1 className="project-title">{project.title}</h1>
                     <p className="project-tagline">{project.description}</p>
@@ -130,41 +184,144 @@ const ProjectDetail = ({ projects }) => {
             {/* Main Content */}
             <main className="project-content" ref={contentRef}>
                 <div className="container">
+
+                    {/* ════════════════ INTERACTIVE MEDIA & VIDEO CONSOLE ════════════════ */}
+                    {(videoInfo || mediaList.length > 0) && (
+                        <div className="media-showcase-console animate-on-scroll">
+                            <div className="media-console-header">
+                                <div className="media-console-tabs">
+                                    {videoInfo && (
+                                        <button
+                                            className={`media-tab-btn ${activeTab === 'video' ? 'active' : ''}`}
+                                            onClick={() => setActiveTab('video')}
+                                        >
+                                            <span>▶ Video Demo</span>
+                                        </button>
+                                    )}
+                                    {mediaList.length > 0 && (
+                                        <button
+                                            className={`media-tab-btn ${activeTab === 'gallery' ? 'active' : ''}`}
+                                            onClick={() => setActiveTab('gallery')}
+                                        >
+                                            <span>📸 Screenshots &amp; Mockups ({mediaList.length})</span>
+                                        </button>
+                                    )}
+                                </div>
+
+                                {activeTab === 'gallery' && (
+                                    <span className="media-counter-badge">
+                                        Slide {activeImageIdx + 1} of {mediaList.length}
+                                    </span>
+                                )}
+                            </div>
+
+                            {/* Main Stage Display */}
+                            <div className="media-stage-wrapper">
+                                {activeTab === 'video' && videoInfo ? (
+                                    videoInfo.type === 'html5' ? (
+                                        <video
+                                            src={videoInfo.embedUrl}
+                                            controls
+                                            playsInline
+                                            className="html5-video-player"
+                                        />
+                                    ) : (
+                                        <iframe
+                                            src={videoInfo.embedUrl}
+                                            title={`${project.title} Video Showcase`}
+                                            className="video-responsive-frame"
+                                            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+                                            allowFullScreen
+                                        />
+                                    )
+                                ) : (
+                                    activeImage && (
+                                        <div
+                                            className="stage-screenshot-container"
+                                            onClick={() => setLightboxImage(activeImage.url)}
+                                            title="Click to view full screen"
+                                        >
+                                            {mediaList.length > 1 && (
+                                                <>
+                                                    <button
+                                                        className="stage-nav-arrow prev"
+                                                        onClick={(e) => { e.stopPropagation(); handlePrevImage(); }}
+                                                        aria-label="Previous Screenshot"
+                                                    >
+                                                        ‹
+                                                    </button>
+                                                    <button
+                                                        className="stage-nav-arrow next"
+                                                        onClick={(e) => { e.stopPropagation(); handleNextImage(); }}
+                                                        aria-label="Next Screenshot"
+                                                    >
+                                                        ›
+                                                    </button>
+                                                </>
+                                            )}
+                                            <img
+                                                src={activeImage.url}
+                                                alt={`${project.title} Preview`}
+                                                className="stage-screenshot-img"
+                                                loading="eager"
+                                            />
+                                            <span className="zoom-hint-pill">🔍 Click to Expand High-Res</span>
+                                        </div>
+                                    )
+                                )}
+                            </div>
+
+                            {/* Multi-Thumbnail Selector Strip */}
+                            <div className="media-thumbnail-strip">
+                                {videoInfo && (
+                                    <button
+                                        className={`thumb-item-btn ${activeTab === 'video' ? 'active' : ''}`}
+                                        onClick={() => setActiveTab('video')}
+                                        title="Watch Video Demo"
+                                    >
+                                        <img src={project.thumbnail || project.image || '/logo192.png'} alt="Video Thumbnail" />
+                                        <div className="thumb-video-badge">
+                                            <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+                                                <polygon points="5 3 19 12 5 21 5 3"></polygon>
+                                            </svg>
+                                            <span>Video</span>
+                                        </div>
+                                    </button>
+                                )}
+
+                                {mediaList.map((item, idx) => (
+                                    <button
+                                        key={idx}
+                                        className={`thumb-item-btn ${activeTab === 'gallery' && activeImageIdx === idx ? 'active' : ''}`}
+                                        onClick={() => {
+                                            setActiveTab('gallery');
+                                            setActiveImageIdx(idx);
+                                        }}
+                                        title={`View ${item.label}`}
+                                    >
+                                        <img src={item.url} alt={`Thumbnail ${idx + 1}`} />
+                                    </button>
+                                ))}
+                            </div>
+                        </div>
+                    )}
+
                     {/* Share Section */}
                     <div className="share-section animate-on-scroll">
-                        <span className="share-label">Share this project:</span>
+                        <span className="share-label">Share this case study:</span>
                         <div className="share-buttons">
                             <button
                                 className={`share-btn ${copied ? 'copied' : ''}`}
                                 onClick={copyLink}
-                                title="Copy link"
+                                title="Copy direct link"
                             >
-                                {copied ? (
-                                    <>
-                                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                                            <polyline points="20 6 9 17 4 12" />
-                                        </svg>
-                                        Copied!
-                                    </>
-                                ) : (
-                                    <>
-                                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                                            <rect x="9" y="9" width="13" height="13" rx="2" ry="2" />
-                                            <path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1" />
-                                        </svg>
-                                        Copy Link
-                                    </>
-                                )}
+                                {copied ? '✓ Copied!' : '📋 Copy Link'}
                             </button>
                             <button className="share-btn twitter" onClick={shareOnTwitter} title="Share on Twitter">
-                                <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor">
-                                    <path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z" />
-                                </svg>
+                                Twitter / X
                             </button>
                             <button className="share-btn linkedin" onClick={shareOnLinkedIn} title="Share on LinkedIn">
-                                <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor">
-                                    <path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433c-1.144 0-2.063-.926-2.063-2.065 0-1.139.92-2.063 2.063-2.063 1.14 0 2.064.925 2.064 2.063 0 1.139-.925 2.065-2.064 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z" />
-                                </svg>
+                                LinkedIn
                             </button>
                         </div>
                     </div>
@@ -172,7 +329,7 @@ const ProjectDetail = ({ projects }) => {
                     {/* Description */}
                     <section className="content-section animate-on-scroll">
                         <h2 className="section-heading">About This Project</h2>
-                        <p className="project-long-description">{project.longDescription}</p>
+                        <p className="project-long-description">{project.longDescription || project.description}</p>
                     </section>
 
                     {/* The Problem */}
@@ -199,64 +356,49 @@ const ProjectDetail = ({ projects }) => {
                         </section>
                     )}
 
-                    {/* Project Screenshots in 3D */}
-                    {project.screenshots && project.screenshots.length > 0 && (
+                    {/* Technologies */}
+                    {Array.isArray(project.technologies) && project.technologies.length > 0 && (
                         <section className="content-section animate-on-scroll">
-                            <h2 className="section-heading">Case Study Mockups</h2>
-                            <div className="project-screenshots-container perspective-workspace">
-                                <div className="project-screenshots-grid scene-3d">
-                                    {project.screenshots.map((screenshot, idx) => (
-                                        <div key={idx} className="project-screenshot-card stack-3d">
-                                            <img
-                                                src={screenshot}
-                                                alt={`${project.title} interface snapshot ${idx + 1}`}
-                                                className="project-screenshot-img layer-mid"
-                                                loading="lazy"
-                                            />
-                                        </div>
-                                    ))}
-                                </div>
+                            <h2 className="section-heading">Technologies Used</h2>
+                            <div className="tech-grid">
+                                {project.technologies.map((tech, idx) => (
+                                    <div key={idx} className="tech-item">
+                                        <span className="tech-name">{tech}</span>
+                                    </div>
+                                ))}
                             </div>
                         </section>
                     )}
 
-                    {/* Technologies */}
-                    <section className="content-section animate-on-scroll">
-                        <h2 className="section-heading">Technologies Used</h2>
-                        <div className="tech-grid">
-                            {project.technologies.map((tech, idx) => (
-                                <div key={idx} className="tech-item">
-                                    <span className="tech-name">{tech}</span>
-                                </div>
-                            ))}
-                        </div>
-                    </section>
-
                     {/* Features */}
-                    <section className="content-section animate-on-scroll">
-                        <h2 className="section-heading">Key Features</h2>
-                        <div className="features-grid">
-                            {project.features.map((feature, idx) => (
-                                <div key={idx} className="feature-card">
-                                    <div className="feature-icon">✓</div>
-                                    <span className="feature-text">{feature}</span>
-                                </div>
-                            ))}
-                        </div>
-                    </section>
+                    {Array.isArray(project.features) && project.features.length > 0 && (
+                        <section className="content-section animate-on-scroll">
+                            <h2 className="section-heading">Key Features</h2>
+                            <div className="features-grid">
+                                {project.features.map((feature, idx) => (
+                                    <div key={idx} className="feature-card">
+                                        <div className="feature-icon">✓</div>
+                                        <span className="feature-text">{feature}</span>
+                                    </div>
+                                ))}
+                            </div>
+                        </section>
+                    )}
 
                     {/* Highlights */}
-                    <section className="content-section animate-on-scroll">
-                        <h2 className="section-heading">Highlights</h2>
-                        <div className="highlights-grid">
-                            {project.highlights.map((highlight, idx) => (
-                                <div key={idx} className="highlight-card">
-                                    <div className="highlight-number">{idx + 1}</div>
-                                    <span className="highlight-text">{highlight}</span>
-                                </div>
-                            ))}
-                        </div>
-                    </section>
+                    {Array.isArray(project.highlights) && project.highlights.length > 0 && (
+                        <section className="content-section animate-on-scroll">
+                            <h2 className="section-heading">Highlights</h2>
+                            <div className="highlights-grid">
+                                {project.highlights.map((highlight, idx) => (
+                                    <div key={idx} className="highlight-card">
+                                        <div className="highlight-number">{idx + 1}</div>
+                                        <span className="highlight-text">{highlight}</span>
+                                    </div>
+                                ))}
+                            </div>
+                        </section>
+                    )}
 
                     {/* Related Projects */}
                     {relatedProjects.length > 0 && (
@@ -270,7 +412,7 @@ const ProjectDetail = ({ projects }) => {
                                         className="related-card"
                                     >
                                         <div className="related-image">
-                                            <img src={relatedProject.thumbnail} alt={relatedProject.title} />
+                                            <img src={relatedProject.thumbnail || relatedProject.image || '/logo192.png'} alt={relatedProject.title} />
                                         </div>
                                         <div className="related-info">
                                             <h3>{relatedProject.title}</h3>
@@ -297,6 +439,16 @@ const ProjectDetail = ({ projects }) => {
                     </section>
                 </div>
             </main>
+
+            {/* Lightbox Fullscreen Modal */}
+            {lightboxImage && (
+                <div className="media-lightbox-modal" onClick={() => setLightboxImage(null)}>
+                    <div className="lightbox-img-wrapper" onClick={(e) => e.stopPropagation()}>
+                        <button className="lightbox-close-btn" onClick={() => setLightboxImage(null)}>✕</button>
+                        <img src={lightboxImage} alt="Expanded Screenshot" />
+                    </div>
+                </div>
+            )}
         </div>
     );
 };

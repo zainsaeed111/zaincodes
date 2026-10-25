@@ -1,6 +1,7 @@
 import React, { useState, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
 import usePortfolioData from '../hooks/usePortfolioData';
+import { normalizeScreenshots } from '../utils/mediaHelper';
 import './ProjectsShowcase.css';
 
 const ProjectsShowcase = () => {
@@ -228,6 +229,21 @@ const ProjectsShowcase = () => {
                       <span className="badge-ico">{meta.icon}</span>
                       <span>{meta.label}</span>
                     </span>
+
+                    <div className="card-media-indicators">
+                      {Boolean(project.videoUrl || project.videoLink || project.demoVideo) && (
+                        <span className="card-video-pill" title="Interactive Video Demo Available">
+                          <span>▶</span>
+                          <span>Video</span>
+                        </span>
+                      )}
+                      {normalizeScreenshots(project.screenshots).length > 1 && (
+                        <span className="card-screens-pill" title="Multiple Screenshots Available">
+                          <span>📸</span>
+                          <span>{normalizeScreenshots(project.screenshots).length}</span>
+                        </span>
+                      )}
+                    </div>
                   </div>
 
                   {/* Card Body */}

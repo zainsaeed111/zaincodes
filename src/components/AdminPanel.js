@@ -162,7 +162,7 @@ const AdminPanel = () => {
     const [showForm, setShowForm] = useState(false);
     const [formData, setFormData] = useState({
         title: '', slug: '', category: 'android', description: '', longDescription: '',
-        thumbnail: '', image: '', technologies: '', features: '', highlights: '',
+        thumbnail: '', image: '', videoUrl: '', screenshots: '', technologies: '', features: '', highlights: '',
         playStoreLink: '', githubLink: '', liveLink: ''
     });
 
@@ -377,7 +377,7 @@ const AdminPanel = () => {
     const openAddProject = () => {
         setFormData({
             title: '', slug: '', category: 'android', description: '', longDescription: '',
-            thumbnail: '', image: '', technologies: '', features: '', highlights: '',
+            thumbnail: '', image: '', videoUrl: '', screenshots: '', technologies: '', features: '', highlights: '',
             playStoreLink: '', githubLink: '', liveLink: ''
         });
         setEditingProject(null);
@@ -391,7 +391,9 @@ const AdminPanel = () => {
             description: proj.description || '',
             longDescription: proj.longDescription || '',
             thumbnail: proj.thumbnail || proj.image || '',
-            image: proj.image || '',
+            image: proj.image || proj.thumbnail || '',
+            videoUrl: proj.videoUrl || proj.videoLink || proj.demoVideo || '',
+            screenshots: Array.isArray(proj.screenshots) ? proj.screenshots.join('\n') : (proj.screenshots || ''),
             technologies: (proj.technologies || []).join(', '),
             features: (proj.features || []).join('\n'),
             highlights: (proj.highlights || []).join('\n'),
@@ -415,6 +417,7 @@ const AdminPanel = () => {
         const techArray = formData.technologies.split(',').map(t => t.trim()).filter(Boolean);
         const featArray = formData.features.split('\n').map(f => f.trim()).filter(Boolean);
         const highArray = formData.highlights.split('\n').map(h => h.trim()).filter(Boolean);
+        const screenshotArray = formData.screenshots.split('\n').map(s => s.trim()).filter(Boolean);
 
         const projectData = {
             id: editingProject ? editingProject.id : Date.now(),
@@ -425,6 +428,8 @@ const AdminPanel = () => {
             longDescription: sanitizeInput(formData.longDescription),
             thumbnail: formData.thumbnail || formData.image,
             image: formData.image || formData.thumbnail,
+            videoUrl: formData.videoUrl ? formData.videoUrl.trim() : '',
+            screenshots: screenshotArray,
             technologies: techArray,
             features: featArray,
             highlights: highArray,
@@ -943,7 +948,17 @@ const AdminPanel = () => {
                             </div>
                             <div className="form-group full-width"><label>Short Summary</label><input name="description" value={formData.description} onChange={handleProjectFormChange} required /></div>
                             <div className="form-group full-width"><label>Detailed Architecture Description</label><textarea name="longDescription" rows="4" value={formData.longDescription} onChange={handleProjectFormChange} /></div>
-                            <div className="form-group"><label>Image / Thumbnail URL</label><input name="image" value={formData.image} onChange={handleProjectFormChange} placeholder="/Profile.webp or https://..." /></div>
+                            <div className="form-group"><label>Cover / Main Thumbnail URL</label><input name="image" value={formData.image} onChange={handleProjectFormChange} placeholder="/Profile.webp or https://..." required /></div>
+                            <div className="form-group">
+                                <label>🎬 Showcase Video Demo Link (100% Free)</label>
+                                <input name="videoUrl" value={formData.videoUrl} onChange={handleProjectFormChange} placeholder="https://youtube.com/watch?v=... or MP4 URL" />
+                                <small style={{ color: 'var(--text-muted)', fontSize: '0.78rem' }}>Free hosting on YouTube (unlisted/public), Google Drive, or raw MP4</small>
+                            </div>
+                            <div className="form-group full-width">
+                                <label>📸 Multiple Screenshots &amp; Mockups Gallery (One URL per line)</label>
+                                <textarea name="screenshots" rows="4" value={formData.screenshots} onChange={handleProjectFormChange} placeholder={"https://images.unsplash.com/photo-1...\nhttps://images.unsplash.com/photo-2...\nhttps://images.unsplash.com/photo-3..."} />
+                                <small style={{ color: 'var(--text-muted)', fontSize: '0.78rem' }}>Visitors can click through every thumbnail in high-res and expand full-screen.</small>
+                            </div>
                             <div className="form-group"><label>Technologies (comma separated)</label><input name="technologies" value={formData.technologies} onChange={handleProjectFormChange} placeholder="Kotlin, Jetpack Compose, Room, Coroutines" /></div>
                             <div className="form-group"><label>Play Store / Live Demo Link</label><input name="playStoreLink" value={formData.playStoreLink} onChange={handleProjectFormChange} placeholder="https://play.google.com/..." /></div>
                             <div className="form-group"><label>GitHub Repository Link</label><input name="githubLink" value={formData.githubLink} onChange={handleProjectFormChange} placeholder="https://github.com/..." /></div>
