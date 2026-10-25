@@ -1,12 +1,10 @@
 import React, { useEffect, useRef, useState } from 'react';
-import { useNavigate } from 'react-router-dom';
 import './Hero.css';
 import usePortfolioData from '../hooks/usePortfolioData';
 import { downloadResume } from '../utils/resumeHelper';
 
 const Hero = () => {
   const { heroData } = usePortfolioData();
-  const navigate = useNavigate();
   const heroRef = useRef(null);
   const stageRef = useRef(null);
   const [imgError, setImgError] = useState(false);
@@ -81,6 +79,7 @@ const Hero = () => {
 
           <p className="hero-description">{description}</p>
 
+          {/* Perfectly Aligned 2-Button Hero Row */}
           <div className="hero-actions">
             <button
               className="btn-primary"
@@ -93,38 +92,28 @@ const Hero = () => {
               </svg>
             </button>
 
-            {/* Direct Redirect to Projects Showcase Page */}
-            <button
-              className="btn-secondary"
-              onClick={() => navigate('/projects')}
-              title="View all projects on dedicated page"
-            >
-              <span>Projects Showcase</span>
-              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                <rect x="3" y="3" width="7" height="7"></rect>
-                <rect x="14" y="3" width="7" height="7"></rect>
-                <rect x="14" y="14" width="7" height="7"></rect>
-                <rect x="3" y="14" width="7" height="7"></rect>
-              </svg>
-            </button>
-
-            {/* Free One-Click Resume Download */}
+            {/* Seamless One-Click Resume Download */}
             <button
               className="btn-resume"
               onClick={downloadResume}
               title="Download Zain Saeed Resume (PDF)"
             >
-              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
                 <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
                 <polyline points="7 10 12 15 17 10"></polyline>
                 <line x1="12" y1="15" x2="12" y2="3"></line>
               </svg>
-              <span>Download CV</span>
+              <span>Download Resume</span>
             </button>
           </div>
 
           <div className="hero-trust">
-            <div className="hero-trust-item">
+            <div
+              className="hero-trust-item clickable-trust"
+              onClick={() => document.getElementById('portfolio')?.scrollIntoView({ behavior: 'smooth' })}
+              title="View Shipped Apps"
+              style={{ cursor: 'pointer' }}
+            >
               <span className="hero-trust-number text-gradient">{statApps}+</span>
               <span className="hero-trust-label">Products Shipped</span>
             </div>

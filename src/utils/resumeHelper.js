@@ -6,9 +6,9 @@
 /**
  * Initiates direct download of Zain Saeed's Resume
  */
-export function downloadResume() {
+export async function downloadResume() {
   const fileData = localStorage.getItem('resumeFileData');
-  const fileName = localStorage.getItem('resumeFileName') || 'Zain_Saeed_Mobile_Developer_Resume.pdf';
+  const fileName = localStorage.getItem('resumeFileName') || 'Zain_Saeed_Resume.pdf';
   const customLink = localStorage.getItem('resumeLink');
 
   // 1. Direct Base64 File Download (Uploaded in Admin Panel)
@@ -44,17 +44,36 @@ export function downloadResume() {
     }
   }
 
-  // 3. Fallback: Download official default resume document or public PDF
+  // 3. Robust Blob Download from /resume.pdf
+  try {
+    const response = await fetch('/resume.pdf', { cache: 'no-cache' });
+    if (response.ok) {
+      const blob = await response.blob();
+      const blobUrl = window.URL.createObjectURL(blob);
+      const link = document.createElement('a');
+      link.href = blobUrl;
+      link.download = 'Zain_Saeed_Resume.pdf';
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      window.URL.revokeObjectURL(blobUrl);
+      return { success: true, method: 'blob_download' };
+    }
+  } catch (err) {
+    console.warn('Direct blob download notice, trying direct link fallback:', err);
+  }
+
+  // 4. Fallback: Direct Anchor
   try {
     const defaultLink = document.createElement('a');
     defaultLink.href = '/resume.pdf';
     defaultLink.download = 'Zain_Saeed_Resume.pdf';
+    defaultLink.target = '_blank';
     document.body.appendChild(defaultLink);
     defaultLink.click();
     document.body.removeChild(defaultLink);
     return { success: true, method: 'public_fallback' };
   } catch (err) {
-    // Ultimate fallback: open contact section
     window.location.href = '#contact';
     return { success: false, method: 'contact' };
   }
@@ -72,7 +91,6 @@ export function processResumeUpload(file) {
       return;
     }
 
-    // Limit to 4.5 MB to respect localStorage limits safely
     const MAX_BYTES = 4.5 * 1024 * 1024;
     if (file.size > MAX_BYTES) {
       reject(new Error('File size exceeds 4.5 MB. Please upload a smaller PDF or compress it.'));

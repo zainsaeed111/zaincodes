@@ -469,3 +469,26 @@
   .badge-bottom-left { left: 0; bottom: 15px; }
   .badge-bottom-right { right: 0; bottom: -5px; }
 }
+
+/* -- Hero Actions Precision Alignment -- */
+.hero-actions {
+  display: flex;
+  align-items: center;
+  gap: 1.25rem;
+  flex-wrap: wrap;
+  margin-top: 0.75rem;
+}
+
+.hero-actions .btn-primary,
+.hero-actions .btn-resume {
+  min-height: 52px;
+  padding: 0.85rem 1.8rem;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.65rem;
+  box-sizing: border-box;
+  font-size: 0.95rem;
+  font-weight: 600;
+  line-height: 1;
+}

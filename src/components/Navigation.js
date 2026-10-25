@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import Logo from './Logo';
 import { downloadResume } from '../utils/resumeHelper';
@@ -8,9 +8,12 @@ const Navigation = () => {
   const [isScrolled, setIsScrolled] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [activeSection, setActiveSection] = useState('home');
+  const [isWorkDropdownOpen, setIsWorkDropdownOpen] = useState(false);
   const [currentTheme, setCurrentTheme] = useState(() => localStorage.getItem('siteTheme') || 'dark');
   const location = useLocation();
   const navigate = useNavigate();
+  const dropdownRef = useRef(null);
+
   const isHomePage = location.pathname === '/';
   const isProjectsPage = location.pathname === '/projects' || location.pathname === '/showcase';
 
@@ -37,6 +40,17 @@ const Navigation = () => {
     return () => window.removeEventListener('scroll', handleScroll);
   }, [isHomePage]);
 
+  // Close dropdown on outside click
+  useEffect(() => {
+    const handleClickOutside = (e) => {
+      if (dropdownRef.current && !dropdownRef.current.contains(e.target)) {
+        setIsWorkDropdownOpen(false);
+      }
+    };
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, []);
+
   const toggleTheme = () => {
     const nextTheme = currentTheme === 'dark' ? 'light' : 'dark';
     setCurrentTheme(nextTheme);
@@ -46,6 +60,8 @@ const Navigation = () => {
   };
 
   const scrollToSection = (sectionId) => {
+    setIsWorkDropdownOpen(false);
+    setIsMobileMenuOpen(false);
     if (!isHomePage) {
       navigate('/');
       setTimeout(() => {
@@ -56,17 +72,7 @@ const Navigation = () => {
       const element = document.getElementById(sectionId);
       if (element) element.scrollIntoView({ behavior: 'smooth' });
     }
-    setIsMobileMenuOpen(false);
   };
-
-  const navLinks = [
-    { id: 'home', label: 'Home', isRoute: false },
-    { id: 'projects-page', label: 'Projects Showcase', isRoute: true, path: '/projects' },
-    { id: 'about', label: 'About', isRoute: false },
-    { id: 'portfolio', label: 'Featured Work', isRoute: false },
-    { id: 'skills', label: 'Expertise', isRoute: false },
-    { id: 'contact', label: 'Contact', isRoute: false }
-  ];
 
   return (
     <nav className={`navigation ${isScrolled ? 'scrolled' : ''}`}>
@@ -76,37 +82,91 @@ const Navigation = () => {
         </div>
 
         <div className={`nav-menu ${isMobileMenuOpen ? 'active' : ''}`}>
-          {navLinks.map((link) => {
-            if (link.isRoute) {
-              return (
-                <button
-                  key={link.id}
-                  onClick={() => {
-                    navigate(link.path);
-                    setIsMobileMenuOpen(false);
-                  }}
-                  className={`nav-link nav-btn-link ${isProjectsPage ? 'active' : ''}`}
-                >
-                  <span className="nav-link-badge">New</span>
-                  <span>{link.label}</span>
-                </button>
-              );
-            }
+          {/* Home */}
+          <a
+            href="#home"
+            onClick={(e) => { e.preventDefault(); scrollToSection('home'); }}
+            className={`nav-link ${activeSection === 'home' && isHomePage ? 'active' : ''}`}
+          >
+            Home
+          </a>
 
-            return (
-              <a
-                key={link.id}
-                href={`#${link.id}`}
-                onClick={(e) => {
-                  e.preventDefault();
-                  scrollToSection(link.id);
-                }}
-                className={`nav-link ${activeSection === link.id && isHomePage ? 'active' : ''}`}
-              >
-                {link.label}
-              </a>
-            );
-          })}
+          {/* About */}
+          <a
+            href="#about"
+            onClick={(e) => { e.preventDefault(); scrollToSection('about'); }}
+            className={`nav-link ${activeSection === 'about' && isHomePage ? 'active' : ''}`}
+          >
+            About
+          </a>
+
+          {/* Work / Projects with Submenu Dropdown */}
+          <div
+            className="nav-dropdown-wrapper"
+            ref={dropdownRef}
+            onMouseEnter={() => setIsWorkDropdownOpen(true)}
+            onMouseLeave={() => setIsWorkDropdownOpen(false)}
+          >
+            <button
+              className={`nav-link nav-dropdown-trigger ${(activeSection === 'portfolio' && isHomePage) || isProjectsPage ? 'active' : ''}`}
+              onClick={() => setIsWorkDropdownOpen(!isWorkDropdownOpen)}
+              aria-haspopup="true"
+              aria-expanded={isWorkDropdownOpen}
+            >
+              <span>Work</span>
+              <svg className={`chevron-icon ${isWorkDropdownOpen ? 'rotated' : ''}`} width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
+                <polyline points="6 9 12 15 18 9"></polyline>
+              </svg>
+            </button>
+
+            {isWorkDropdownOpen && (
+              <div className="nav-submenu-dropdown">
+                <button
+                  className="submenu-item"
+                  onClick={() => scrollToSection('portfolio')}
+                >
+                  <span className="submenu-icon">📌</span>
+                  <div className="submenu-text">
+                    <strong>Featured Work</strong>
+                    <small>Top Android &amp; Flutter apps</small>
+                  </div>
+                </button>
+
+                <button
+                  className="submenu-item"
+                  onClick={() => {
+                    setIsWorkDropdownOpen(false);
+                    setIsMobileMenuOpen(false);
+                    navigate('/projects');
+                  }}
+                >
+                  <span className="submenu-icon">🚀</span>
+                  <div className="submenu-text">
+                    <strong>All Projects Showcase</strong>
+                    <small>Search &amp; browse case studies</small>
+                  </div>
+                </button>
+              </div>
+            )}
+          </div>
+
+          {/* Skills */}
+          <a
+            href="#skills"
+            onClick={(e) => { e.preventDefault(); scrollToSection('skills'); }}
+            className={`nav-link ${activeSection === 'skills' && isHomePage ? 'active' : ''}`}
+          >
+            Expertise
+          </a>
+
+          {/* Contact */}
+          <a
+            href="#contact"
+            onClick={(e) => { e.preventDefault(); scrollToSection('contact'); }}
+            className={`nav-link ${activeSection === 'contact' && isHomePage ? 'active' : ''}`}
+          >
+            Contact
+          </a>
 
           {/* Quick Resume Download Pill */}
           <button
