@@ -22,7 +22,7 @@ export function getVideoEmbedInfo(url) {
     return {
       type: 'youtube',
       id: ytMatch[1],
-      embedUrl: `https://www.youtube-nocookie.com/embed/${ytMatch[1]}?autoplay=0&rel=0&modestbranding=1`
+      embedUrl: `https://www.youtube-nocookie.com/embed/${ytMatch[1]}?autoplay=1&mute=1&rel=0&modestbranding=1`
     };
   }
 

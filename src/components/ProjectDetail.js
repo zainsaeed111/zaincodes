@@ -222,6 +222,9 @@ const ProjectDetail = ({ projects }) => {
                                         <video
                                             src={videoInfo.embedUrl}
                                             controls
+                                            autoPlay
+                                            muted
+                                            loop
                                             playsInline
                                             className="html5-video-player"
                                         />
