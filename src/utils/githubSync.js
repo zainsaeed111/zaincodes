@@ -26,7 +26,7 @@ export const pushToGitHub = async (newData) => {
 
     try {
         // 1. Get the current file's SHA (required by GitHub API for updates)
-        const getFileResponse = await fetch(`https://api.github.com/repos/${GITHUB_REPO}/contents/${DATA_PATH}?ref=master`, {
+        const getFileResponse = await fetch(`https://api.github.com/repos/${GITHUB_REPO}/contents/${DATA_PATH}?ref=main`, {
             headers: {
                 'Authorization': authHeader,
                 'Accept': 'application/vnd.github.v3+json'
@@ -62,7 +62,7 @@ export const pushToGitHub = async (newData) => {
                 message: 'Update portfolio data via Admin Panel',
                 content: content,
                 sha: sha,
-                branch: 'master' // Target the production branch
+                branch: 'main' // Target the production branch
             })
         });
 
@@ -84,7 +84,7 @@ export const pushToGitHub = async (newData) => {
  */
 export const fetchLatestGitHubData = async () => {
     try {
-        const response = await fetch(`https://raw.githubusercontent.com/${GITHUB_REPO}/master/${DATA_PATH}?t=${Date.now()}`);
+        const response = await fetch(`https://raw.githubusercontent.com/${GITHUB_REPO}/main/${DATA_PATH}?t=${Date.now()}`);
         if (!response.ok) return null;
         return await response.json();
     } catch (error) {
