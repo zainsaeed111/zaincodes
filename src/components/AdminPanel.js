@@ -2,8 +2,17 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import './AdminPanel.css';
 import { pushToGitHub } from '../utils/githubSync';
-
-const ADMIN_PASSWORD = 'zaincodes2024'; // Change this to your password
+import {
+    verifyAdminPassword,
+    updateAdminPassword,
+    checkLoginAttempts,
+    recordFailedLogin,
+    recordSuccessfulLogin,
+    validateSession,
+    terminateSession,
+    sanitizeInput
+} from '../utils/security';
+import { processResumeUpload, downloadResume } from '../utils/resumeHelper';
 
 /* ── Default data (mirrors the hardcoded values in Hero / Skills / About) ── */
 const defaultHero = {
@@ -93,44 +102,42 @@ const defaultProjects = [
         id: 1,
         slug: "e-commerce-mobile-app",
         title: "E-Commerce Mobile App",
-        category: "android",
-        image: "https://images.unsplash.com/photo-1556742049-0cfed4f6a45d?w=800&h=600&fit=crop",
-        thumbnail: "https://images.unsplash.com/photo-1556742049-0cfed4f6a45d?w=400&h=300&fit=crop",
-        description: "A comprehensive e-commerce solution built with Kotlin and Android Architecture Components.",
-        longDescription: "This full-featured e-commerce application revolutionizes mobile shopping with its intuitive interface and robust architecture.",
-        technologies: ["Kotlin", "Android", "Room Database", "Retrofit", "MVVM"],
-        features: ["User Authentication", "Product Catalog", "Shopping Cart", "Payment Integration", "Order Tracking"],
-        highlights: ["50,000+ downloads", "4.8 star rating", "99.9% crash-free"],
-        playStoreLink: "#",
-        githubLink: "#",
-        liveLink: "#"
+        category: "mobile",
+        description: "Full-featured shopping app with real-time inventory and payments.",
+        longDescription: "A comprehensive e-commerce mobile application built for iOS and Android.",
+        technologies: ["React Native", "Firebase", "Stripe", "Redux"],
+        features: ["Real-time inventory tracking", "Stripe payment integration", "Order history & tracking"],
+        liveUrl: "", githubUrl: "https://github.com/zainsaeed111"
     }
 ];
 
-/* ── Helpers ── */
+/* ── Storage helper ── */
 const load = (key, fallback) => {
-    try {
-        const d = localStorage.getItem(key);
-        return d ? JSON.parse(d) : fallback;
-    } catch { return fallback; }
+    try { const v = localStorage.getItem(key); return v ? JSON.parse(v) : fallback; }
+    catch { return fallback; }
 };
 const save = (key, val) => {
-    localStorage.setItem(key, JSON.stringify(val));
-    window.dispatchEvent(new Event('portfolioDataUpdated'));
+    try { localStorage.setItem(key, JSON.stringify(val)); }
+    catch (e) { console.error('Save error:', e); }
 };
 
-/* ═══════════════════════════════ COMPONENT ═══════════════════════════════ */
 const AdminPanel = () => {
     const navigate = useNavigate();
 
-    /* ── Auth ── */
+    /* ── Auth State ── */
     const [isAuthenticated, setIsAuthenticated] = useState(false);
     const [password, setPassword] = useState('');
+    const [loginError, setLoginError] = useState('');
+    const [lockoutStatus, setLockoutStatus] = useState(null);
 
-    /* ── Active tab ── */
+    /* ── Master Password Change State ── */
+    const [newMasterPassword, setNewMasterPassword] = useState('');
+    const [confirmMasterPassword, setConfirmMasterPassword] = useState('');
+
+    /* ── Active Tab ── */
     const [activeTab, setActiveTab] = useState('hero');
 
-    /* ── Data state ── */
+    /* ── Data States ── */
     const [hero, setHero] = useState(defaultHero);
     const [about, setAbout] = useState(defaultAbout);
     const [skills, setSkills] = useState(defaultSkills);
@@ -138,15 +145,23 @@ const AdminPanel = () => {
     const [social, setSocial] = useState(defaultSocial);
     const [theme, setTheme] = useState(() => localStorage.getItem('siteTheme') || 'dark');
     const [projects, setProjects] = useState([]);
+    
+    /* ── Resume & File Upload State ── */
     const [resumeLink, setResumeLink] = useState('');
+    const [resumeFileName, setResumeFileName] = useState(() => localStorage.getItem('resumeFileName') || '');
+    const [resumeFileSize, setResumeFileSize] = useState(() => localStorage.getItem('resumeFileSize') || '');
+    const [isUploadingResume, setIsUploadingResume] = useState(false);
+
+    /* ── GitHub Sync ── */
     const [githubToken, setGithubToken] = useState(() => localStorage.getItem('REACT_APP_GITHUB_TOKEN') || '');
+    const [showGithubToken, setShowGithubToken] = useState(false);
     const [isSyncing, setIsSyncing] = useState(false);
 
     /* ── Project form ── */
     const [editingProject, setEditingProject] = useState(null);
     const [showForm, setShowForm] = useState(false);
     const [formData, setFormData] = useState({
-        title: '', slug: '', category: 'web', description: '', longDescription: '',
+        title: '', slug: '', category: 'android', description: '', longDescription: '',
         thumbnail: '', image: '', technologies: '', features: '', highlights: '',
         playStoreLink: '', githubLink: '', liveLink: ''
     });
@@ -161,13 +176,14 @@ const AdminPanel = () => {
 
     /* ── Toast ── */
     const [toast, setToast] = useState('');
-    const showToast = (msg) => { setToast(msg); setTimeout(() => setToast(''), 2500); };
+    const showToast = (msg) => { setToast(msg); setTimeout(() => setToast(''), 3000); };
 
-    /* ── Init ── */
+    /* ── Appearance ── */
     const saveTheme = (newTheme) => {
         setTheme(newTheme);
         localStorage.setItem('siteTheme', newTheme);
         document.documentElement.className = newTheme === 'light' ? 'light-theme' : '';
+        document.body.className = newTheme === 'light' ? 'light-theme' : '';
         showToast(`Appearance updated to ${newTheme} mode!`);
         triggerGlobalSync();
     };
@@ -196,8 +212,19 @@ const AdminPanel = () => {
         }
     };
 
+    /* ── Lifecycle & Security Init ── */
     useEffect(() => {
-        if (sessionStorage.getItem('adminAuth') === 'true') setIsAuthenticated(true);
+        // Validate active session
+        if (validateSession()) {
+            setIsAuthenticated(true);
+        }
+
+        // Check lockout
+        const attempts = checkLoginAttempts();
+        if (!attempts.allowed) {
+            setLockoutStatus(attempts);
+        }
+
         setHero(load('heroData', defaultHero));
         setAbout(load('aboutData', defaultAbout));
         setSkills(load('skillsData', defaultSkills));
@@ -213,192 +240,258 @@ const AdminPanel = () => {
 
         const currentTheme = localStorage.getItem('siteTheme') || 'dark';
         document.documentElement.className = currentTheme === 'light' ? 'light-theme' : '';
+        document.body.className = currentTheme === 'light' ? 'light-theme' : '';
 
         setResumeLink(localStorage.getItem('resumeLink') || '');
     }, []);
 
     /* ── Auth handlers ── */
-    const handleLogin = (e) => {
+    const handleLogin = async (e) => {
         e.preventDefault();
-        if (password === ADMIN_PASSWORD) { setIsAuthenticated(true); sessionStorage.setItem('adminAuth', 'true'); }
-        else alert('Incorrect password!');
+        const check = checkLoginAttempts();
+        if (!check.allowed) {
+            setLockoutStatus(check);
+            setLoginError(`Security Lockout: Too many failed attempts. Try again in ${check.remainingMinutes} minutes.`);
+            return;
+        }
+
+        const isValid = await verifyAdminPassword(password);
+        if (isValid) {
+            recordSuccessfulLogin();
+            setIsAuthenticated(true);
+            setLoginError('');
+            showToast('Authenticated securely via salted SHA-256.');
+        } else {
+            const result = recordFailedLogin();
+            if (!result.allowed) {
+                setLockoutStatus(result);
+                setLoginError(`Security Lockout: Account locked for 15 minutes.`);
+            } else {
+                setLoginError(`Incorrect password! ${result.remainingAttempts} attempts remaining before lockout.`);
+            }
+        }
     };
-    const handleLogout = () => { setIsAuthenticated(false); sessionStorage.removeItem('adminAuth'); };
+
+    const handleLogout = () => {
+        terminateSession();
+        setIsAuthenticated(false);
+        setPassword('');
+    };
+
+    const handlePasswordChangeSubmit = async (e) => {
+        e.preventDefault();
+        if (!newMasterPassword || newMasterPassword.length < 6) {
+            alert('New password must be at least 6 characters.');
+            return;
+        }
+        if (newMasterPassword !== confirmMasterPassword) {
+            alert('Passwords do not match.');
+            return;
+        }
+        try {
+            await updateAdminPassword(newMasterPassword);
+            setNewMasterPassword('');
+            setConfirmMasterPassword('');
+            showToast('Master password successfully updated and cryptographically hashed!');
+        } catch (err) {
+            alert(err.message);
+        }
+    };
 
     /* ── Hero ── */
     const handleHeroChange = (e) => {
         const { name, value } = e.target;
-        setHero(prev => ({ ...prev, [name]: name.startsWith('stat') ? Number(value) : value }));
+        setHero(prev => ({ ...prev, [name]: name.startsWith('stat') ? Number(value) : sanitizeInput(value) }));
     };
     const saveHero = () => { save('heroData', hero); showToast('Hero section saved!'); triggerGlobalSync({ heroData: hero }); };
 
     /* ── About ── */
     const handleAboutChange = (e) => {
         const { name, value } = e.target;
-        setAbout(prev => ({ ...prev, [name]: value }));
+        setAbout(prev => ({ ...prev, [name]: sanitizeInput(value) }));
     };
     const saveAbout = () => { save('aboutData', about); showToast('About section saved!'); triggerGlobalSync({ aboutData: about }); };
-    const addTech = () => {
-        const name = prompt('Tech name (e.g. React)');
-        if (!name) return;
-        const icon = prompt('Emoji icon', '🔧');
-        const color = prompt('Hex color', '#61DAFB');
-        const updatedTech = [...about.techStack, { name, icon, color }];
-        const updatedAbout = { ...about, techStack: updatedTech };
-        setAbout(updatedAbout);
-        save('aboutData', updatedAbout);
-        triggerGlobalSync({ aboutData: updatedAbout });
-    };
-    const removeTech = (idx) => {
-        const updatedTech = about.techStack.filter((_, i) => i !== idx);
-        const updatedAbout = { ...about, techStack: updatedTech };
-        setAbout(updatedAbout);
-        save('aboutData', updatedAbout);
-        triggerGlobalSync({ aboutData: updatedAbout });
-    };
-
-    /* ── Contact ── */
-    const handleContactChange = (e) => {
-        const { name, value } = e.target;
-        setContact(prev => ({ ...prev, [name]: value }));
-    };
-    const saveContact = () => { save('contactData', contact); showToast('Contact info saved!'); triggerGlobalSync({ contactData: contact }); };
-
-    /* ── Social ── */
-    const openSocialEditor = (idx) => {
-        const s = idx !== null ? social[idx] : { name: '', icon: '', url: '' };
-        setEditingSocial(idx);
-        setSocialForm(s);
-    };
-    const saveSocialItem = () => {
-        let updated;
-        if (editingSocial !== null) {
-            updated = social.map((s, i) => i === editingSocial ? socialForm : s);
-        } else {
-            updated = [...social, socialForm];
-        }
-        setSocial(updated);
-        save('socialData', updated);
-        setEditingSocial(null);
-        showToast('Social link saved!');
-        triggerGlobalSync({ socialLinks: updated });
-    };
-    const deleteSocialItem = (idx) => {
-        if (!window.confirm('Remove this social link?')) return;
-        const updated = social.filter((_, i) => i !== idx);
-        setSocial(updated);
-        save('socialData', updated);
-        showToast('Social link removed');
-        triggerGlobalSync({ socialLinks: updated });
-    };
 
     /* ── Skills ── */
-    const openSkillEditor = (catIdx) => {
-        const cat = catIdx !== null ? skills[catIdx] : { title: '', icon: '🌐', skills: [] };
-        setEditingSkillCat(catIdx);
+    const saveSkills = (updated) => { setSkills(updated); save('skillsData', updated); showToast('Skills saved!'); triggerGlobalSync({ skillsData: updated }); };
+    const deleteSkillCategory = (idx) => {
+        if (!window.confirm('Delete this category?')) return;
+        saveSkills(skills.filter((_, i) => i !== idx));
+    };
+    const openSkillEditor = (idx) => {
+        const cat = skills[idx];
         setSkillForm({
             title: cat.title,
             icon: cat.icon,
             skills: cat.skills.map(s => `${s.name}:${s.level}:${s.color}`).join('\n')
         });
+        setEditingSkillCat(idx);
     };
     const saveSkillCategory = () => {
         const parsed = skillForm.skills.split('\n').filter(l => l.trim()).map(line => {
-            const [name, level, color] = line.split(':').map(s => s.trim());
-            return { name: name || 'Skill', level: parseInt(level) || 80, color: color || '#00C9A7' };
+            const [name, level, color] = line.split(':');
+            return { name: name?.trim() || '', level: parseInt(level) || 80, color: color?.trim() || '#38bdf8' };
         });
-        const cat = { title: skillForm.title, icon: skillForm.icon, skills: parsed };
-        let updated;
-        if (editingSkillCat !== null) {
-            updated = skills.map((s, i) => i === editingSkillCat ? cat : s);
-        } else {
-            updated = [...skills, cat];
-        }
-        setSkills(updated);
-        save('skillsData', updated);
+        const updated = [...skills];
+        const newCat = { title: skillForm.title, icon: skillForm.icon, skills: parsed };
+        if (editingSkillCat === 'new') updated.push(newCat);
+        else updated[editingSkillCat] = newCat;
+        saveSkills(updated);
         setEditingSkillCat(null);
-        showToast('Skill category saved!');
-        triggerGlobalSync({ skillsData: updated });
-    };
-    const deleteSkillCategory = (idx) => {
-        if (!window.confirm('Delete this skill category?')) return;
-        const updated = skills.filter((_, i) => i !== idx);
-        setSkills(updated);
-        save('skillsData', updated);
-        showToast('Category deleted');
-        triggerGlobalSync({ skillsData: updated });
     };
 
-    /* ── Projects (existing logic preserved) ── */
-    const generateSlug = (t) => t.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '');
-    const handleFormChange = (e) => {
+    /* ── Contact ── */
+    const handleContactChange = (e) => {
         const { name, value } = e.target;
-        setFormData(prev => ({ ...prev, [name]: value, ...(name === 'title' ? { slug: generateSlug(value) } : {}) }));
+        setContact(prev => ({ ...prev, [name]: sanitizeInput(value) }));
     };
-    const handleSubmit = (e) => {
-        e.preventDefault();
-        const d = {
-            id: editingProject ? editingProject.id : Date.now(),
-            title: formData.title, slug: formData.slug || generateSlug(formData.title),
-            category: formData.category, description: formData.description,
-            longDescription: formData.longDescription,
-            thumbnail: formData.thumbnail, image: formData.image || formData.thumbnail,
-            technologies: formData.technologies.split(',').map(t => t.trim()).filter(Boolean),
-            features: formData.features.split(',').map(f => f.trim()).filter(Boolean),
-            highlights: formData.highlights.split(',').map(h => h.trim()).filter(Boolean),
-            playStoreLink: formData.playStoreLink ? formData.playStoreLink.trim() : '',
-            githubLink: formData.githubLink ? formData.githubLink.trim() : '',
-            liveLink: formData.liveLink ? formData.liveLink.trim() : ''
-        };
-        const updated = editingProject ? projects.map(p => p.id === editingProject.id ? d : p) : [...projects, d];
-        setProjects(updated); save('portfolioProjects', updated);
-        resetForm(); showToast(editingProject ? 'Project updated!' : 'Project added!');
-        triggerGlobalSync({ portfolioProjects: updated });
+    const saveContact = () => { save('contactData', contact); showToast('Contact info saved!'); triggerGlobalSync({ contactData: contact }); };
+
+    /* ── Social ── */
+    const saveSocial = (updated) => { setSocial(updated); save('socialData', updated); showToast('Social links saved!'); triggerGlobalSync({ socialLinks: updated }); };
+    const deleteSocial = (idx) => {
+        if (!window.confirm('Delete this link?')) return;
+        saveSocial(social.filter((_, i) => i !== idx));
     };
-    const resetForm = () => {
+    const saveSocialItem = () => {
+        const updated = [...social];
+        if (editingSocial === 'new') updated.push(socialForm);
+        else updated[editingSocial] = socialForm;
+        saveSocial(updated);
+        setEditingSocial(null);
+    };
+
+    /* ── Projects ── */
+    const handleProjectFormChange = (e) => {
+        const { name, value } = e.target;
+        setFormData(prev => ({ ...prev, [name]: value }));
+    };
+    const openAddProject = () => {
         setFormData({
-            title: '', slug: '', category: 'web', description: '', longDescription: '',
+            title: '', slug: '', category: 'android', description: '', longDescription: '',
             thumbnail: '', image: '', technologies: '', features: '', highlights: '',
             playStoreLink: '', githubLink: '', liveLink: ''
         });
-        setEditingProject(null); setShowForm(false);
+        setEditingProject(null);
+        setShowForm(true);
     };
-    const handleEdit = (p) => {
+    const openEditProject = (proj) => {
         setFormData({
-            title: p.title, slug: p.slug, category: p.category,
-            description: p.description, longDescription: p.longDescription || '',
-            thumbnail: p.thumbnail, image: p.image || '',
-            technologies: p.technologies.join(', '), features: p.features.join(', '),
-            highlights: p.highlights ? p.highlights.join(', ') : '',
-            playStoreLink: p.playStoreLink || '', githubLink: p.githubLink || '',
-            liveLink: p.liveLink || ''
+            title: proj.title || '',
+            slug: proj.slug || '',
+            category: proj.category || 'android',
+            description: proj.description || '',
+            longDescription: proj.longDescription || '',
+            thumbnail: proj.thumbnail || proj.image || '',
+            image: proj.image || '',
+            technologies: (proj.technologies || []).join(', '),
+            features: (proj.features || []).join('\n'),
+            highlights: (proj.highlights || []).join('\n'),
+            playStoreLink: proj.playStoreLink || proj.liveUrl || '',
+            githubLink: proj.githubUrl || '',
+            liveLink: proj.liveUrl || ''
         });
-        setEditingProject(p); setShowForm(true);
+        setEditingProject(proj);
+        setShowForm(true);
     };
-    const handleDelete = (id) => {
+    const deleteProject = (id) => {
         if (!window.confirm('Delete this project?')) return;
         const updated = projects.filter(p => p.id !== id);
-        setProjects(updated); save('portfolioProjects', updated);
+        setProjects(updated);
+        save('portfolioProjects', updated);
+        showToast('Project deleted');
         triggerGlobalSync({ portfolioProjects: updated });
     };
+    const handleSubmit = (e) => {
+        e.preventDefault();
+        const techArray = formData.technologies.split(',').map(t => t.trim()).filter(Boolean);
+        const featArray = formData.features.split('\n').map(f => f.trim()).filter(Boolean);
+        const highArray = formData.highlights.split('\n').map(h => h.trim()).filter(Boolean);
 
-    /* ── Resume ── */
-    const handleResumeUpdate = () => { localStorage.setItem('resumeLink', resumeLink); showToast('Resume link saved!'); };
+        const projectData = {
+            id: editingProject ? editingProject.id : Date.now(),
+            title: sanitizeInput(formData.title),
+            slug: sanitizeInput(formData.slug) || formData.title.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, ''),
+            category: formData.category,
+            description: sanitizeInput(formData.description),
+            longDescription: sanitizeInput(formData.longDescription),
+            thumbnail: formData.thumbnail || formData.image,
+            image: formData.image || formData.thumbnail,
+            technologies: techArray,
+            features: featArray,
+            highlights: highArray,
+            liveUrl: formData.playStoreLink || formData.liveLink,
+            githubUrl: formData.githubLink
+        };
+
+        let updated;
+        if (editingProject) {
+            updated = projects.map(p => p.id === editingProject.id ? projectData : p);
+            showToast('Project updated!');
+        } else {
+            updated = [projectData, ...projects];
+            showToast('Project added!');
+        }
+        setProjects(updated);
+        save('portfolioProjects', updated);
+        triggerGlobalSync({ portfolioProjects: updated });
+        resetForm();
+    };
+    const resetForm = () => { setShowForm(false); setEditingProject(null); };
+
+    /* ── Resume Management (100% Free File Upload & Links) ── */
+    const handleResumeUpload = async (e) => {
+        const file = e.target.files?.[0];
+        if (!file) return;
+
+        setIsUploadingResume(true);
+        try {
+            const processed = await processResumeUpload(file);
+            localStorage.setItem('resumeFileData', processed.dataUrl);
+            localStorage.setItem('resumeFileName', processed.name);
+            localStorage.setItem('resumeFileSize', processed.size);
+            setResumeFileName(processed.name);
+            setResumeFileSize(processed.size);
+            showToast(`Resume "${processed.name}" uploaded successfully!`);
+            triggerGlobalSync({ resumeLink: processed.name });
+        } catch (err) {
+            alert(err.message);
+        } finally {
+            setIsUploadingResume(false);
+        }
+    };
+
+    const handleRemoveResumeFile = () => {
+        if (!window.confirm('Remove the uploaded resume file?')) return;
+        localStorage.removeItem('resumeFileData');
+        localStorage.removeItem('resumeFileName');
+        localStorage.removeItem('resumeFileSize');
+        setResumeFileName('');
+        setResumeFileSize('');
+        showToast('Uploaded resume removed.');
+    };
+
+    const handleResumeLinkUpdate = () => {
+        localStorage.setItem('resumeLink', resumeLink);
+        showToast('Resume link saved!');
+        triggerGlobalSync({ resumeLink });
+    };
 
     /* ── Export / Import ── */
     const handleExport = () => {
         const data = { hero, about, skills, contact, social, projects, resumeLink };
         const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
         const a = document.createElement('a'); a.href = URL.createObjectURL(blob);
-        a.download = 'portfolio-data.json'; a.click();
+        a.download = 'portfolio-data-backup.json'; a.click();
     };
+
     const handleImport = (e) => {
         const file = e.target.files[0];
         if (!file) return;
         const reader = new FileReader();
-        reader.onload = (ev) => {
+        reader.onload = (event) => {
             try {
-                const data = JSON.parse(ev.target.result);
+                const data = JSON.parse(event.target.result);
                 if (data.hero) { setHero(data.hero); save('heroData', data.hero); }
                 if (data.about) { setAbout(data.about); save('aboutData', data.about); }
                 if (data.skills) { setSkills(data.skills); save('skillsData', data.skills); }
@@ -406,24 +499,44 @@ const AdminPanel = () => {
                 if (data.social) { setSocial(data.social); save('socialData', data.social); }
                 if (data.projects) { setProjects(data.projects); save('portfolioProjects', data.projects); }
                 if (data.resumeLink) { setResumeLink(data.resumeLink); localStorage.setItem('resumeLink', data.resumeLink); }
-                showToast('All data imported!');
+                showToast('All data successfully imported!');
             } catch { alert('Invalid file format!'); }
         };
         reader.readAsText(file);
     };
 
-    /* ══════════════════════════ LOGIN SCREEN ══════════════════════════ */
+    /* ══════════════════════════ SECURE LOGIN SCREEN ══════════════════════════ */
     if (!isAuthenticated) {
         return (
             <div className="admin-login">
                 <div className="login-card">
-                    <h1>🔐 Admin Panel</h1>
-                    <p>Enter password to access</p>
-                    <form onSubmit={handleLogin}>
-                        <input type="password" value={password} onChange={(e) => setPassword(e.target.value)} placeholder="Enter password" autoFocus />
-                        <button type="submit" className="btn-primary">Login</button>
-                    </form>
-                    <button className="back-btn" onClick={() => navigate('/')}>← Back to Portfolio</button>
+                    <div className="login-shield-badge">🛡️</div>
+                    <h1>Admin Authentication</h1>
+                    <p>Secured with Salted SHA-256 &amp; Brute-Force Shield</p>
+
+                    {lockoutStatus && !lockoutStatus.allowed ? (
+                        <div className="login-lockout-notice">
+                            <strong>⚠️ Security Lockout Active</strong>
+                            <p>Too many failed attempts. Try again in {lockoutStatus.remainingMinutes} minutes.</p>
+                        </div>
+                    ) : (
+                        <form onSubmit={handleLogin}>
+                            <input
+                                type="password"
+                                value={password}
+                                onChange={(e) => setPassword(e.target.value)}
+                                placeholder="Enter Admin Password"
+                                autoFocus
+                                required
+                            />
+                            {loginError && <div className="login-error-msg">{loginError}</div>}
+                            <button type="submit" className="btn-primary">
+                                <span>Authenticate</span>
+                            </button>
+                        </form>
+                    )}
+
+                    <button className="back-btn" onClick={() => navigate('/')}>← Return to Portfolio</button>
                 </div>
             </div>
         );
@@ -436,19 +549,20 @@ const AdminPanel = () => {
         { id: 'skills', label: '⚡ Skills', count: skills.length },
         { id: 'contact', label: '📞 Contact', count: null },
         { id: 'projects', label: '🚀 Projects', count: projects.length },
-        { id: 'settings', label: '⚙️ Settings', count: null }
+        { id: 'resume', label: '📄 Resume', count: null },
+        { id: 'settings', label: '⚙️ Settings & Security', count: null }
     ];
 
     /* ══════════════════════════ MAIN PANEL ══════════════════════════ */
     return (
         <div className="admin-panel">
-            {/* Toast */}
             {toast && <div className="admin-toast">{toast}</div>}
 
             {/* Header */}
             <header className="admin-header">
-                <h1>📊 Portfolio Admin</h1>
+                <h1>📊 ZainCodes Admin Dashboard</h1>
                 <div className="header-actions">
+                    <button onClick={() => navigate('/projects')} className="btn-secondary"><span>Projects Showcase</span></button>
                     <button onClick={() => navigate('/')} className="btn-secondary"><span>View Site</span></button>
                     <button onClick={handleLogout} className="btn-logout">Logout</button>
                 </div>
@@ -468,7 +582,7 @@ const AdminPanel = () => {
                 {activeTab === 'hero' && (
                     <section className="admin-section">
                         <h2>🏠 Hero Section</h2>
-                        <p className="section-info">Edit the hero banner that visitors see first.</p>
+                        <p className="section-info">Edit the headline and value proposition that visitors see first.</p>
                         <div className="admin-form-grid">
                             <div className="form-group full-width">
                                 <label>Badge Text</label>
@@ -479,33 +593,31 @@ const AdminPanel = () => {
                                 <input name="greeting" value={hero.greeting} onChange={handleHeroChange} />
                             </div>
                             <div className="form-group full-width">
-                                <label>Typed Title (animated text)</label>
+                                <label>Title / Role Positioning</label>
                                 <input name="title" value={hero.title} onChange={handleHeroChange} />
                             </div>
                             <div className="form-group full-width">
-                                <label>Description</label>
-                                <textarea name="description" value={hero.description} onChange={handleHeroChange} rows="3" />
-                            </div>
-                            <div className="form-group full-width">
-                                <label>Profile / Avatar Image URL</label>
-                                <input name="avatarUrl" value={hero.avatarUrl || ''} onChange={handleHeroChange} placeholder="/Profile.webp or https://..." />
+                                <label>Bio / Description</label>
+                                <textarea name="description" rows="4" value={hero.description} onChange={handleHeroChange} />
                             </div>
                             <div className="form-group">
-                                <label>Apps Built (stat number)</label>
-                                <input type="number" name="statApps" value={hero.statApps} onChange={handleHeroChange} />
+                                <label>Products Shipped</label>
+                                <input name="statApps" type="number" value={hero.statApps} onChange={handleHeroChange} />
                             </div>
                             <div className="form-group">
-                                <label>Years Experience</label>
-                                <input type="number" name="statYears" value={hero.statYears} onChange={handleHeroChange} />
+                                <label>Years of Experience</label>
+                                <input name="statYears" type="number" value={hero.statYears} onChange={handleHeroChange} />
                             </div>
                             <div className="form-group">
-                                <label>Client Satisfaction %</label>
-                                <input type="number" name="statSatisfaction" value={hero.statSatisfaction} onChange={handleHeroChange} />
+                                <label>Launch Success Rate (%)</label>
+                                <input name="statSatisfaction" type="number" value={hero.statSatisfaction} onChange={handleHeroChange} />
+                            </div>
+                            <div className="form-group">
+                                <label>Profile Image / Avatar URL</label>
+                                <input name="avatarUrl" value={hero.avatarUrl} onChange={handleHeroChange} />
                             </div>
                         </div>
-                        <div className="admin-save-bar">
-                            <button onClick={saveHero} className="btn-primary"><span>Save Hero</span></button>
-                        </div>
+                        <button onClick={saveHero} className="btn-primary"><span>Save Hero Changes</span></button>
                     </section>
                 )}
 
@@ -513,7 +625,6 @@ const AdminPanel = () => {
                 {activeTab === 'about' && (
                     <section className="admin-section">
                         <h2>👤 About Section</h2>
-                        <p className="section-info">Edit the About Me area and tech stack.</p>
                         <div className="admin-form-grid">
                             <div className="form-group full-width">
                                 <label>Section Subtitle</label>
@@ -525,23 +636,10 @@ const AdminPanel = () => {
                             </div>
                             <div className="form-group full-width">
                                 <label>Intro Paragraph</label>
-                                <textarea name="introText" value={about.introText} onChange={handleAboutChange} rows="4" />
+                                <textarea name="introText" rows="5" value={about.introText} onChange={handleAboutChange} />
                             </div>
                         </div>
-
-                        <h3 className="sub-heading">Tech Stack</h3>
-                        <div className="tech-chips">
-                            {about.techStack.map((t, i) => (
-                                <span key={i} className="tech-chip" style={{ borderColor: t.color }}>
-                                    {t.icon} {t.name} <button onClick={() => removeTech(i)}>×</button>
-                                </span>
-                            ))}
-                            <button className="tech-chip add-chip" onClick={addTech}>+ Add</button>
-                        </div>
-
-                        <div className="admin-save-bar">
-                            <button onClick={saveAbout} className="btn-primary"><span>Save About</span></button>
-                        </div>
+                        <button onClick={saveAbout} className="btn-primary"><span>Save About Changes</span></button>
                     </section>
                 )}
 
@@ -549,30 +647,31 @@ const AdminPanel = () => {
                 {activeTab === 'skills' && (
                     <section className="admin-section">
                         <div className="section-header-admin">
-                            <div><h2>⚡ Skills</h2><p className="section-info" style={{ marginBottom: 0 }}>Manage skill categories and proficiency levels.</p></div>
-                            <button onClick={() => openSkillEditor(null)} className="btn-primary"><span>+ Add Category</span></button>
+                            <h2>⚡ Technical Competencies ({skills.length})</h2>
+                            <button onClick={() => { setSkillForm({ title: '', icon: '🔥', skills: '' }); setEditingSkillCat('new'); }} className="btn-secondary">
+                                <span>+ Add Category</span>
+                            </button>
                         </div>
-
                         <div className="skills-admin-grid">
-                            {skills.map((cat, catIdx) => (
-                                <div key={catIdx} className="skill-cat-card">
-                                    <div className="skill-cat-header">
-                                        <span className="skill-cat-icon">{cat.icon}</span>
-                                        <h4>{cat.title}</h4>
-                                        <div className="skill-cat-actions">
-                                            <button onClick={() => openSkillEditor(catIdx)} className="btn-edit">Edit</button>
-                                            <button onClick={() => deleteSkillCategory(catIdx)} className="btn-delete">Del</button>
+                            {skills.map((cat, idx) => (
+                                <div key={idx} className="skill-cat-card">
+                                    <div className="cat-header">
+                                        <span className="cat-icon">{cat.icon}</span>
+                                        <h3>{cat.title}</h3>
+                                        <div className="cat-actions">
+                                            <button onClick={() => openSkillEditor(idx)} className="btn-edit-sm">Edit</button>
+                                            <button onClick={() => deleteSkillCategory(idx)} className="btn-del-sm">×</button>
                                         </div>
                                     </div>
-                                    <div className="skill-cat-list">
-                                        {cat.skills.map((s, sIdx) => (
-                                            <div key={sIdx} className="skill-preview">
-                                                <span>{s.name}</span>
-                                                <div className="skill-bar-mini"><div style={{ width: `${s.level}%`, background: s.color }} /></div>
-                                                <span className="skill-lvl">{s.level}%</span>
-                                            </div>
+                                    <ul className="cat-skills-list">
+                                        {cat.skills.map((s, si) => (
+                                            <li key={si}>
+                                                <span className="skill-dot" style={{ background: s.color }} />
+                                                <span className="skill-name">{s.name}</span>
+                                                <span className="skill-pct">{s.level}%</span>
+                                            </li>
                                         ))}
-                                    </div>
+                                    </ul>
                                 </div>
                             ))}
                         </div>
@@ -582,16 +681,14 @@ const AdminPanel = () => {
                 {/* ──────── CONTACT TAB ──────── */}
                 {activeTab === 'contact' && (
                     <section className="admin-section">
-                        <h2>📞 Contact & Social</h2>
-                        <p className="section-info">Edit your contact details and social media links appearing in Contact and Footer sections.</p>
-
+                        <h2>📞 Contact &amp; Social Information</h2>
                         <div className="admin-form-grid">
                             <div className="form-group">
                                 <label>Email Address</label>
                                 <input name="email" value={contact.email} onChange={handleContactChange} />
                             </div>
                             <div className="form-group">
-                                <label>Phone Number</label>
+                                <label>Phone / WhatsApp</label>
                                 <input name="phone" value={contact.phone} onChange={handleContactChange} />
                             </div>
                             <div className="form-group full-width">
@@ -599,28 +696,26 @@ const AdminPanel = () => {
                                 <input name="location" value={contact.location} onChange={handleContactChange} />
                             </div>
                         </div>
-                        <div className="admin-save-bar">
-                            <button onClick={saveContact} className="btn-primary"><span>Save Contact Info</span></button>
-                        </div>
+                        <button onClick={saveContact} className="btn-primary"><span>Save Contact</span></button>
 
-                        <h3 className="sub-heading">Social Media Links</h3>
-                        <div className="social-admin-grid">
-                            {social.map((s, idx) => (
-                                <div key={idx} className="social-item-card">
-                                    <span className="social-icon-large">{s.icon}</span>
-                                    <div className="social-info">
-                                        <h4>{s.name}</h4>
-                                        <p>{s.url}</p>
+                        <div className="social-admin-section" style={{ marginTop: '2.5rem' }}>
+                            <div className="section-header-admin">
+                                <h3>🌐 Social Links</h3>
+                                <button onClick={() => { setSocialForm({ name: '', icon: '🔗', url: '' }); setEditingSocial('new'); }} className="btn-secondary">
+                                    <span>+ Add Social</span>
+                                </button>
+                            </div>
+                            <div className="social-admin-list">
+                                {social.map((s, idx) => (
+                                    <div key={idx} className="social-admin-item">
+                                        <span className="social-ico">{s.icon}</span>
+                                        <span className="social-name">{s.name}</span>
+                                        <a href={s.url} target="_blank" rel="noopener noreferrer" className="social-url">{s.url}</a>
+                                        <button onClick={() => { setSocialForm(s); setEditingSocial(idx); }} className="btn-edit-sm">Edit</button>
+                                        <button onClick={() => deleteSocial(idx)} className="btn-del-sm">×</button>
                                     </div>
-                                    <div className="social-actions">
-                                        <button onClick={() => openSocialEditor(idx)} className="btn-edit">Edit</button>
-                                        <button onClick={() => deleteSocialItem(idx)} className="btn-delete">Remove</button>
-                                    </div>
-                                </div>
-                            ))}
-                            <button className="add-social-btn" onClick={() => openSocialEditor(null)}>
-                                <span>+ Add New Social Link</span>
-                            </button>
+                                ))}
+                            </div>
                         </div>
                     </section>
                 )}
@@ -629,116 +724,190 @@ const AdminPanel = () => {
                 {activeTab === 'projects' && (
                     <section className="admin-section">
                         <div className="section-header-admin">
-                            <h2>🚀 Projects ({projects.length})</h2>
-                            <button onClick={() => setShowForm(true)} className="btn-primary"><span>+ Add Project</span></button>
+                            <h2>🚀 Production Projects &amp; Case Studies ({projects.length})</h2>
+                            <button onClick={openAddProject} className="btn-primary"><span>+ Add New Project</span></button>
                         </div>
                         <div className="projects-list">
-                            {projects.length === 0 ? (
-                                <p className="no-projects">No custom projects yet. Default projects are shown on the site. Click "Add Project" to override with your own!</p>
-                            ) : (
-                                projects.map(project => (
-                                    <div key={project.id} className="project-card-admin">
-                                        <img src={project.thumbnail} alt={project.title} />
-                                        <div className="project-info-admin">
-                                            <h4>{project.title}</h4>
-                                            <span className="category-badge">{project.category}</span>
-                                            <p>{project.description}</p>
-                                        </div>
-                                        <div className="project-actions-admin">
-                                            <button onClick={() => handleEdit(project)} className="btn-edit">Edit</button>
-                                            <button onClick={() => handleDelete(project.id)} className="btn-delete">Delete</button>
-                                        </div>
+                            {projects.map((proj) => (
+                                <div key={proj.id} className="project-card-admin">
+                                    <img src={proj.thumbnail || proj.image || '/logo192.png'} alt={proj.title} />
+                                    <div className="project-info-admin">
+                                        <h4>{proj.title}</h4>
+                                        <span className="category-badge">{proj.category}</span>
+                                        <p>{proj.description}</p>
                                     </div>
-                                ))
-                            )}
+                                    <div className="project-actions-admin">
+                                        <button onClick={() => openEditProject(proj)} className="btn-secondary">Edit</button>
+                                        <button onClick={() => deleteProject(proj.id)} className="btn-delete">Delete</button>
+                                    </div>
+                                </div>
+                            ))}
                         </div>
                     </section>
                 )}
 
-                {/* ──────── SETTINGS TAB ──────── */}
-                {activeTab === 'settings' && (
-                    <div className="admin-settings-container">
-                        <section className="admin-section appearance-settings">
-                            <h2>✨ Appearance</h2>
-                            <p className="section-info">Choose the look and feel of your portfolio. Switching themes will affect both the main site and this admin panel.</p>
-                            <div className="theme-toggle-grid">
-                                <button
-                                    className={`theme-option ${theme === 'dark' ? 'active' : ''}`}
-                                    onClick={() => saveTheme('dark')}
-                                >
-                                    <span className="theme-icon">🌙</span>
-                                    <div className="theme-details">
-                                        <strong>Dark Mode</strong>
-                                        <span>Premium emerald & teal dark theme</span>
-                                    </div>
-                                    <div className="theme-check">✓</div>
-                                </button>
-                                <button
-                                    className={`theme-option ${theme === 'light' ? 'active' : ''}`}
-                                    onClick={() => saveTheme('light')}
-                                >
-                                    <span className="theme-icon">☀️</span>
-                                    <div className="theme-details">
-                                        <strong>Light Mode</strong>
-                                        <span>Professional slate & indigo light theme</span>
-                                    </div>
-                                    <div className="theme-check">✓</div>
-                                </button>
-                            </div>
-                        </section>
+                {/* ──────── RESUME TAB (100% FREE UPLOAD & DOWNLOAD FLOW) ──────── */}
+                {activeTab === 'resume' && (
+                    <section className="admin-section">
+                        <h2>📄 Resume &amp; CV Manager (100% Free)</h2>
+                        <p className="section-info">
+                            Upload your latest resume PDF directly from your computer. Visitors can download it with a single click from the Hero and Navigation headers.
+                        </p>
 
-                        <section className="admin-section">
-                            <h2>📄 Resume Link</h2>
-                            <p className="section-info">Upload your resume to Google Drive, then paste the shareable link here.</p>
-                            <div className="resume-form">
-                                <input type="url" value={resumeLink} onChange={(e) => setResumeLink(e.target.value)} placeholder="https://drive.google.com/your-resume-link" />
-                                <button onClick={() => { handleResumeUpdate(); triggerGlobalSync(); }} className="btn-primary"><span>Save</span></button>
-                            </div>
-                        </section>
+                        <div className="resume-upload-card">
+                            <div className="upload-dropzone">
+                                <div className="dropzone-icon">📁</div>
+                                <h4>{resumeFileName ? 'Replace Existing Resume' : 'Upload Resume File'}</h4>
+                                <p>Supports .pdf documents (Max 4.5 MB, zero external cost)</p>
 
-                        <section className="admin-section github-sync-settings">
-                            <h2>🌐 Global Sync (Real-Time)</h2>
-                            <p className="section-info">To make changes reflect globally on all devices, enter your <strong>GitHub Personal Access Token</strong>. Changes will then be committed directly to your repository.</p>
+                                <label className="btn-primary file-select-btn">
+                                    <span>{isUploadingResume ? 'Processing File...' : 'Choose PDF File'}</span>
+                                    <input
+                                        type="file"
+                                        accept=".pdf,application/pdf"
+                                        onChange={handleResumeUpload}
+                                        disabled={isUploadingResume}
+                                        hidden
+                                    />
+                                </label>
+                            </div>
+
+                            {/* Current File Status */}
+                            {resumeFileName && (
+                                <div className="current-resume-status">
+                                    <div className="file-info-badge">
+                                        <span className="badge-file-icon">📄</span>
+                                        <div className="badge-file-details">
+                                            <strong>{resumeFileName}</strong>
+                                            <span>Size: {resumeFileSize || 'Stored Locally'}</span>
+                                        </div>
+                                    </div>
+
+                                    <div className="resume-test-actions">
+                                        <button onClick={downloadResume} className="btn-secondary" title="Test download in browser">
+                                            <span>⬇️ Test Download</span>
+                                        </button>
+                                        <button onClick={handleRemoveResumeFile} className="btn-delete" title="Remove uploaded file">
+                                            <span>Delete File</span>
+                                        </button>
+                                    </div>
+                                </div>
+                            )}
+                        </div>
+
+                        {/* Optional External Link Fallback */}
+                        <div className="resume-url-fallback" style={{ marginTop: '2.5rem' }}>
+                            <h3>🔗 Or Use External Link (Google Drive / GitHub)</h3>
+                            <p className="section-info">If you prefer linking directly to a cloud document:</p>
                             <div className="resume-form">
                                 <input
-                                    type="password"
-                                    value={githubToken}
-                                    onChange={(e) => {
-                                        setGithubToken(e.target.value);
-                                        localStorage.setItem('REACT_APP_GITHUB_TOKEN', e.target.value);
-                                    }}
-                                    placeholder="ghp_xxxxxxxxxxxx"
+                                    type="url"
+                                    value={resumeLink}
+                                    onChange={(e) => setResumeLink(e.target.value)}
+                                    placeholder="https://drive.google.com/file/d/... or raw GitHub PDF URL"
                                 />
-                                <button onClick={triggerGlobalSync} className="btn-primary" disabled={isSyncing || !githubToken}>
-                                    <span>{isSyncing ? 'Syncing...' : 'Sync Now'}</span>
+                                <button onClick={handleResumeLinkUpdate} className="btn-secondary">
+                                    <span>Save Link</span>
                                 </button>
                             </div>
-                            {!githubToken && <p className="token-hint">Don't have a token? <a href="https://github.com/settings/tokens/new?scopes=repo" target="_blank" rel="noopener noreferrer">Create one with 'repo' scope</a></p>}
-                        </section>
+                        </div>
+                    </section>
+                )}
+
+                {/* ──────── SETTINGS & SECURITY TAB ──────── */}
+                {activeTab === 'settings' && (
+                    <div className="settings-grid">
+                        {/* Security Master Password */}
                         <section className="admin-section">
-                            <h2>💾 Backup & Restore</h2>
-                            <p className="section-info">Export ALL data (hero, about, skills, projects, resume) or import from backup.</p>
-                            <div className="backup-actions">
-                                <button onClick={handleExport} className="btn-secondary"><span>Export All Data</span></button>
-                                <label className="btn-secondary import-btn"><span>Import Data</span><input type="file" accept=".json" onChange={handleImport} hidden /></label>
+                            <h2>🔐 Security &amp; Master Password</h2>
+                            <p className="section-info">
+                                Change your administrative password. It is stored as a cryptographic salted SHA-256 hash.
+                            </p>
+                            <form onSubmit={handlePasswordChangeSubmit} className="password-change-form">
+                                <div className="admin-form-grid">
+                                    <div className="form-group">
+                                        <label>New Password (min. 6 chars)</label>
+                                        <input
+                                            type="password"
+                                            value={newMasterPassword}
+                                            onChange={(e) => setNewMasterPassword(e.target.value)}
+                                            placeholder="Enter new master password"
+                                        />
+                                    </div>
+                                    <div className="form-group">
+                                        <label>Confirm Password</label>
+                                        <input
+                                            type="password"
+                                            value={confirmMasterPassword}
+                                            onChange={(e) => setConfirmMasterPassword(e.target.value)}
+                                            placeholder="Confirm new master password"
+                                        />
+                                    </div>
+                                </div>
+                                <button type="submit" className="btn-primary" style={{ marginTop: '1rem' }}>
+                                    <span>Update Master Password</span>
+                                </button>
+                            </form>
+                        </section>
+
+                        {/* Theme Settings */}
+                        <section className="admin-section">
+                            <h2>🎨 Site Theme &amp; Default Appearance</h2>
+                            <div className="theme-toggle-admin">
+                                <button className={`theme-option ${theme === 'dark' ? 'active' : ''}`} onClick={() => saveTheme('dark')}>
+                                    <span className="theme-preview dark-preview" />
+                                    <span>Dark Cyber Mode</span>
+                                </button>
+                                <button className={`theme-option ${theme === 'light' ? 'active' : ''}`} onClick={() => saveTheme('light')}>
+                                    <span className="theme-preview light-preview" />
+                                    <span>Light Studio Mode</span>
+                                </button>
                             </div>
                         </section>
-                        <section className="admin-section danger-zone">
-                            <h2>🗑️ Reset to Defaults</h2>
-                            <p className="section-info">Reset all sections to their default values.</p>
+
+                        {/* GitHub Global Sync */}
+                        <section className="admin-section github-sync-settings">
+                            <h2>🌐 GitHub Global Sync (Real-Time Deployment)</h2>
+                            <p className="section-info">
+                                Enter your Personal Access Token with repo scope. Updates will be committed directly to your repository and deployed live by Vercel.
+                            </p>
+                            <div className="resume-form">
+                                <div className="token-input-wrapper" style={{ position: 'relative', flex: 1 }}>
+                                    <input
+                                        type={showGithubToken ? "text" : "password"}
+                                        value={githubToken}
+                                        onChange={(e) => {
+                                            setGithubToken(e.target.value);
+                                            localStorage.setItem('REACT_APP_GITHUB_TOKEN', e.target.value);
+                                        }}
+                                        placeholder="ghp_xxxxxxxxxxxx"
+                                        style={{ width: '100%' }}
+                                    />
+                                    <button
+                                        type="button"
+                                        onClick={() => setShowGithubToken(!showGithubToken)}
+                                        className="token-toggle-btn"
+                                        style={{ position: 'absolute', right: '10px', top: '50%', transform: 'translateY(-50%)', background: 'none', border: 'none', color: '#94a3b8', cursor: 'pointer' }}
+                                    >
+                                        {showGithubToken ? '👁️' : '🔒'}
+                                    </button>
+                                </div>
+                                <button onClick={() => triggerGlobalSync()} className="btn-primary" disabled={isSyncing || !githubToken}>
+                                    <span>{isSyncing ? 'Syncing...' : 'Sync to GitHub'}</span>
+                                </button>
+                            </div>
+                        </section>
+
+                        {/* Backup & Restore */}
+                        <section className="admin-section">
+                            <h2>💾 Data Backup &amp; Restore</h2>
+                            <p className="section-info">Download a full JSON backup of your portfolio database or restore from a saved copy.</p>
                             <div className="backup-actions">
-                                <button className="btn-delete" onClick={() => {
-                                    if (!window.confirm('Reset ALL data to defaults? This cannot be undone.')) return;
-                                    setHero(defaultHero); save('heroData', defaultHero);
-                                    setAbout(defaultAbout); save('aboutData', defaultAbout);
-                                    setSkills(defaultSkills); save('skillsData', defaultSkills);
-                                    setContact(defaultContact); save('contactData', defaultContact);
-                                    setSocial(defaultSocial); save('socialData', defaultSocial);
-                                    setProjects(defaultProjects); save('portfolioProjects', defaultProjects);
-                                    setResumeLink(''); localStorage.removeItem('resumeLink');
-                                    saveTheme('dark');
-                                    showToast('All data reset to defaults');
-                                }}>Reset Everything</button>
+                                <button onClick={handleExport} className="btn-secondary"><span>Export All Data</span></button>
+                                <label className="btn-secondary import-btn">
+                                    <span>Import Data</span>
+                                    <input type="file" accept=".json" onChange={handleImport} hidden />
+                                </label>
                             </div>
                         </section>
                     </div>
@@ -754,25 +923,27 @@ const AdminPanel = () => {
                             <button type="button" onClick={resetForm} className="close-btn">×</button>
                         </div>
                         <div className="form-grid">
-                            <div className="form-group"><label>Project Title *</label><input type="text" name="title" value={formData.title} onChange={handleFormChange} required /></div>
-                            <div className="form-group"><label>URL Slug</label><input type="text" name="slug" value={formData.slug} onChange={handleFormChange} placeholder="auto-generated" /></div>
-                            <div className="form-group"><label>Category *</label>
-                                <select name="category" value={formData.category} onChange={handleFormChange}>
-                                    <option value="web">Web</option><option value="android">Android</option><option value="flutter">Flutter</option>
-                                </select></div>
-                            <div className="form-group"><label>Thumbnail URL *</label><input type="url" name="thumbnail" value={formData.thumbnail} onChange={handleFormChange} placeholder="https://i.ibb.co/..." required /></div>
-                            <div className="form-group full-width"><label>Short Description *</label><textarea name="description" value={formData.description} onChange={handleFormChange} rows="2" required /></div>
-                            <div className="form-group full-width"><label>Long Description</label><textarea name="longDescription" value={formData.longDescription} onChange={handleFormChange} rows="4" /></div>
-                            <div className="form-group full-width"><label>Technologies (comma separated) *</label><input type="text" name="technologies" value={formData.technologies} onChange={handleFormChange} placeholder="React, Next.js, TypeScript" required /></div>
-                            <div className="form-group full-width"><label>Features (comma separated)</label><input type="text" name="features" value={formData.features} onChange={handleFormChange} placeholder="Auth, Dashboard, Analytics" /></div>
-                            <div className="form-group full-width"><label>Highlights (comma separated)</label><input type="text" name="highlights" value={formData.highlights} onChange={handleFormChange} placeholder="99.9% uptime, 10K users" /></div>
-                            <div className="form-group"><label>Live / App URL</label><input type="url" name="liveLink" value={formData.liveLink} onChange={handleFormChange} placeholder="https://..." /></div>
-                            <div className="form-group"><label>Play Store Link</label><input type="url" name="playStoreLink" value={formData.playStoreLink} onChange={handleFormChange} /></div>
-                            <div className="form-group full-width"><label>GitHub Link</label><input type="url" name="githubLink" value={formData.githubLink} onChange={handleFormChange} /></div>
+                            <div className="form-group"><label>Title</label><input name="title" value={formData.title} onChange={handleProjectFormChange} required /></div>
+                            <div className="form-group"><label>Slug (URL key)</label><input name="slug" value={formData.slug} onChange={handleProjectFormChange} placeholder="my-app-name" /></div>
+                            <div className="form-group">
+                                <label>Category</label>
+                                <select name="category" value={formData.category} onChange={handleProjectFormChange}>
+                                    <option value="android">Android Native (Kotlin/Java)</option>
+                                    <option value="flutter">Flutter Cross-Platform</option>
+                                    <option value="web">Web &amp; Full Stack</option>
+                                </select>
+                            </div>
+                            <div className="form-group full-width"><label>Short Summary</label><input name="description" value={formData.description} onChange={handleProjectFormChange} required /></div>
+                            <div className="form-group full-width"><label>Detailed Architecture Description</label><textarea name="longDescription" rows="4" value={formData.longDescription} onChange={handleProjectFormChange} /></div>
+                            <div className="form-group"><label>Image / Thumbnail URL</label><input name="image" value={formData.image} onChange={handleProjectFormChange} placeholder="/Profile.webp or https://..." /></div>
+                            <div className="form-group"><label>Technologies (comma separated)</label><input name="technologies" value={formData.technologies} onChange={handleProjectFormChange} placeholder="Kotlin, Jetpack Compose, Room, Coroutines" /></div>
+                            <div className="form-group"><label>Play Store / Live Demo Link</label><input name="playStoreLink" value={formData.playStoreLink} onChange={handleProjectFormChange} placeholder="https://play.google.com/..." /></div>
+                            <div className="form-group"><label>GitHub Repository Link</label><input name="githubLink" value={formData.githubLink} onChange={handleProjectFormChange} placeholder="https://github.com/..." /></div>
+                            <div className="form-group full-width"><label>Key Architectural Features (one per line)</label><textarea name="features" rows="3" value={formData.features} onChange={handleProjectFormChange} placeholder={"MVVM Architecture with StateFlow\nOffline-first Room Database caching"} /></div>
                         </div>
                         <div className="form-actions">
-                            <button type="button" onClick={resetForm} className="btn-secondary"><span>Cancel</span></button>
-                            <button type="submit" className="btn-primary"><span>{editingProject ? 'Update' : 'Add Project'}</span></button>
+                            <button type="button" onClick={resetForm} className="btn-secondary">Cancel</button>
+                            <button type="submit" className="btn-primary">Save Project</button>
                         </div>
                     </form>
                 </div>
@@ -783,7 +954,7 @@ const AdminPanel = () => {
                 <div className="project-form-overlay">
                     <div className="project-form">
                         <div className="form-header">
-                            <h3>{typeof editingSkillCat === 'number' ? 'Edit Category' : 'Add Category'}</h3>
+                            <h3>{editingSkillCat === 'new' ? 'Add Skill Category' : 'Edit Skill Category'}</h3>
                             <button type="button" onClick={() => setEditingSkillCat(null)} className="close-btn">×</button>
                         </div>
                         <div className="form-grid">
@@ -791,12 +962,12 @@ const AdminPanel = () => {
                             <div className="form-group"><label>Icon (emoji)</label><input value={skillForm.icon} onChange={e => setSkillForm(p => ({ ...p, icon: e.target.value }))} /></div>
                             <div className="form-group full-width">
                                 <label>Skills (one per line: <code>Name:Level:Color</code>)</label>
-                                <textarea rows="8" value={skillForm.skills} onChange={e => setSkillForm(p => ({ ...p, skills: e.target.value }))} placeholder={"React:92:#61DAFB\nTypeScript:88:#3178C6"} />
+                                <textarea rows="8" value={skillForm.skills} onChange={e => setSkillForm(p => ({ ...p, skills: e.target.value }))} placeholder={"Android Kotlin:95:#3DDC84\nFlutter:90:#0284c7"} />
                             </div>
                         </div>
                         <div className="form-actions">
-                            <button onClick={() => setEditingSkillCat(null)} className="btn-secondary"><span>Cancel</span></button>
-                            <button onClick={saveSkillCategory} className="btn-primary"><span>Save Category</span></button>
+                            <button onClick={() => setEditingSkillCat(null)} className="btn-secondary">Cancel</button>
+                            <button onClick={saveSkillCategory} className="btn-primary">Save Category</button>
                         </div>
                     </div>
                 </div>
@@ -816,8 +987,8 @@ const AdminPanel = () => {
                             <div className="form-group full-width"><label>Profile URL</label><input value={socialForm.url} onChange={e => setSocialForm(p => ({ ...p, url: e.target.value }))} placeholder="https://..." /></div>
                         </div>
                         <div className="form-actions">
-                            <button onClick={() => setEditingSocial(null)} className="btn-secondary"><span>Cancel</span></button>
-                            <button onClick={saveSocialItem} className="btn-primary"><span>Save Link</span></button>
+                            <button onClick={() => setEditingSocial(null)} className="btn-secondary">Cancel</button>
+                            <button onClick={saveSocialItem} className="btn-primary">Save Link</button>
                         </div>
                     </div>
                 </div>

@@ -10,6 +10,7 @@ import Skills from './components/Skills';
 import Contact from './components/Contact';
 import Footer from './components/Footer';
 import ProjectDetail from './components/ProjectDetail';
+import ProjectsShowcase from './components/ProjectsShowcase';
 import portfolioData from './data/portfolioData.json';
 import { fetchLatestGitHubData } from './utils/githubSync';
 
@@ -223,6 +224,8 @@ function App() {
               <main>
                 <Routes>
                   <Route path="/" element={<HomePage projects={projects} />} />
+                  <Route path="/projects" element={<ProjectsShowcase />} />
+                  <Route path="/showcase" element={<ProjectsShowcase />} />
                   <Route path="/portfolio/:slug" element={<ProjectDetail projects={projects} />} />
                 </Routes>
               </main>

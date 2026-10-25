@@ -890,3 +890,124 @@
         flex-direction: column;
     }
 }
+
+/* -- Enhanced Security & Resume Styling -- */
+.login-shield-badge {
+    font-size: 3rem;
+    margin-bottom: 0.5rem;
+    animation: pulse 2s infinite;
+}
+
+.login-lockout-notice {
+    background: rgba(239, 68, 68, 0.15);
+    border: 1px solid rgba(239, 68, 68, 0.4);
+    color: #ef4444;
+    padding: 1rem;
+    border-radius: var(--radius-md);
+    margin-bottom: 1.25rem;
+    font-size: 0.9rem;
+}
+
+.login-error-msg {
+    color: #f87171;
+    font-size: 0.85rem;
+    background: rgba(239, 68, 68, 0.1);
+    padding: 0.6rem;
+    border-radius: var(--radius-sm);
+    border: 1px solid rgba(239, 68, 68, 0.2);
+}
+
+.resume-upload-card {
+    background: var(--dark-surface);
+    border: 1px solid var(--dark-border);
+    border-radius: var(--radius-lg);
+    padding: 2rem;
+    margin-top: 1rem;
+}
+
+.upload-dropzone {
+    border: 2px dashed rgba(255, 255, 255, 0.15);
+    border-radius: var(--radius-md);
+    padding: 2.5rem 1.5rem;
+    text-align: center;
+    background: rgba(0, 0, 0, 0.2);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.75rem;
+}
+
+.dropzone-icon {
+    font-size: 2.5rem;
+}
+
+.upload-dropzone h4 {
+    color: var(--text-white);
+    font-size: 1.15rem;
+    margin: 0;
+}
+
+.upload-dropzone p {
+    color: var(--text-muted);
+    font-size: 0.85rem;
+    margin: 0;
+}
+
+.file-select-btn {
+    cursor: pointer;
+    margin-top: 0.5rem;
+}
+
+.current-resume-status {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    background: rgba(16, 185, 129, 0.1);
+    border: 1px solid rgba(16, 185, 129, 0.3);
+    border-radius: var(--radius-md);
+    padding: 1rem 1.5rem;
+    margin-top: 1.5rem;
+    flex-wrap: wrap;
+    gap: 1rem;
+}
+
+.file-info-badge {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+}
+
+.badge-file-icon {
+    font-size: 1.8rem;
+}
+
+.badge-file-details {
+    display: flex;
+    flex-direction: column;
+}
+
+.badge-file-details strong {
+    color: #10b981;
+    font-size: 0.95rem;
+}
+
+.badge-file-details span {
+    color: var(--text-muted);
+    font-size: 0.8rem;
+}
+
+.resume-test-actions {
+    display: flex;
+    gap: 0.75rem;
+}
+
+.settings-grid {
+    display: flex;
+    flex-direction: column;
+    gap: 2rem;
+}
+
+.password-change-form {
+    display: flex;
+    flex-direction: column;
+}
