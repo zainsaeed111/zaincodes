@@ -1,0 +1,20 @@
+<svg width="512" height="360" viewBox="70 130 372 252" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="accent" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#22d3ee"/>
+      <stop offset="100%" stop-color="#6366f1"/>
+    </linearGradient>
+  </defs>
+
+  <!-- Code bracket left -->
+  <path d="M182 150 L100 256 L182 362" fill="none" stroke="url(#accent)" stroke-width="32"
+        stroke-linecap="round" stroke-linejoin="round"/>
+
+  <!-- Code bracket right -->
+  <path d="M330 150 L412 256 L330 362" fill="none" stroke="url(#accent)" stroke-width="32"
+        stroke-linecap="round" stroke-linejoin="round"/>
+
+  <!-- Z with padding inside the brackets -->
+  <path d="M216 196 L296 196 L216 316 L296 316" fill="none" stroke="#f8fafc" stroke-width="30"
+        stroke-linecap="round" stroke-linejoin="round"/>
+</svg>

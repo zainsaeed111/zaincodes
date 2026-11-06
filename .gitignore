@@ -17,9 +17,24 @@
 .env.development.local
 .env.test.local
 .env.production.local
+web/.env.local
+web/.data/
+web/.next/
+web/node_modules/
+web/coverage/
 
 npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
 
 .vercel
+
+# Local Phase 2 backups (JSON copies may be kept; never commit secrets)
+backups/**/*.env*
+backups/**/uploads/
+backups/pglite-*/
+
+# Never commit local DB / media / secrets
+**/.data/
+**/.env.local
+**/*.pem

@@ -1,0 +1,25 @@
+# Optional local Postgres when Docker Desktop is available.
+# Phase 2 currently uses PGlite inside web/ (no Docker required).
+# This file is prepared for a later switch — do not point it at production.
+
+services:
+  db:
+    image: postgres:17-alpine
+    container_name: zaincodes-local-db
+    restart: unless-stopped
+    ports:
+      - "5433:5432"
+    environment:
+      POSTGRES_USER: zaincodes
+      POSTGRES_PASSWORD: zaincodes_local
+      POSTGRES_DB: zaincodes_dev
+    volumes:
+      - zaincodes_pg_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U zaincodes -d zaincodes_dev"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+volumes:
+  zaincodes_pg_data:

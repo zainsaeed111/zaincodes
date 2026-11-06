@@ -17,7 +17,13 @@
     "start": "react-scripts start",
     "build": "react-scripts build",
     "test": "react-scripts test",
-    "eject": "react-scripts eject"
+    "eject": "react-scripts eject",
+    "dev:cra": "react-scripts start",
+    "dev:web": "npm --prefix web run dev",
+    "seed:web": "npm --prefix web run seed",
+    "smoke:web": "npm --prefix web run smoke",
+    "test:web": "npm --prefix web run test",
+    "backup:web": "npm --prefix web run backup:db"
   },
   "eslintConfig": {
     "extends": [
