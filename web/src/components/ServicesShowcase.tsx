@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import { useState } from "react";
 import { Reveal } from "@/components/motion/Reveal";
 
 export type ServiceItem = {
@@ -53,59 +54,59 @@ const FALLBACK: Record<PrimarySlug, { title: string; summary: string; capabiliti
 function ServicePreview({ slug }: { slug: string }) {
   if (slug === "web-development") {
     return (
-      <svg className="svc-preview-art" viewBox="0 0 160 100" aria-hidden>
-        <rect x="12" y="18" width="136" height="68" rx="6" className="svc-pv-frame" />
-        <rect x="12" y="18" width="136" height="14" className="svc-pv-chrome" />
-        <circle cx="24" cy="25" r="2.5" className="svc-pv-dot" />
-        <circle cx="34" cy="25" r="2.5" className="svc-pv-dot" />
-        <circle cx="44" cy="25" r="2.5" className="svc-pv-dot" />
-        <rect x="24" y="44" width="52" height="8" rx="2" className="svc-pv-fill" />
-        <rect x="24" y="58" width="72" height="4" rx="1" className="svc-pv-line" />
-        <rect x="24" y="66" width="60" height="4" rx="1" className="svc-pv-line" />
-        <rect x="108" y="44" width="28" height="28" rx="4" className="svc-pv-accent" />
+      <svg className="svc-preview-art" viewBox="0 0 200 128" aria-hidden>
+        <rect x="16" y="22" width="168" height="84" rx="8" className="svc-pv-frame" />
+        <rect x="16" y="22" width="168" height="16" className="svc-pv-chrome" />
+        <circle cx="30" cy="30" r="3" className="svc-pv-dot" />
+        <circle cx="42" cy="30" r="3" className="svc-pv-dot" />
+        <circle cx="54" cy="30" r="3" className="svc-pv-dot" />
+        <rect x="32" y="52" width="70" height="10" rx="2" className="svc-pv-fill" />
+        <rect x="32" y="70" width="96" height="5" rx="1.5" className="svc-pv-line" />
+        <rect x="32" y="82" width="78" height="5" rx="1.5" className="svc-pv-line" />
+        <rect x="140" y="52" width="30" height="36" rx="5" className="svc-pv-accent" />
       </svg>
     );
   }
   if (slug === "full-stack-development") {
     return (
-      <svg className="svc-preview-art" viewBox="0 0 160 100" aria-hidden>
-        <rect x="28" y="16" width="104" height="18" rx="4" className="svc-pv-fill" />
-        <rect x="40" y="42" width="80" height="16" rx="4" className="svc-pv-accent" />
-        <rect x="52" y="66" width="56" height="16" rx="4" className="svc-pv-frame" />
-        <path d="M80 34v8M80 58v8" className="svc-pv-path" />
+      <svg className="svc-preview-art" viewBox="0 0 200 128" aria-hidden>
+        <rect x="40" y="18" width="120" height="22" rx="5" className="svc-pv-fill" />
+        <rect x="54" y="52" width="92" height="20" rx="5" className="svc-pv-accent" />
+        <rect x="68" y="86" width="64" height="20" rx="5" className="svc-pv-frame" />
+        <path d="M100 40v12M100 72v14" className="svc-pv-path" />
       </svg>
     );
   }
   if (slug === "mobile-app-development") {
     return (
-      <svg className="svc-preview-art" viewBox="0 0 160 100" aria-hidden>
-        <rect x="58" y="10" width="44" height="80" rx="8" className="svc-pv-frame" />
-        <rect x="64" y="22" width="32" height="52" rx="2" className="svc-pv-fill" />
-        <rect x="72" y="78" width="16" height="3" rx="1.5" className="svc-pv-line" />
-        <rect x="38" y="28" width="14" height="44" rx="4" className="svc-pv-accent" opacity="0.55" />
-        <rect x="108" y="28" width="14" height="44" rx="4" className="svc-pv-accent" opacity="0.55" />
+      <svg className="svc-preview-art" viewBox="0 0 200 128" aria-hidden>
+        <rect x="74" y="12" width="52" height="104" rx="10" className="svc-pv-frame" />
+        <rect x="82" y="28" width="36" height="68" rx="3" className="svc-pv-fill" />
+        <rect x="90" y="102" width="20" height="4" rx="2" className="svc-pv-line" />
+        <rect x="48" y="34" width="16" height="56" rx="5" className="svc-pv-accent" opacity="0.55" />
+        <rect x="136" y="34" width="16" height="56" rx="5" className="svc-pv-accent" opacity="0.55" />
       </svg>
     );
   }
   if (slug === "custom-software-development") {
     return (
-      <svg className="svc-preview-art" viewBox="0 0 160 100" aria-hidden>
-        <circle cx="40" cy="50" r="14" className="svc-pv-frame" />
-        <circle cx="80" cy="32" r="12" className="svc-pv-accent" />
-        <circle cx="80" cy="68" r="12" className="svc-pv-fill" />
-        <circle cx="120" cy="50" r="14" className="svc-pv-frame" />
-        <path d="M52 44l16-8M52 56l16 8M92 36l16 8M92 64l16-8" className="svc-pv-path" />
+      <svg className="svc-preview-art" viewBox="0 0 200 128" aria-hidden>
+        <circle cx="52" cy="64" r="18" className="svc-pv-frame" />
+        <circle cx="100" cy="40" r="15" className="svc-pv-accent" />
+        <circle cx="100" cy="88" r="15" className="svc-pv-fill" />
+        <circle cx="148" cy="64" r="18" className="svc-pv-frame" />
+        <path d="M68 56l18-10M68 72l18 10M116 46l18 10M116 82l18-10" className="svc-pv-path" />
       </svg>
     );
   }
   return (
-    <svg className="svc-preview-art" viewBox="0 0 160 100" aria-hidden>
-      <rect x="18" y="22" width="124" height="58" rx="4" className="svc-pv-frame" />
-      <rect x="18" y="22" width="124" height="12" className="svc-pv-chrome" />
-      <rect x="28" y="44" width="48" height="26" rx="3" className="svc-pv-fill" />
-      <rect x="84" y="44" width="46" height="8" rx="2" className="svc-pv-line" />
-      <rect x="84" y="56" width="38" height="8" rx="2" className="svc-pv-line" />
-      <rect x="48" y="80" width="64" height="6" rx="2" className="svc-pv-accent" />
+    <svg className="svc-preview-art" viewBox="0 0 200 128" aria-hidden>
+      <rect x="24" y="28" width="152" height="72" rx="5" className="svc-pv-frame" />
+      <rect x="24" y="28" width="152" height="14" className="svc-pv-chrome" />
+      <rect x="36" y="56" width="58" height="32" rx="4" className="svc-pv-fill" />
+      <rect x="104" y="56" width="56" height="8" rx="2" className="svc-pv-line" />
+      <rect x="104" y="70" width="46" height="8" rx="2" className="svc-pv-line" />
+      <rect x="68" y="104" width="64" height="6" rx="2" className="svc-pv-accent" />
     </svg>
   );
 }
@@ -121,8 +122,7 @@ export function ServicesShowcase({ services }: { services?: ServiceItem[] | null
   const ordered = PRIMARY.map((slug) => {
     const cms = bySlug.get(slug);
     const fb = FALLBACK[slug];
-    const caps =
-      cms?.capabilities && cms.capabilities.length ? cms.capabilities : fb.capabilities;
+    const caps = cms?.capabilities && cms.capabilities.length ? cms.capabilities : fb.capabilities;
     return {
       slug,
       title: cms?.title || fb.title,
@@ -132,6 +132,9 @@ export function ServicesShowcase({ services }: { services?: ServiceItem[] | null
       sortOrder: cms?.sortOrder ?? PRIMARY.indexOf(slug),
     };
   }).sort((a, b) => a.sortOrder - b.sortOrder);
+
+  const [active, setActive] = useState(ordered[0]?.slug || PRIMARY[0]);
+  const current = ordered.find((s) => s.slug === active) || ordered[0];
 
   const secondary = (services || []).filter(
     (s) => s.slug === "flutter-development" || s.slug === "android-development",
@@ -143,52 +146,62 @@ export function ServicesShowcase({ services }: { services?: ServiceItem[] | null
         <Reveal>
           <div className="section-intro">
             <p className="eyebrow">Services</p>
-            <h2>What I build for clients</h2>
-            <p>Focused offerings across web, systems, mobile, custom software, and desktop.</p>
+            <h2>What I build</h2>
+            <p>Five focused offerings — hover a row to preview, open a page for the full brief.</p>
           </div>
         </Reveal>
 
-        <div className="svc-rail" role="list">
-          {ordered.map((s, i) => (
-            <Reveal key={s.slug} delay={i * 0.04}>
-              <Link href={s.href} className="svc-row" role="listitem" data-service={s.slug}>
+        <div className="svc-board">
+          <div className="svc-index" role="list">
+            {ordered.map((s, i) => (
+              <Link
+                key={s.slug}
+                href={s.href}
+                role="listitem"
+                className={`svc-index-row ${active === s.slug ? "is-active" : ""}`}
+                data-service={s.slug}
+                onMouseEnter={() => setActive(s.slug)}
+                onFocus={() => setActive(s.slug)}
+              >
                 <span className="svc-num" aria-hidden>
                   {String(i + 1).padStart(2, "0")}
                 </span>
-                <div className="svc-copy">
-                  <h3>{s.title}</h3>
-                  <p>{s.summary}</p>
-                  {s.capabilities.length ? (
-                    <p className="svc-caps-line">
-                      {s.capabilities.map((c, idx) => (
-                        <span key={c}>
-                          {idx > 0 ? (
-                            <span className="svc-caps-sep" aria-hidden>
-                              {" "}
-                              ·{" "}
-                            </span>
-                          ) : null}
-                          {c}
-                        </span>
-                      ))}
-                    </p>
-                  ) : null}
-                </div>
-                <div className="svc-aside">
-                  <div className="svc-preview" aria-hidden>
-                    <ServicePreview slug={s.slug} />
-                  </div>
-                  <span className="svc-cta">
-                    View service
-                    <em aria-hidden>→</em>
-                  </span>
-                </div>
+                <span className="svc-index-copy">
+                  <strong>{s.title}</strong>
+                  <span>{s.summary}</span>
+                </span>
+                <span className="svc-index-go" aria-hidden>
+                  →
+                </span>
               </Link>
-            </Reveal>
-          ))}
+            ))}
+          </div>
+
+          <aside className="svc-stage" aria-live="polite">
+            {current ? (
+              <>
+                <div className="svc-stage-preview">
+                  <ServicePreview slug={current.slug} />
+                </div>
+                <p className="svc-stage-kicker">Service preview</p>
+                <h3>{current.title}</h3>
+                <p>{current.summary}</p>
+                {current.capabilities.length ? (
+                  <ul className="svc-stage-caps">
+                    {current.capabilities.map((c) => (
+                      <li key={c}>{c}</li>
+                    ))}
+                  </ul>
+                ) : null}
+                <Link className="svc-stage-cta" href={current.href}>
+                  Open {current.title}
+                </Link>
+              </>
+            ) : null}
+          </aside>
         </div>
 
-        <Reveal delay={0.12}>
+        <Reveal delay={0.1}>
           <div className="services-sublinks">
             {(secondary.length
               ? secondary

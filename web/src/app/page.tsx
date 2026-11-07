@@ -41,7 +41,6 @@ export default async function HomePage() {
   }
   const hero = content.hero;
   const about = content.about;
-  const featured = projects.slice(0, 5);
 
   return (
     <main>
@@ -76,7 +75,7 @@ export default async function HomePage() {
         }))}
       />
 
-      <WorkShowcase projects={featured} />
+      <WorkShowcase projects={projects} />
 
       <SkillsShowcase categories={content.skills || []} />
 

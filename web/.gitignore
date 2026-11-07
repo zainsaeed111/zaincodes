@@ -16,9 +16,15 @@
 # next.js
 /.next/
 /out/
+.open-next/
+.wrangler/
 
 # production
 /build
+
+# Cloudflare local secrets (never commit)
+.dev.vars
+cloudflare-env.d.ts
 
 # misc
 .DS_Store
@@ -43,3 +49,6 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+
+.vercel
+.env*

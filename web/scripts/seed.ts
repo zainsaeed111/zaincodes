@@ -320,11 +320,15 @@ async function main() {
 
   // Projects upsert by slug — preserve every case-study field
   for (const [idx, project] of data.portfolioProjects.entries()) {
+    const looksClient = /skans|institute|client|company|store|campus|insight/i.test(
+      `${project.title} ${project.description || ""}`,
+    );
     const payload = {
       legacyId: project.id,
       slug: project.slug,
       title: project.title,
       category: project.category,
+      workContext: (looksClient ? "client" : "personal") as "client" | "personal",
       description: project.description,
       longDescription: project.longDescription,
       problem: project.problem,

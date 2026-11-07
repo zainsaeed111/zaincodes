@@ -64,8 +64,18 @@ export function SiteHeader() {
             </Link>
           ))}
           <div className="nav-end">
-            <a className="btn btn-secondary btn-sm" href="/api/resume" onClick={() => setOpen(false)}>
-              Resume
+            <a className="btn-resume btn-resume-nav" href="/api/resume" onClick={() => setOpen(false)}>
+              <span className="btn-resume-icon" aria-hidden>
+                <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" strokeWidth="1.8">
+                  <path d="M14 3H7a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V8l-5-5Z" />
+                  <path d="M14 3v5h5" />
+                  <path d="M12 18v-6" />
+                  <path d="M9.5 15.5 12 18l2.5-2.5" />
+                </svg>
+              </span>
+              <span className="btn-resume-copy">
+                <strong>Resume</strong>
+              </span>
             </a>
             <ThemeToggle />
           </div>

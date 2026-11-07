@@ -57,6 +57,8 @@ export async function PUT(req: NextRequest) {
       }
     }
     const rows = await db.select().from(services).orderBy(asc(services.sortOrder));
+    const { revalidateSiteSurfaces } = await import("@/lib/cms-revalidate");
+    revalidateSiteSurfaces();
     return apiOk({ services: rows, saved: true });
   } catch (err) {
     return handleRouteError(err);

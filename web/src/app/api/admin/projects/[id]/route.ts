@@ -5,11 +5,18 @@ import { ensureSchema, getDb } from "@/db/client";
 import { projectImages, projects } from "@/db/schema";
 import { guardAdminWrite } from "@/lib/admin-guard";
 import { apiError, apiOk, fromZodError, handleRouteError } from "@/lib/http";
+import { showcaseFieldsSchema, toFlag } from "@/lib/project-showcase-schema";
+import { canonicalizeTypeSlug, slugifyCategory } from "@/lib/project-taxonomy";
+import { syncProjectTypeLinks } from "@/lib/project-types";
 
 const patchSchema = z.object({
   slug: z.string().min(1).max(160).optional(),
   title: z.string().min(1).max(200).optional(),
-  category: z.enum(["android", "flutter", "web"]).optional(),
+  category: z.string().min(1).max(64).optional(),
+  typeSlugs: z.array(z.string().min(1).max(64)).min(1).optional(),
+  workContext: z.enum(["client", "personal", "unassigned"]).optional(),
+  needsGroupReview: z.union([z.boolean(), z.number()]).optional(),
+  categoryIcon: z.string().max(40).nullable().optional(),
   description: z.string().max(1000).nullable().optional(),
   longDescription: z.string().max(8000).nullable().optional(),
   problem: z.string().max(4000).nullable().optional(),
@@ -28,6 +35,7 @@ const patchSchema = z.object({
   status: z.enum(["draft", "published"]).optional(),
   sortOrder: z.number().int().optional(),
   screenshots: z.array(z.string().max(1000)).optional(),
+  ...showcaseFieldsSchema,
 });
 
 export async function PATCH(
@@ -49,13 +57,57 @@ export async function PATCH(
     const [existing] = await db.select().from(projects).where(eq(projects.id, id)).limit(1);
     if (!existing) return apiError("NOT_FOUND", "Project not found.");
 
-    const { screenshots, ...rest } = parsed.data;
+    const {
+      screenshots,
+      category,
+      typeSlugs: typeSlugsRaw,
+      showcaseAutoplay,
+      scrollPreview,
+      isFeatured,
+      needsGroupReview,
+      workContext,
+      ...rest
+    } = parsed.data;
+
+    let typeSlugs: string[] | undefined;
+    if (typeSlugsRaw?.length) {
+      typeSlugs = Array.from(
+        new Set(typeSlugsRaw.map((s) => canonicalizeTypeSlug(s) || slugifyCategory(s)).filter(Boolean)),
+      );
+    } else if (category) {
+      typeSlugs = [canonicalizeTypeSlug(category) || slugifyCategory(category)];
+    }
+
+    if (typeSlugs) {
+      await syncProjectTypeLinks(id, typeSlugs);
+    }
+
+    const nextContext = workContext ?? existing.workContext;
+    const nextNeedsReview =
+      needsGroupReview !== undefined
+        ? toFlag(needsGroupReview)
+        : workContext === "unassigned"
+          ? 1
+          : workContext === "client" || workContext === "personal"
+            ? 0
+            : existing.needsGroupReview;
+
     const [updated] = await db
       .update(projects)
-      .set({ ...rest, updatedAt: new Date() })
+      .set({
+        ...rest,
+        ...(workContext ? { workContext } : {}),
+        ...(typeSlugs ? { category: typeSlugs[0] } : category ? { category: slugifyCategory(category) || existing.category } : {}),
+        ...(showcaseAutoplay !== undefined ? { showcaseAutoplay: toFlag(showcaseAutoplay) } : {}),
+        ...(scrollPreview !== undefined ? { scrollPreview: toFlag(scrollPreview) } : {}),
+        ...(isFeatured !== undefined ? { isFeatured: toFlag(isFeatured) } : {}),
+        needsGroupReview: nextNeedsReview,
+        updatedAt: new Date(),
+      })
       .where(eq(projects.id, id))
       .returning();
 
+    // Never wipe media unless screenshots array is explicitly provided.
     if (screenshots) {
       await db.delete(projectImages).where(eq(projectImages.projectId, id));
       if (screenshots.length) {
@@ -71,7 +123,10 @@ export async function PATCH(
       }
     }
 
-    return apiOk({ project: updated });
+    void nextContext;
+    const { revalidateSiteSurfaces } = await import("@/lib/cms-revalidate");
+    revalidateSiteSurfaces({ projectSlug: updated.slug });
+    return apiOk({ project: { ...updated, typeSlugs: typeSlugs || undefined } });
   } catch (err) {
     return handleRouteError(err);
   }
@@ -92,6 +147,8 @@ export async function DELETE(
     const db = getDb();
     const deleted = await db.delete(projects).where(and(eq(projects.id, id))).returning();
     if (!deleted.length) return apiError("NOT_FOUND", "Project not found.");
+    const { revalidateSiteSurfaces } = await import("@/lib/cms-revalidate");
+    revalidateSiteSurfaces({ projectSlug: deleted[0].slug });
     return apiOk({ deleted: true, id });
   } catch (err) {
     return handleRouteError(err);

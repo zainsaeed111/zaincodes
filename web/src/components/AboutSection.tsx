@@ -72,8 +72,19 @@ export function AboutSection({
                 <em aria-hidden>→</em>
               </a>
               {hasResume ? (
-                <a className="about-resume-link" href="/api/resume" target="_blank" rel="noopener noreferrer">
-                  Download resume
+                <a className="btn-resume" href="/api/resume" target="_blank" rel="noopener noreferrer">
+                  <span className="btn-resume-icon" aria-hidden>
+                    <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" strokeWidth="1.8">
+                      <path d="M14 3H7a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V8l-5-5Z" />
+                      <path d="M14 3v5h5" />
+                      <path d="M12 18v-6" />
+                      <path d="M9.5 15.5 12 18l2.5-2.5" />
+                    </svg>
+                  </span>
+                  <span className="btn-resume-copy">
+                    <strong>Download resume</strong>
+                    <small>PDF · curated experience</small>
+                  </span>
                 </a>
               ) : null}
             </div>

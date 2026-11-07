@@ -1,16 +1,15 @@
+import { neon } from "@neondatabase/serverless";
 import { PGlite } from "@electric-sql/pglite";
 import { drizzle as drizzlePglite } from "drizzle-orm/pglite";
-import { drizzle as drizzlePg } from "drizzle-orm/postgres-js";
+import { drizzle as drizzleNeon } from "drizzle-orm/neon-http";
 import fs from "node:fs";
 import path from "node:path";
-import postgres from "postgres";
 import * as schema from "./schema";
 
-const SCHEMA_VERSION = "phase8-blog-cms-v2";
+const SCHEMA_VERSION = "phase8-blog-cms-v6";
 
-type AppDb =
-  | ReturnType<typeof drizzlePglite<typeof schema>>
-  | ReturnType<typeof drizzlePg<typeof schema>>;
+type NeonSql = ReturnType<typeof neon>;
+type AppDb = ReturnType<typeof drizzlePglite<typeof schema>> | ReturnType<typeof drizzleNeon<typeof schema>>;
 
 type Migrator = {
   exec: (sql: string) => Promise<void>;
@@ -22,7 +21,7 @@ type Migrator = {
 
 const globalForDb = globalThis as unknown as {
   pglite?: PGlite;
-  pgSql?: ReturnType<typeof postgres>;
+  neonSql?: NeonSql;
   db?: AppDb;
   schemaReady?: Promise<void>;
   appliedSchemaVersion?: string;
@@ -54,44 +53,75 @@ export function getPGlite() {
   return globalForDb.pglite;
 }
 
-function getPostgresSql() {
-  if (!globalForDb.pgSql) {
+async function resolvePostgresUrl() {
+  const fromEnv = process.env.DATABASE_URL?.trim();
+  if (fromEnv) return fromEnv;
+  // Vercel: never touch OpenNext Cloudflare (build would demand Hyperdrive local URL).
+  if (process.env.VERCEL) {
+    return null;
+  }
+  try {
+    const { getCloudflareContext } = await import("@opennextjs/cloudflare");
+    const ctx = await getCloudflareContext({ async: true });
+    const hyperdrive = (ctx?.env as { HYPERDRIVE?: { connectionString?: string } } | undefined)
+      ?.HYPERDRIVE;
+    if (hyperdrive?.connectionString) return hyperdrive.connectionString;
+  } catch {
+    // Local Node / non-Workers runtime — Hyperdrive binding unavailable.
+  }
+  return null;
+}
+
+function getNeonSql() {
+  if (!globalForDb.neonSql) {
     const url = process.env.DATABASE_URL?.trim();
     if (!url) throw new Error("DATABASE_URL is required for Postgres mode.");
-    globalForDb.pgSql = postgres(url, {
-      max: 5,
-      idle_timeout: 20,
-      prepare: false,
-      ssl: url.includes("localhost") || url.includes("127.0.0.1") ? false : "require",
-    });
+    globalForDb.neonSql = neon(url);
   }
-  return globalForDb.pgSql;
+  return globalForDb.neonSql;
+}
+
+/** Prefer Hyperdrive on Workers; falls back to DATABASE_URL secret/env. */
+export async function ensurePostgresFromBindings() {
+  if (globalForDb.neonSql) return;
+  const url = await resolvePostgresUrl();
+  if (!url) return;
+  process.env.DATABASE_URL = url;
+  getNeonSql();
 }
 
 export function getDb(): AppDb {
   if (!globalForDb.db) {
     if (useExternalPostgres()) {
-      globalForDb.db = drizzlePg(getPostgresSql(), { schema });
+      globalForDb.db = drizzleNeon(getNeonSql(), { schema }) as AppDb;
     } else {
-      globalForDb.db = drizzlePglite(getPGlite(), { schema });
+      globalForDb.db = drizzlePglite(getPGlite(), { schema }) as AppDb;
     }
   }
-  return globalForDb.db;
+  return globalForDb.db as AppDb;
 }
 
 function getMigrator(): Migrator {
   if (useExternalPostgres()) {
-    const sql = getPostgresSql();
+    const sql = getNeonSql();
     return {
       async exec(text: string) {
-        await sql.unsafe(text);
+        // Neon HTTP rejects multi-statement prepared SQL — run one statement at a time.
+        const parts = text
+          .split(";")
+          .map((s) => s.trim())
+          .filter((s) => s.length > 0 && !s.startsWith("--"));
+        for (const part of parts) {
+          await sql.query(part);
+        }
       },
       async query<T extends Record<string, unknown> = Record<string, unknown>>(
         text: string,
         params: unknown[] = [],
       ) {
-        const rows = (await sql.unsafe(text, params as (string | number | boolean | null)[])) as unknown as T[];
-        return { rows: Array.isArray(rows) ? rows : [] };
+        const result = await sql.query(text, params as (string | number | boolean | null)[]);
+        const rows = (Array.isArray(result) ? result : (result as { rows?: T[] }).rows || []) as T[];
+        return { rows };
       },
     };
   }
@@ -275,6 +305,8 @@ CREATE TABLE IF NOT EXISTS projects (
   slug TEXT NOT NULL,
   title TEXT NOT NULL,
   category TEXT NOT NULL,
+  work_context TEXT NOT NULL DEFAULT 'client',
+  category_icon TEXT,
   description TEXT,
   long_description TEXT,
   problem TEXT,
@@ -286,7 +318,17 @@ CREATE TABLE IF NOT EXISTS projects (
   cover_url TEXT,
   thumbnail_url TEXT,
   video_url TEXT,
+  video_poster_url TEXT,
   preview_style TEXT NOT NULL DEFAULT 'banner',
+  showcase_mode TEXT NOT NULL DEFAULT 'static',
+  showcase_autoplay INTEGER NOT NULL DEFAULT 1,
+  slideshow_interval_ms INTEGER NOT NULL DEFAULT 4200,
+  image_fit TEXT NOT NULL DEFAULT 'cover',
+  banner_aspect TEXT NOT NULL DEFAULT '16/10',
+  scroll_preview INTEGER NOT NULL DEFAULT 0,
+  showcase_image_order JSONB DEFAULT '[]'::jsonb,
+  is_featured INTEGER NOT NULL DEFAULT 0,
+  needs_group_review INTEGER NOT NULL DEFAULT 0,
   play_store_link TEXT,
   live_link TEXT,
   github_link TEXT,
@@ -305,6 +347,27 @@ CREATE TABLE IF NOT EXISTS project_images (
   sort_order INTEGER NOT NULL DEFAULT 0,
   is_cover BOOLEAN NOT NULL DEFAULT FALSE
 );
+
+CREATE TABLE IF NOT EXISTS project_types (
+  id SERIAL PRIMARY KEY,
+  slug TEXT NOT NULL,
+  name TEXT NOT NULL,
+  description TEXT,
+  icon TEXT DEFAULT 'spark',
+  sort_order INTEGER NOT NULL DEFAULT 0,
+  enabled INTEGER NOT NULL DEFAULT 1,
+  created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+  updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
+);
+CREATE UNIQUE INDEX IF NOT EXISTS project_types_slug_idx ON project_types(slug);
+
+CREATE TABLE IF NOT EXISTS project_type_links (
+  id SERIAL PRIMARY KEY,
+  project_id INTEGER NOT NULL REFERENCES projects(id) ON DELETE CASCADE,
+  type_id INTEGER NOT NULL REFERENCES project_types(id) ON DELETE CASCADE,
+  sort_order INTEGER NOT NULL DEFAULT 0
+);
+CREATE UNIQUE INDEX IF NOT EXISTS project_type_links_unique ON project_type_links(project_id, type_id);
 
 CREATE TABLE IF NOT EXISTS blog_categories (
   id SERIAL PRIMARY KEY,
@@ -435,26 +498,220 @@ async function addColumn(client: Migrator, table: string, column: string, defini
   }
 }
 
-async function applySchema() {
-  const client = getMigrator();
-  // Idempotent DDL — safe to re-run after code upgrades (PGlite local or external Postgres).
-  await client.exec(CREATE_SQL);
-  await addColumn(client, "site_settings", "logo_url", "TEXT");
-  await addColumn(client, "site_settings", "blog_monetization_enabled", "INTEGER NOT NULL DEFAULT 0");
-  await addColumn(client, "site_settings", "adsense_client_id", "TEXT");
-  await addColumn(client, "site_settings", "affiliate_disclosure", "TEXT");
-  try {
-    await client.exec("ALTER TABLE services ADD COLUMN IF NOT EXISTS capabilities JSONB DEFAULT '[]'::jsonb");
-    await client.exec("ALTER TABLE services ADD COLUMN IF NOT EXISTS href TEXT");
-  } catch {
-    // ignore
+/** Default subcategories + safe remap of legacy category strings → type links. */
+async function seedProjectTaxonomy(client: Migrator) {
+  const defaults: Array<[string, string, string, string, number]> = [
+    ["web-development", "Web Development", "Sites, portals, and product UI on the open web.", "web", 10],
+    ["mobile-app-development", "Mobile App Development", "Cross-platform and native mobile apps.", "mobile", 20],
+    ["full-stack-development", "Full-Stack Development", "End-to-end product with UI, APIs, and data.", "fullstack", 30],
+    ["custom-software-development", "Custom Software Development", "Bespoke software and product engineering.", "spark", 40],
+    ["ai-projects", "AI Projects", "Agentic workflows, LLM tooling, and AI product features.", "spark", 50],
+    ["backend-development", "Backend Development", "APIs, services, and server-side systems.", "backend", 60],
+    ["desktop-application-development", "Desktop Application Development", "Desktop applications and installable clients.", "desktop", 70],
+  ];
+
+  for (const [slug, name, description, icon, sortOrder] of defaults) {
+    try {
+      await client.query(
+        `INSERT INTO project_types (slug, name, description, icon, sort_order, enabled)
+         SELECT $1, $2, $3, $4, $5, 1
+         WHERE NOT EXISTS (SELECT 1 FROM project_types WHERE slug = $1)`,
+        [slug, name, description, icon, sortOrder],
+      );
+    } catch (err) {
+      console.warn("[db] project_types seed:", err instanceof Error ? err.message : err);
+    }
   }
-  await addColumn(client, "hero_content", "badge_enabled", "INTEGER NOT NULL DEFAULT 1");
+
+  /** Map legacy category field → canonical subcategory slug. */
+  const legacyMap: Record<string, string> = {
+    web: "web-development",
+    "web-development": "web-development",
+    mobile: "mobile-app-development",
+    android: "mobile-app-development",
+    ios: "mobile-app-development",
+    flutter: "mobile-app-development",
+    "mobile-app-development": "mobile-app-development",
+    fullstack: "full-stack-development",
+    "full-stack": "full-stack-development",
+    "full-stack-development": "full-stack-development",
+    desktop: "desktop-application-development",
+    "desktop-application-development": "desktop-application-development",
+    backend: "backend-development",
+    "backend-development": "backend-development",
+    "ai-agents": "ai-projects",
+    ai: "ai-projects",
+    "ai-projects": "ai-projects",
+    ui: "custom-software-development",
+    custom: "custom-software-development",
+    "custom-software-development": "custom-software-development",
+  };
+
+  try {
+    const rows = await client.query<{ id: number; category: string; category_icon: string | null }>(
+      "SELECT id, category, category_icon FROM projects",
+    );
+    for (const row of rows.rows) {
+      const raw = String(row.category || "")
+        .trim()
+        .toLowerCase()
+        .replace(/[^a-z0-9]+/g, "-")
+        .replace(/^-|-$/g, "");
+      const targetSlug = legacyMap[raw] || raw || "web-development";
+
+      // Ensure custom types exist for unknown slugs
+      if (!legacyMap[raw] && raw && !defaults.some((d) => d[0] === raw)) {
+        try {
+          await client.query(
+            `INSERT INTO project_types (slug, name, description, icon, sort_order, enabled)
+             SELECT $1, $2, $3, $4, 900, 1
+             WHERE NOT EXISTS (SELECT 1 FROM project_types WHERE slug = $1)`,
+            [
+              targetSlug,
+              targetSlug
+                .split("-")
+                .filter(Boolean)
+                .map((w) => w.charAt(0).toUpperCase() + w.slice(1))
+                .join(" "),
+              "Custom project subcategory.",
+              row.category_icon || "spark",
+            ],
+          );
+        } catch {
+          // ignore
+        }
+      }
+
+      if (row.category !== targetSlug) {
+        try {
+          await client.query("UPDATE projects SET category = $1 WHERE id = $2", [targetSlug, row.id]);
+        } catch {
+          // ignore
+        }
+      }
+
+      try {
+        const typeRow = await client.query<{ id: number }>(
+          "SELECT id FROM project_types WHERE slug = $1 LIMIT 1",
+          [targetSlug],
+        );
+        const typeId = typeRow.rows[0]?.id;
+        if (!typeId) continue;
+        await client.query(
+          `INSERT INTO project_type_links (project_id, type_id, sort_order)
+           SELECT $1, $2, 0
+           WHERE NOT EXISTS (
+             SELECT 1 FROM project_type_links WHERE project_id = $1 AND type_id = $2
+           )`,
+          [row.id, typeId],
+        );
+      } catch (err) {
+        console.warn("[db] project_type_links migrate:", err instanceof Error ? err.message : err);
+      }
+    }
+  } catch (err) {
+    console.warn("[db] taxonomy migrate:", err instanceof Error ? err.message : err);
+  }
+}
+
+async function applyAdditiveProjectMigrations(client: Migrator) {
   await addColumn(client, "projects", "preview_style", "TEXT DEFAULT 'banner'");
+  await addColumn(client, "projects", "work_context", "TEXT NOT NULL DEFAULT 'client'");
+  await addColumn(client, "projects", "category_icon", "TEXT");
+  await addColumn(client, "projects", "video_poster_url", "TEXT");
+  await addColumn(client, "projects", "showcase_mode", "TEXT NOT NULL DEFAULT 'static'");
+  await addColumn(client, "projects", "showcase_autoplay", "INTEGER NOT NULL DEFAULT 1");
+  await addColumn(client, "projects", "slideshow_interval_ms", "INTEGER NOT NULL DEFAULT 4200");
+  await addColumn(client, "projects", "image_fit", "TEXT NOT NULL DEFAULT 'cover'");
+  await addColumn(client, "projects", "banner_aspect", "TEXT NOT NULL DEFAULT '16/10'");
+  await addColumn(client, "projects", "scroll_preview", "INTEGER NOT NULL DEFAULT 0");
+  await addColumn(client, "projects", "showcase_image_order", "JSONB DEFAULT '[]'::jsonb");
+  await addColumn(client, "projects", "is_featured", "INTEGER NOT NULL DEFAULT 0");
+  await addColumn(client, "projects", "needs_group_review", "INTEGER NOT NULL DEFAULT 0");
   try {
     await client.exec("UPDATE projects SET preview_style = 'banner' WHERE preview_style IS NULL");
   } catch (err) {
     console.warn("[db] preview_style migrate:", err instanceof Error ? err.message : err);
+  }
+  try {
+    // Preserve existing assignments; only fill truly empty values as unassigned for review.
+    await client.exec(
+      "UPDATE projects SET work_context = 'unassigned', needs_group_review = 1 WHERE work_context IS NULL OR work_context = ''",
+    );
+  } catch (err) {
+    console.warn("[db] work_context migrate:", err instanceof Error ? err.message : err);
+  }
+  try {
+    await client.exec("UPDATE projects SET showcase_mode = 'static' WHERE showcase_mode IS NULL OR showcase_mode = ''");
+  } catch (err) {
+    console.warn("[db] showcase_mode migrate:", err instanceof Error ? err.message : err);
+  }
+  try {
+    await client.exec(`
+CREATE TABLE IF NOT EXISTS project_types (
+  id SERIAL PRIMARY KEY,
+  slug TEXT NOT NULL,
+  name TEXT NOT NULL,
+  description TEXT,
+  icon TEXT DEFAULT 'spark',
+  sort_order INTEGER NOT NULL DEFAULT 0,
+  enabled INTEGER NOT NULL DEFAULT 1,
+  created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+  updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
+)`);
+    await client.exec("CREATE UNIQUE INDEX IF NOT EXISTS project_types_slug_idx ON project_types(slug)");
+    await client.exec(`
+CREATE TABLE IF NOT EXISTS project_type_links (
+  id SERIAL PRIMARY KEY,
+  project_id INTEGER NOT NULL REFERENCES projects(id) ON DELETE CASCADE,
+  type_id INTEGER NOT NULL REFERENCES project_types(id) ON DELETE CASCADE,
+  sort_order INTEGER NOT NULL DEFAULT 0
+)`);
+    await client.exec(
+      "CREATE UNIQUE INDEX IF NOT EXISTS project_type_links_unique ON project_type_links(project_id, type_id)",
+    );
+  } catch (err) {
+    console.warn("[db] project taxonomy tables:", err instanceof Error ? err.message : err);
+  }
+  await seedProjectTaxonomy(client);
+}
+
+async function applySchema() {
+  const client = getMigrator();
+  // Neon HTTP + Workers: each statement is a subrequest. Skip full DDL when already migrated,
+  // but always re-run additive project taxonomy migrations (idempotent).
+  let alreadyMigrated = false;
+  try {
+    const existing = await client.query<{ version: string }>(
+      "SELECT version FROM schema_migrations WHERE version = $1 LIMIT 1",
+      [SCHEMA_VERSION],
+    );
+    alreadyMigrated = existing.rows.length > 0;
+  } catch {
+    // schema_migrations may not exist yet — continue with CREATE.
+  }
+
+  if (!alreadyMigrated) {
+    // Idempotent DDL — safe to re-run after code upgrades (PGlite local or external Postgres).
+    await client.exec(CREATE_SQL);
+    await addColumn(client, "site_settings", "logo_url", "TEXT");
+    await addColumn(client, "site_settings", "blog_monetization_enabled", "INTEGER NOT NULL DEFAULT 0");
+    await addColumn(client, "site_settings", "adsense_client_id", "TEXT");
+    await addColumn(client, "site_settings", "affiliate_disclosure", "TEXT");
+    try {
+      await client.exec("ALTER TABLE services ADD COLUMN IF NOT EXISTS capabilities JSONB DEFAULT '[]'::jsonb");
+      await client.exec("ALTER TABLE services ADD COLUMN IF NOT EXISTS href TEXT");
+    } catch {
+      // ignore
+    }
+    await addColumn(client, "hero_content", "badge_enabled", "INTEGER NOT NULL DEFAULT 1");
+  }
+
+  await applyAdditiveProjectMigrations(client);
+
+  if (alreadyMigrated) {
+    globalForDb.appliedSchemaVersion = SCHEMA_VERSION;
+    return;
   }
 
   await addColumn(client, "blog_posts", "body_html", "TEXT");
@@ -552,6 +809,7 @@ async function applySchema() {
 }
 
 export async function ensureSchema() {
+  await ensurePostgresFromBindings();
   if (globalForDb.appliedSchemaVersion === SCHEMA_VERSION && globalForDb.schemaReady) {
     await globalForDb.schemaReady;
     return;

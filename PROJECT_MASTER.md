@@ -44,11 +44,11 @@ The successful website will have: secure server auth and protected CRUD; durable
 | 3 | Admin CMS, media, resume and publishing | IN PROGRESS (local CRUD live) | Persisted admin change appears for clean public visitor |
 | 4 | Premium design system | IN PROGRESS (container/spacing/buttons/light theme refined) | Consistent tokens, non-generic UI, reduced motion |
 | 5 | Homepage, real CTAs, loader, WhatsApp | IN PROGRESS (balanced hero + nav theme toggle) | Responsive hero, real WhatsApp/contact paths |
-| 6 | Web/mobile project galleries, case studies | IN PROGRESS (case hero alignment + public URL guard) | Gallery matrix & media management pass |
+| 6 | Web/mobile project galleries, case studies | IN PROGRESS (DB taxonomy + shareable filters + full-width grid) | Gallery matrix & media management pass |
 | 7 | Crawlable service pages and technical SEO | IN PROGRESS (7 service SSR pages incl. custom/desktop) | Unique SSR metadata, sitemap, schema, no thin pages |
-| 8 | Blog CMS and publish workflows | VERIFIED COMPLETE (local) | Draft private; published indexable; content sanitized |
+| 8 | Blog CMS and publish workflows | VERIFIED COMPLETE (local + live Neon) | Draft private; published indexable; content sanitized |
 | 9 | Performance, accessibility and responsiveness | IN PROGRESS (responsive CSS + error pages; Lighthouse NOT RUN) | Evidence-backed Lighthouse/axe/device checks |
-| 10 | E2E QA and safe launch | BLOCKED (no durable prod DB/storage credentials) | Staging sign-off, rollback verified, live smoke tests |
+| 10 | E2E QA and safe launch | IN PROGRESS (Vercel + CF live; R2 still skipped) | Staging sign-off, rollback verified, live smoke tests |
 
 Statuses: `NOT STARTED`, `IN PROGRESS`, `BLOCKED`, `VERIFIED COMPLETE`. Never mark complete on implementation alone.
 
@@ -68,8 +68,9 @@ Statuses: `NOT STARTED`, `IN PROGRESS`, `BLOCKED`, `VERIFIED COMPLETE`. Never ma
 **Tests:** `npm run test:web` (Vitest).  
 **Smoke:** `npm run smoke:web` (requires Next on `:3001`).  
 **Admin bootstrap credentials:** stored only in gitignored `web/.env.local` (`ADMIN_BOOTSTRAP_EMAIL` / `ADMIN_BOOTSTRAP_PASSWORD`). Do not commit.  
-**Storage:** local driver `web/.data/uploads` via `/api/media/...` and `/api/resume`. Cloud storage adapter exists but is **BLOCKED** until credentials.  
-**Production:** not deployed; no DNS/domain/production DB changes.
+**Storage:** local driver `web/.data/uploads` via `/api/media/...` and `/api/resume`. Cloudflare R2 adapter ready; **BLOCKED** on free path (R2 API needs card). Uploads on Vercel are **not durable** across instances — CMS text/projects/blog use Neon.  
+**Cloudflare Workers:** Live at `https://zaincodes.zaincodes.workers.dev` (OpenNext + Hyperdrive + Neon). Keep-alive cron Worker `zaincodes-keepalive` every 5m.  
+**Production (Vercel):** `https://www.zaincodes.tech` (aliased) — Neon Postgres, admin CMS dynamic via `revalidatePath`, Hobby daily cron + CF keep-alive for Neon wake.
 
 ## 0.4 Immediate implementation order (start here, not from scratch)
 
@@ -108,6 +109,142 @@ Next: ...
 - Owner permission still pending to archive/remove `docs/upgrade-plan/*.md`.
 
 ## 0.7 Unified change log (append entries here only)
+
+### 2026-11-08 — Portfolio container + compact filter UI regression fix
+Status: VERIFIED COMPLETE (local only — not deployed)
+Root cause: `.pg-shell` on the same node as `.container` forced `max-width:100%` / full width, killing gutters.
+Changed code files: `globals.css`, `ProjectsIndex.tsx`, `WorkShowcase.tsx`, `project-taxonomy.ts` (`shortTypeLabel`)
+Implementation: Shared container max 1320px + `calc(100% - 2*gutter)` with gutters 18→28→48–64px. Removed MAIN CATEGORY / 01–02 / repeated Client·Freelance on cards. Compact All/Client/Freelance segment + short type chips (dropdown &lt;900px); subtle Copy link. Same 2-col grid when filtering; single match stays one track (~half width), 16:10 banners.
+Verify (CDP 1440): containerLeft≈58, width≈1309, 2×643 cols; `?type=web` single card 643 / ratio 1.6. No production deploy.
+Next: owner visual check; deploy only on approval.
+
+### 2026-11-08 — Two-level DB taxonomy + shareable filters + full-width gallery
+Status: VERIFIED COMPLETE (local only — not deployed)
+Changed code files:
+- `web/src/db/schema.ts`, `web/src/db/client.ts` (SCHEMA v6: `project_types`, `project_type_links`, `needs_group_review`; additive migrations always re-run)
+- `web/src/lib/project-taxonomy.ts`, `web/src/lib/project-types.ts`, `web/src/lib/content.ts`
+- `web/src/app/api/admin/projects/route.ts`, `[id]/route.ts`, `api/admin/project-types/route.ts`
+- `web/src/components/ProjectsIndex.tsx`, `WorkShowcase.tsx`, `admin/page.tsx`, `projects/page.tsx`
+- `web/src/app/globals.css` (full-width `.pg-grid--gallery`, compact `.pg-filters`; removed only-child half-width cap)
+- `web/tests/project-taxonomy.test.ts`, `web/scripts/migrate-taxonomy.mjs`
+Implementation: Default mains Client & Company / Freelance & Personal; 7 default DB subcategories + custom; multi-select type links; safe legacy remap (web→web-development, android/flutter/mobile→mobile-app-development) without inventing ownership; unassigned stays in All Projects + admin review flag; shareable `/projects?group=&type=` (aliases web/mobile/full-stack/ai); filtered pages `noindex` + canonical `/projects`; homepage featured + filter chips; CMS `revalidatePath` on save.
+Verify: Vitest 29 PASS; `/api/projects` count=8 with typeSlugs; CDP 1440 → container 1425, 2 cols ~700px, banner 16:10 (1.6); `?group=client-company&type=mobile` → 2 projects; `?type=ai` empty state; mobile 1-col. No production deploy.
+Next: owner can refine multi-subcategory assignments / featured flags in Admin; deploy only on approval.
+
+### 2026-11-07 — Main category + separate subcategory lanes
+Status: SUPERSEDED by 2026-11-08 DB taxonomy + full-width gallery
+
+### 2026-11-07 — Fix project gallery left-column collapse
+Status: SUPERSEDED by 2026-11-08 full-width `.pg-grid--gallery` (removed only-child half-width cap)
+Root cause: (1) per-discipline lanes each made a 2-col grid so single-item lanes left an empty right column; (2) `aspect-ratio` + `max-height` on `.pbanner-stage` could shrink banner width.
+Changed code files: `WorkShowcase.tsx`, `ProjectsIndex.tsx`, `globals.css`
+Implementation: One continuous `repeat(2, minmax(0, 1fr))` grid per Client/Personal chapter; discipline tags on cards + chapter legend; listing banners forced to 16:10 with `width:100%` and no max-height; Reveal wrappers `.pg-grid-item { width:100% }`; 1-col ≤768px.
+Verify (CDP): 1440 → container 1280, Client grid children 2 at 628px each (Campus left / Baby SOS right), stages 16:10 (~627×392); 390 → 1 column. Vitest 23 PASS; `npm run build` PASS.
+Next: none for layout; deploy only on approval.
+
+### 2026-11-07 — Digital Craft UI + restore Client/Personal chapters
+Status: VERIFIED COMPLETE (local only — not deployed)
+Changed code files:
+- `WorkShowcase.tsx`, `ProjectsIndex.tsx`, `project-taxonomy.ts` (chapters restored; empty contexts hidden)
+- `ServicesShowcase.tsx` (compact index + shared preview)
+- `SkillsShowcase.tsx` (editorial lanes, no %, related links)
+- `CategoryGlyph.tsx`, `globals.css` (cool-white light tokens, smaller banners via `--banner-max-h*`)
+- Case study eyebrow restored to `Client/Personal · discipline`
+Implementation: Categories/subcategories returned using real `workContext` + discipline lanes. Thumbnail banners capped (~148–220px). Light mode cool-white/ink/ZainCodes-blue. Services interactive board. Skills denser.
+Tests: [PASS] vitest 23; production `npm run build` PASS; home/projects show Client & Personal chapters, no empty chapter copy; banner sizes reduced via CSS max-height.
+Next: deeper Hero/About/Contact/Blog polish if owner wants; deploy only on approval.
+
+### 2026-11-07 — Banner-first admin-controlled project showcase
+Status: VERIFIED COMPLETE (local only — not deployed)
+Changed code files:
+- `web/src/db/schema.ts`, `web/src/db/client.ts` (v5 showcase columns)
+- `web/src/lib/showcase.ts`, `web/src/lib/project-showcase-schema.ts`, `web/src/lib/content.ts`, `web/src/lib/project-taxonomy.ts`
+- `web/src/components/ProjectBanner.tsx`, `WorkShowcase.tsx`, `ProjectsIndex.tsx`
+- `web/src/app/portfolio/[slug]/page.tsx`, `web/src/app/admin/page.tsx`
+- `web/src/app/api/admin/projects/route.ts`, `[id]/route.ts`
+- `web/src/app/globals.css` (`.pg-*` / `.pbanner-*`)
+- `web/tests/showcase.test.ts`, `web/tests/foundation.test.ts` (cleanup draft tmp projects)
+Implementation: Removed phone/chapter empty UI. Flat 2-col banner gallery. Modes A–D (static/slideshow/video/custom), scroll webpage preview, admin Media & Showcase Settings persisted to DB. Case-study hero uses `ProjectBanner`.
+Tests: [PASS] `npm test` → 23 passed (incl. 5 showcase). Unauthorized admin PATCH/POST → 401. Authenticated PATCH showcaseMode slideshow→static persists; public API reflects. `/api/projects` count=8. Home + `/projects` + case study: no “Nothing in this chapter”, no phone frames, `pg-grid`/`pbanner` present.
+Data/SEO/Security: schema v5 columns via ensureSchema; admin writes guarded; no production deploy.
+Risks: scrolling preview is CSS animation (pause on hover/reduced-motion); inline muted video only for direct uploads when autoplay+in-view.
+Rollback: revert listed files; columns are additive/defaulted.
+Next: owner uploads real banners/videos in Admin; approve deploy when ready.
+
+### 2026-11-07 — Fix empty /projects chapters
+Status: SUPERSEDED by banner-first showcase
+Changed code files: `web/src/app/projects/page.tsx` (server `listPublishedProjects`), `web/src/components/ProjectsIndex.tsx`
+Implementation: `/projects` was client-fetch-only so chapters rendered empty when JS/fetch lagged. Now SSR loads published projects into ProjectsIndex.
+Verify: browser `/projects` shows Client (Campus Insight, Baby SOS) + Personal chapters with device frames.
+
+### 2026-11-07 — Premium modular showcase + light theme (local)
+Status: VERIFIED COMPLETE (local build PASS; no prod deploy)
+Changed code files: `web/src/lib/project-taxonomy.ts` (`resolvePreviewFrame`, `presentationKind`), `web/src/components/ProjectMediaPreview.tsx`, `web/src/components/WorkShowcase.tsx`, `web/src/app/projects/page.tsx`, `web/src/app/portfolio/[slug]/page.tsx`, `web/src/app/globals.css` (light neutrals, `wk-*` modular layouts, device frames, case study)
+Implementation: Killed stretched banner default. Auto phone/browser/stack frames by discipline. Showcase uses phone rail / web feature+grid / product rows. Light theme warmer editorial neutrals + stronger contrast. Case study hides empty link blocks; constrained hero media. CMS unchanged.
+Tests: `npm run build` PASS. Local preview `http://localhost:3001`.
+Next: owner review locally; deploy only when approved.
+
+### 2026-11-07 — Editorial work showcase redesign
+Status: SUPERSEDED by modular showcase pass
+Changed code files: `web/src/components/WorkShowcase.tsx`, `web/src/app/projects/page.tsx`, `web/src/app/globals.css` (`wk-*` system)
+Implementation: Removed nested card/gradient patch UI. Typography-led chapters (Client / Personal), quiet discipline labels, media-first lead + hairline stack rows. Admin taxonomy unchanged (dynamic).
+Next: owner visual check on live home + /projects.
+
+### 2026-11-07 — Work sections premium polish (no filter bar)
+Status: SUPERSEDED by editorial redesign
+Changed code files: `web/src/app/globals.css` (context/discipline premium + responsive), `web/src/components/WorkShowcase.tsx`, `web/src/app/projects/page.tsx`, admin projects help copy
+Implementation: Kept section alignment; upgraded depth/hover/mobile. Admin remains source of truth for workContext + category + categoryIcon (revalidate on save).
+Next: owner can add custom disciplines anytime from admin.
+
+### 2026-11-07 — Premium resume + project taxonomy showcase
+Status: VERIFIED COMPLETE (local smoke; deploy next)
+Changed code files: `web/src/lib/project-taxonomy.ts`, `web/src/components/WorkTaxonomyFilters.tsx`, `web/src/components/WorkShowcase.tsx`, `web/src/app/projects/page.tsx`, `web/src/components/AboutSection.tsx`, `web/src/components/SiteHeader.tsx`, `web/src/db/schema.ts`, `web/src/db/client.ts` (v3 + `work_context`), admin/API project routes, `web/src/app/globals.css`
+Implementation: Dual filters — Built for (client/company vs personal/freelance) + Discipline (web/mobile/desktop/fullstack/backend). Admin CMS fields wired. Premium resume CTA. Schema migrate `work_context`.
+Tests: local `/api/projects` 200 with workContext; seed 8 projects.
+Next: Vercel prod deploy after local confirm.
+
+### 2026-11-07 — Vercel production + Neon keep-alive + dynamic admin
+Status: VERIFIED COMPLETE (live smoke; free path)
+Changed code files: `web/next.config.ts` (skip OpenNext Hyperdrive init on Vercel), `web/src/db/client.ts`, `web/vercel.json` (Hobby-safe daily cron), `web/scripts/vercel-set-env.mjs`, `web/src/lib/cms-revalidate.ts`, `web/src/app/api/cron/keep-alive/route.ts`, `web/workers/keep-alive.js`, `.github/workflows/keep-alive.yml`
+Implementation: Linked Vercel project `zaincodes`; pushed Neon/auth/CRON env; prod deploy aliased to `www.zaincodes.tech`. Neon free cannot disable suspend — CF Worker cron `*/5` pings `/api/health` on Vercel + Workers. Admin CMS writes revalidate public paths (no redeploy for content).
+Live checks: `/` `/blog` `/admin` `/api/health` `/api/content/home` `/api/projects` **200** (postgres). Keep-alive Worker deployed `zaincodes-keepalive.zaincodes.workers.dev` schedule `*/5 * * * *`.
+Risks: image/resume uploads still local driver (not durable on Vercel); R2 remains blocked without card. Hobby Vercel cron is once/day only — 5-min keep-alive is CF Worker (and optional GH Actions when pushed).
+Rollback: Vercel dashboard → previous deployment; CF Workers → prior version; Neon data intact.
+Next: optional durable media (R2 when free/card ok); push GH keep-alive workflow; Lighthouse Phase 9.
+
+### 2026-11-07 — Free Neon DB + Cloudflare blog wire
+Status: VERIFIED COMPLETE (free Neon + Hyperdrive + Workers; no card/R2)
+Changed code files: `web/src/db/client.ts` (Neon HTTP + schema skip), `web/src/lib/blog/sanitize.ts` (Workers-safe, no jsdom), `web/wrangler.jsonc` (Hyperdrive), `web/scripts/cf-with-neon-env.mjs`, `web/scripts/migrate-neon.mjs`
+Implementation: Created free Neon project `zaincodes`; migrated+seeded; Hyperdrive `zaincodes-db`; Worker secrets DATABASE_URL; redeployed.
+Live checks: `/` `/blog` `/api/health` **200** (postgres); `/admin` after sanitizer fix. Image uploads still local-driver (R2 skipped).
+Next: optional R2 only if owner accepts $0 enable; rotate Neon password if URI leaked in agent logs.
+Rollback: remove Hyperdrive binding; unset DATABASE_URL secret; local PGlite remains.
+
+### 2026-11-07 — Free Cloudflare Workers deploy (no paid / no card)
+Status: VERIFIED COMPLETE (Workers live; durable DB/R2 intentionally skipped)
+Changed code files: `web/wrangler.jsonc` (no R2), `web/open-next.config.ts` (avoid cloudflare:sockets), `web/scripts/register-workers-subdomain.mjs`
+Implementation: Registered free `workers.dev` subdomain `zaincodes`; OpenNext deploy; secrets AUTH_SECRET + admin bootstrap uploaded. No R2 purchase, no credit card.
+Tests: Live `https://zaincodes.zaincodes.workers.dev/` → **200**; `/api/health` → **503** (expected without durable Postgres on Workers FS).
+Limits: Blog/admin durable persistence still local (`localhost:3001` PGlite). Workers free host is for public site presence; full CMS durability needs free Neon later (optional, not paid CF R2).
+Next: optional free Neon DATABASE_URL only when owner wants durable cloud CMS — still no card/R2 required for basic Workers hosting.
+Rollback: `npx wrangler delete zaincodes`
+
+### 2026-11-07 — Cloudflare Agent Setup (Cursor)
+Status: VERIFIED COMPLETE (skills + MCP config; restart required for MCP tools)
+Changed code files: `.cursor/mcp.json`, project `.agents/skills/*` (22 Cloudflare skills), user `~/.cursor/mcp.json`, user `~/.agents/skills/*`
+Implementation: Followed https://developers.cloudflare.com/agent-setup/prompt.md for Cursor — skills via `npx skills add cloudflare/skills`, MCP `https://mcp.cloudflare.com/mcp`. Optional `cf` CLI not installed (ask owner).
+Tests: 22 project skills present; MCP JSON written. Cloudflare MCP tools not in current session until agent restart + OAuth.
+Next: restart Cursor agent; enable R2 in dashboard; then continue Workers deploy.
+Rollback: remove `.cursor/mcp.json` / `.agents/skills` / user copies.
+
+### 2026-11-07 — Cloudflare Workers + R2 setup (R2 not enabled)
+Status: BLOCKED — Wrangler OAuth OK; R2 product not enabled on account
+Changed code files: `web/wrangler.jsonc`, `web/open-next.config.ts`, `web/next.config.ts` (OpenNext init), `web/package.json` (+`cf:*` scripts, `@opennextjs/cloudflare`, `wrangler`), `web/scripts/setup-cloudflare-r2.mjs`, `web/.env.example`, `web/.gitignore`, root `package.json` cf scripts
+Implementation: OpenNext Cloudflare Workers deploy path + R2 bucket names `zaincodes-media` / preview; R2 setup script; local CRA/Next unchanged on `:3001`.
+Tests: `wrangler login` **PASS** (account `503153818e90769583cd4c7538028c6c`); `wrangler r2 bucket create` **FAIL** API 10042 “Please enable R2 through the Cloudflare Dashboard”. Deploy not run.
+Blockers: (1) Owner opens Chrome R2 overview and enables R2 (2) Neon/Supabase `DATABASE_URL` (3) R2 API token → `S3_*` secrets (4) `npm run cf:setup-r2` + `npm run cf:deploy`
+Next: owner enables R2 in dashboard; then create buckets + secrets + deploy.
+Rollback: remove OpenNext/wrangler deps and cf configs; keep local PGlite.
 
 ### 2026-11-07 — Launch verification + durability adapters (pre-approval)
 Status: BLOCKED for production (local PASS; durable hosting not provisioned)

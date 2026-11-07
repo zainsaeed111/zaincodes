@@ -1,0 +1,12 @@
+.open-next
+.wrangler
+.data
+*.md
+tests
+scripts/cf-*.mjs
+scripts/wire-*.mjs
+scripts/register-*.mjs
+scripts/setup-cloudflare-*.mjs
+wrangler.jsonc
+open-next.config.ts
+cloudflare-env.d.ts

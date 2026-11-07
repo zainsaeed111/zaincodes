@@ -103,20 +103,24 @@ describe("database integrity", () => {
     await db.insert(projects).values({
       slug,
       title: "Temp",
-      category: "web",
+      category: "web-development",
       problem: "p",
       solution: "s",
       architecture: "a",
       githubLink: "https://github.com/example",
-      status: "published",
+      status: "draft",
     });
-    await db
-      .update(projects)
-      .set({ title: "Temp Updated", problem: "p2" })
-      .where(eq(projects.slug, slug));
-    const [row] = await db.select().from(projects).where(eq(projects.slug, slug)).limit(1);
-    expect(row.title).toBe("Temp Updated");
-    expect(row.problem).toBe("p2");
-    expect(row.githubLink).toBe("https://github.com/example");
+    try {
+      await db
+        .update(projects)
+        .set({ title: "Temp Updated", problem: "p2" })
+        .where(eq(projects.slug, slug));
+      const [row] = await db.select().from(projects).where(eq(projects.slug, slug)).limit(1);
+      expect(row.title).toBe("Temp Updated");
+      expect(row.problem).toBe("p2");
+      expect(row.githubLink).toBe("https://github.com/example");
+    } finally {
+      await db.delete(projects).where(eq(projects.slug, slug));
+    }
   });
 });

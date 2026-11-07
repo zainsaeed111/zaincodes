@@ -257,6 +257,8 @@ export async function PUT(req: NextRequest) {
     }
 
     const content = await getHomeContent();
+    const { revalidateSiteSurfaces } = await import("@/lib/cms-revalidate");
+    revalidateSiteSurfaces();
     return apiOk({ content, saved: true });
   } catch (err) {
     return handleRouteError(err);

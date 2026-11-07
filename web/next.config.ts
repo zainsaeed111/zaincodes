@@ -9,7 +9,20 @@ const nextConfig: NextConfig = {
   // Local browser tooling may open 127.0.0.1 while Next serves localhost.
   allowedDevOrigins: ["127.0.0.1", "localhost"],
   // Keep native/server-only packages out of the client bundle.
-  serverExternalPackages: ["@electric-sql/pglite", "postgres", "@aws-sdk/client-s3"],
+  serverExternalPackages: ["@electric-sql/pglite", "@neondatabase/serverless", "@aws-sdk/client-s3"],
 };
 
-export default nextConfig;
+async function loadConfig(): Promise<NextConfig> {
+  // Only for Cloudflare Workers local preview — skip for normal next/Vercel (avoids Hyperdrive noise).
+  if (
+    process.env.NODE_ENV === "development" &&
+    !process.env.VERCEL &&
+    process.env.CF_DEV === "1"
+  ) {
+    const { initOpenNextCloudflareForDev } = await import("@opennextjs/cloudflare");
+    initOpenNextCloudflareForDev();
+  }
+  return nextConfig;
+}
+
+export default loadConfig();

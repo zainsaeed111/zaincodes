@@ -3,10 +3,11 @@
 import { useReducedMotion } from "motion/react";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { collectProjectSlides, parseVideoUrl } from "@/lib/media";
+import { resolvePreviewFrame, type PreviewFrame } from "@/lib/project-taxonomy";
 
 type Shot = { url: string; alt?: string | null; isCover?: boolean };
 
-export type PreviewStyle = "banner" | "phone" | "browser" | "stack";
+export type PreviewStyle = "banner" | "phone" | "browser" | "stack" | "auto";
 
 export function ProjectMediaPreview({
   title,
@@ -27,7 +28,6 @@ export function ProjectMediaPreview({
   thumbnailUrl?: string | null;
   screenshots?: Shot[] | null;
   videoUrl?: string | null;
-  /** Store-style banner by default (Play/App Store feature graphic). */
   previewStyle?: PreviewStyle | string | null;
   size?: "sm" | "md" | "lg";
   interactive?: boolean;
@@ -37,20 +37,11 @@ export function ProjectMediaPreview({
     [coverUrl, thumbnailUrl, screenshots],
   );
   const video = useMemo(() => parseVideoUrl(videoUrl), [videoUrl]);
-  const mobile = category === "android" || category === "flutter";
-  const fullstack = (technologies || []).some((t) =>
-    /node|express|spring|api|postgres|mongo|nestjs/i.test(t),
+
+  const style: PreviewFrame = useMemo(
+    () => resolvePreviewFrame(category, previewStyle, technologies),
+    [category, previewStyle, technologies],
   );
-
-  const style: PreviewStyle = useMemo(() => {
-    const raw = (previewStyle || "banner").toLowerCase();
-    if (raw === "phone" || raw === "browser" || raw === "stack" || raw === "banner") return raw;
-    // Legacy auto: still prefer banner for showcase consistency
-    return "banner";
-  }, [previewStyle]);
-
-  const deviceFrame =
-    style === "phone" ? "ppm-phone" : style === "stack" || (style === "browser" && fullstack) ? "ppm-stack" : style === "browser" ? "ppm-browser" : "ppm-banner";
 
   const [idx, setIdx] = useState(0);
   const [paused, setPaused] = useState(false);
@@ -78,7 +69,7 @@ export function ProjectMediaPreview({
     const el = rootRef.current;
     if (!el || typeof IntersectionObserver === "undefined") return;
     const io = new IntersectionObserver(([entry]) => setInView(entry.isIntersecting), {
-      threshold: 0.35,
+      threshold: 0.3,
     });
     io.observe(el);
     return () => io.disconnect();
@@ -86,15 +77,13 @@ export function ProjectMediaPreview({
 
   useEffect(() => {
     if (!interactive || !multi || paused || !inView || reduceMotion || playerOpen) return;
-    const t = window.setInterval(next, 4200);
+    const t = window.setInterval(next, 4500);
     return () => window.clearInterval(t);
   }, [interactive, multi, paused, inView, reduceMotion, playerOpen, next]);
 
-  // Prefer cover/slide; fall back to video poster for banner when no stills
   const mediaSrc = active?.url && !broken[active.url] ? active.url : null;
   const posterOk = video?.posterUrl && !broken[video.posterUrl] ? video.posterUrl : null;
   const displaySrc = mediaSrc || posterOk || null;
-  const showAsVideoHero = Boolean(video && (!mediaSrc || idx === 0));
 
   function markBroken(url?: string | null) {
     if (!url) return;
@@ -113,25 +102,19 @@ export function ProjectMediaPreview({
         // eslint-disable-next-line @next/next/no-img-element
         <img
           src={displaySrc}
-          alt={active?.alt || `${title} banner`}
+          alt={active?.alt || `${title} preview`}
           loading="lazy"
           onError={() => markBroken(displaySrc)}
         />
       ) : (
         <div className="ppm-placeholder" role="img" aria-label={`${title} preview placeholder`}>
           {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img src="/brand/zaincodes-icon-dark.svg" alt="" width={64} height={45} className="brand-logo-mark-dark" />
+          <img src="/brand/zaincodes-icon-dark.svg" alt="" width={56} height={40} className="brand-logo-mark-dark" />
           {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img src="/brand/zaincodes-icon-light.svg" alt="" width={64} height={45} className="brand-logo-mark-light" />
+          <img src="/brand/zaincodes-icon-light.svg" alt="" width={56} height={40} className="brand-logo-mark-light" />
           <span>Preview coming soon</span>
         </div>
       )}
-      {style === "banner" ? (
-        <div className="ppm-banner-caption" aria-hidden>
-          <strong>{title}</strong>
-          <span>{category}</span>
-        </div>
-      ) : null}
     </div>
   );
 
@@ -139,7 +122,7 @@ export function ProjectMediaPreview({
     <>
       <div
         ref={rootRef}
-        className={`ppm ${deviceFrame} ppm-${size}`}
+        className={`ppm ppm-${style} ppm-${size}`}
         onMouseEnter={() => setPaused(true)}
         onMouseLeave={() => setPaused(false)}
         onFocusCapture={() => setPaused(true)}
@@ -157,18 +140,16 @@ export function ProjectMediaPreview({
           touchX.current = null;
         }}
       >
-        {style === "banner" ? (
-          <div className="ppm-banner-shell">{stage}</div>
-        ) : style === "phone" || (style !== "browser" && style !== "stack" && mobile) ? (
+        {style === "phone" ? (
           <div className="ppm-phone-bezel">
-            <div className="ppm-phone-notch" />
+            <div className="ppm-phone-notch" aria-hidden />
             {stage}
           </div>
         ) : (
-          <div className={`ppm-browser-shell ${style === "stack" || fullstack ? "is-stack" : ""}`}>
-            {style === "stack" || fullstack ? <div className="ppm-browser-back" aria-hidden /> : null}
+          <div className={`ppm-browser-shell ${style === "stack" ? "is-stack" : ""}`}>
+            {style === "stack" ? <div className="ppm-browser-back" aria-hidden /> : null}
             <div className="ppm-browser-front">
-              <div className="ppm-chrome">
+              <div className="ppm-chrome" aria-hidden>
                 <span />
                 <span />
                 <span />
@@ -182,23 +163,11 @@ export function ProjectMediaPreview({
         {video ? (
           <button type="button" className="ppm-play" aria-label={`Play video for ${title}`} onClick={openVideo}>
             <span />
-            {showAsVideoHero && style === "banner" ? <em className="ppm-play-label">Watch</em> : null}
           </button>
         ) : null}
 
         {interactive && multi ? (
           <div className="ppm-controls" onClick={(e) => e.preventDefault()}>
-            <button
-              type="button"
-              aria-label="Previous"
-              onClick={(e) => {
-                e.preventDefault();
-                e.stopPropagation();
-                prev();
-              }}
-            >
-              ‹
-            </button>
             <div className="ppm-dots">
               {slides.map((_, i) => (
                 <button
@@ -214,17 +183,6 @@ export function ProjectMediaPreview({
                 />
               ))}
             </div>
-            <button
-              type="button"
-              aria-label="Next"
-              onClick={(e) => {
-                e.preventDefault();
-                e.stopPropagation();
-                next();
-              }}
-            >
-              ›
-            </button>
           </div>
         ) : null}
       </div>

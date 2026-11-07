@@ -172,6 +172,10 @@ export const projects = pgTable(
     slug: text("slug").notNull(),
     title: text("title").notNull(),
     category: text("category").notNull(),
+    /** client = company/client work; personal = personal & freelance (always fixed). */
+    workContext: text("work_context").notNull().default("client"),
+    /** Optional glyph id for custom/preset disciplines (web, ios, spark, …). */
+    categoryIcon: text("category_icon"),
     description: text("description"),
     longDescription: text("long_description"),
     problem: text("problem"),
@@ -183,8 +187,24 @@ export const projects = pgTable(
     coverUrl: text("cover_url"),
     thumbnailUrl: text("thumbnail_url"),
     videoUrl: text("video_url"),
-    /** Showcase presentation: banner (default) | phone | browser | stack */
+    videoPosterUrl: text("video_poster_url"),
+    /** Legacy device frame hint — unused by public banner-first UI. */
     previewStyle: text("preview_style").notNull().default("banner"),
+    /** static | slideshow | video | custom */
+    showcaseMode: text("showcase_mode").notNull().default("static"),
+    showcaseAutoplay: integer("showcase_autoplay").notNull().default(1),
+    slideshowIntervalMs: integer("slideshow_interval_ms").notNull().default(4200),
+    /** cover | contain */
+    imageFit: text("image_fit").notNull().default("cover"),
+    /** 16/10 | 16/9 | 2/1 | 4/3 */
+    bannerAspect: text("banner_aspect").notNull().default("16/10"),
+    /** Tall webpage screenshot scrolls inside fixed banner viewport */
+    scrollPreview: integer("scroll_preview").notNull().default(0),
+    /** Ordered visible image URLs for slideshow/custom; empty = cover + screenshots */
+    showcaseImageOrder: jsonb("showcase_image_order").$type<string[]>().default([]),
+    isFeatured: integer("is_featured").notNull().default(0),
+    /** 1 = main group (Client/Freelance) needs admin review; still shown in All Projects */
+    needsGroupReview: integer("needs_group_review").notNull().default(0),
     playStoreLink: text("play_store_link"),
     liveLink: text("live_link"),
     githubLink: text("github_link"),
@@ -206,6 +226,40 @@ export const projectImages = pgTable("project_images", {
   sortOrder: integer("sort_order").notNull().default(0),
   isCover: boolean("is_cover").notNull().default(false),
 });
+
+/** Dynamic project subcategories (Web, Mobile, AI, custom…). */
+export const projectTypes = pgTable(
+  "project_types",
+  {
+    id: serial("id").primaryKey(),
+    slug: text("slug").notNull(),
+    name: text("name").notNull(),
+    description: text("description"),
+    icon: text("icon").default("spark"),
+    sortOrder: integer("sort_order").notNull().default(0),
+    /** 1 = visible in public filters */
+    enabled: integer("enabled").notNull().default(1),
+    createdAt: timestamp("created_at", { withTimezone: true }).defaultNow().notNull(),
+    updatedAt: timestamp("updated_at", { withTimezone: true }).defaultNow().notNull(),
+  },
+  (table) => [uniqueIndex("project_types_slug_idx").on(table.slug)],
+);
+
+/** Many-to-many: project ↔ subcategory. */
+export const projectTypeLinks = pgTable(
+  "project_type_links",
+  {
+    id: serial("id").primaryKey(),
+    projectId: integer("project_id")
+      .notNull()
+      .references(() => projects.id, { onDelete: "cascade" }),
+    typeId: integer("type_id")
+      .notNull()
+      .references(() => projectTypes.id, { onDelete: "cascade" }),
+    sortOrder: integer("sort_order").notNull().default(0),
+  },
+  (table) => [uniqueIndex("project_type_links_unique").on(table.projectId, table.typeId)],
+);
 
 export const blogCategories = pgTable(
   "blog_categories",
@@ -353,12 +407,28 @@ export const schemaMigrations = pgTable("schema_migrations", {
 
 export const projectsRelations = relations(projects, ({ many }) => ({
   images: many(projectImages),
+  typeLinks: many(projectTypeLinks),
 }));
 
 export const projectImagesRelations = relations(projectImages, ({ one }) => ({
   project: one(projects, {
     fields: [projectImages.projectId],
     references: [projects.id],
+  }),
+}));
+
+export const projectTypesRelations = relations(projectTypes, ({ many }) => ({
+  links: many(projectTypeLinks),
+}));
+
+export const projectTypeLinksRelations = relations(projectTypeLinks, ({ one }) => ({
+  project: one(projects, {
+    fields: [projectTypeLinks.projectId],
+    references: [projects.id],
+  }),
+  type: one(projectTypes, {
+    fields: [projectTypeLinks.typeId],
+    references: [projectTypes.id],
   }),
 }));
 

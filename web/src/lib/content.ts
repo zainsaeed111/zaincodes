@@ -16,6 +16,8 @@ import {
   skills,
   socialLinks,
 } from "@/db/schema";
+import { listProjectTypes, loadTypeSlugsForProjects } from "@/lib/project-types";
+import { canonicalizeTypeSlug } from "@/lib/project-taxonomy";
 
 export async function getHomeContent() {
   await ensureSchema();
@@ -31,28 +33,25 @@ export async function getHomeContent() {
   const categories = await db.select().from(skillCategories).orderBy(asc(skillCategories.sortOrder));
   const skillRows = await db.select().from(skills).orderBy(asc(skills.sortOrder));
   const featuredProjects = await db
-    .select({
-      id: projects.id,
-      slug: projects.slug,
-      title: projects.title,
-      category: projects.category,
-      description: projects.description,
-      coverUrl: projects.coverUrl,
-      thumbnailUrl: projects.thumbnailUrl,
-      videoUrl: projects.videoUrl,
-      previewStyle: projects.previewStyle,
-      technologies: projects.technologies,
-      problem: projects.problem,
-      solution: projects.solution,
-      architecture: projects.architecture,
-      githubLink: projects.githubLink,
-      liveLink: projects.liveLink,
-      playStoreLink: projects.playStoreLink,
-    })
+    .select()
     .from(projects)
-    .where(eq(projects.status, "published"))
-    .orderBy(asc(projects.sortOrder))
+    .where(and(eq(projects.status, "published"), eq(projects.isFeatured, 1)))
+    .orderBy(asc(projects.sortOrder), asc(projects.id))
     .limit(8);
+
+  const fallbackProjects =
+    featuredProjects.length > 0
+      ? featuredProjects
+      : await db
+          .select()
+          .from(projects)
+          .where(eq(projects.status, "published"))
+          .orderBy(asc(projects.sortOrder), asc(projects.id))
+          .limit(6);
+
+  const homeProjectIds = fallbackProjects.map((p) => p.id);
+  const homeTypeMap = await loadTypeSlugsForProjects(homeProjectIds);
+  const projectTypes = await listProjectTypes();
 
   const [currentResume] = await db
     .select()
@@ -72,7 +71,41 @@ export async function getHomeContent() {
       ...cat,
       skills: skillRows.filter((s) => s.categoryId === cat.id),
     })),
-    featuredProjects,
+    featuredProjects: fallbackProjects.map((project) => {
+      const typeSlugs = homeTypeMap.get(project.id) || [canonicalizeTypeSlug(project.category)];
+      return {
+        id: project.id,
+        slug: project.slug,
+        title: project.title,
+        category: typeSlugs[0] || project.category,
+        workContext: project.workContext || "unassigned",
+        categoryIcon: project.categoryIcon || null,
+        needsGroupReview: project.needsGroupReview ?? 0,
+        typeSlugs,
+        description: project.description,
+        coverUrl: project.coverUrl,
+        thumbnailUrl: project.thumbnailUrl,
+        videoUrl: project.videoUrl,
+        videoPosterUrl: project.videoPosterUrl || null,
+        previewStyle: project.previewStyle || "banner",
+        showcaseMode: project.showcaseMode || "static",
+        showcaseAutoplay: project.showcaseAutoplay ?? 1,
+        slideshowIntervalMs: project.slideshowIntervalMs ?? 4200,
+        imageFit: project.imageFit || "cover",
+        bannerAspect: project.bannerAspect || "16/10",
+        scrollPreview: project.scrollPreview ?? 0,
+        showcaseImageOrder: (project.showcaseImageOrder as string[] | null) || [],
+        isFeatured: project.isFeatured ?? 0,
+        technologies: project.technologies,
+        problem: project.problem,
+        solution: project.solution,
+        architecture: project.architecture,
+        githubLink: project.githubLink,
+        liveLink: project.liveLink,
+        playStoreLink: project.playStoreLink,
+      };
+    }),
+    projectTypes,
     resume: currentResume
       ? {
           id: currentResume.id,
@@ -93,37 +126,61 @@ export async function listPublishedProjects() {
     .where(eq(projects.status, "published"))
     .orderBy(asc(projects.sortOrder), asc(projects.id));
   const images = await db.select().from(projectImages).orderBy(asc(projectImages.sortOrder));
+  const typeMap = await loadTypeSlugsForProjects(rows.map((r) => r.id));
+  const types = await listProjectTypes({ includeDisabled: true });
 
-  return rows.map((project) => ({
-    id: project.id,
-    slug: project.slug,
-    title: project.title,
-    category: project.category,
-    description: project.description,
-    longDescription: project.longDescription,
-    problem: project.problem,
-    solution: project.solution,
-    architecture: project.architecture,
-    technologies: project.technologies,
-    features: project.features,
-    highlights: project.highlights,
-    coverUrl: project.coverUrl,
-    thumbnailUrl: project.thumbnailUrl,
-    videoUrl: project.videoUrl,
-    previewStyle: project.previewStyle || "banner",
-    playStoreLink: project.playStoreLink,
-    liveLink: project.liveLink,
-    githubLink: project.githubLink,
-    screenshots: images
-      .filter((img) => img.projectId === project.id)
-      .map((img) => ({
-        id: img.id,
-        url: img.url,
-        alt: img.alt,
-        sortOrder: img.sortOrder,
-        isCover: img.isCover,
-      })),
-  }));
+  return rows.map((project) => {
+    const typeSlugs =
+      typeMap.get(project.id) || [canonicalizeTypeSlug(project.category) || project.category].filter(Boolean);
+    return {
+      id: project.id,
+      slug: project.slug,
+      title: project.title,
+      category: typeSlugs[0] || project.category,
+      workContext: project.workContext || "unassigned",
+      categoryIcon: project.categoryIcon || null,
+      needsGroupReview: project.needsGroupReview ?? 0,
+      typeSlugs,
+      projectTypes: types.filter((t) => typeSlugs.includes(t.slug)),
+      description: project.description,
+      longDescription: project.longDescription,
+      problem: project.problem,
+      solution: project.solution,
+      architecture: project.architecture,
+      technologies: project.technologies,
+      features: project.features,
+      highlights: project.highlights,
+      coverUrl: project.coverUrl,
+      thumbnailUrl: project.thumbnailUrl,
+      videoUrl: project.videoUrl,
+      videoPosterUrl: project.videoPosterUrl || null,
+      previewStyle: project.previewStyle || "banner",
+      showcaseMode: project.showcaseMode || "static",
+      showcaseAutoplay: project.showcaseAutoplay ?? 1,
+      slideshowIntervalMs: project.slideshowIntervalMs ?? 4200,
+      imageFit: project.imageFit || "cover",
+      bannerAspect: project.bannerAspect || "16/10",
+      scrollPreview: project.scrollPreview ?? 0,
+      showcaseImageOrder: (project.showcaseImageOrder as string[] | null) || [],
+      isFeatured: project.isFeatured ?? 0,
+      playStoreLink: project.playStoreLink,
+      liveLink: project.liveLink,
+      githubLink: project.githubLink,
+      screenshots: images
+        .filter((img) => img.projectId === project.id)
+        .map((img) => ({
+          id: img.id,
+          url: img.url,
+          alt: img.alt,
+          sortOrder: img.sortOrder,
+          isCover: img.isCover,
+        })),
+    };
+  });
+}
+
+export async function listEnabledProjectTypes() {
+  return listProjectTypes();
 }
 
 export async function getProjectBySlug(slug: string) {

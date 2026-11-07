@@ -12,11 +12,18 @@
     "smoke": "node --env-file=.env.local scripts/smoke-api.mjs",
     "accept": "node --env-file=.env.local scripts/launch-acceptance.mjs",
     "test": "vitest run --config vitest.config.ts",
-    "test:watch": "vitest --config vitest.config.ts"
+    "test:watch": "vitest --config vitest.config.ts",
+    "cf:build": "node scripts/cf-with-neon-env.mjs build",
+    "cf:preview": "node scripts/cf-with-neon-env.mjs preview",
+    "cf:deploy": "node scripts/cf-with-neon-env.mjs deploy",
+    "cf:setup-r2": "node scripts/setup-cloudflare-r2.mjs",
+    "cf:typegen": "wrangler types --env-interface CloudflareEnv cloudflare-env.d.ts"
   },
   "dependencies": {
     "@aws-sdk/client-s3": "^3.1164.0",
     "@electric-sql/pglite": "^0.5.15",
+    "@neondatabase/serverless": "^1.2.0",
+    "@opennextjs/cloudflare": "^1.20.16",
     "@tiptap/extension-image": "^3.33.0",
     "@tiptap/extension-link": "^3.33.0",
     "@tiptap/extension-placeholder": "^3.33.0",
@@ -50,6 +57,7 @@
     "eslint-config-next": "15.5.4",
     "tsx": "^4.23.15",
     "typescript": "^5",
-    "vitest": "^3.2.4"
+    "vitest": "^3.2.4",
+    "wrangler": "^4.158.0"
   }
 }

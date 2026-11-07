@@ -5,7 +5,14 @@ import { FormEvent, useCallback, useEffect, useRef, useState } from "react";
 import { BlogAdminPanel } from "@/components/admin/BlogAdminPanel";
 import { BlogSetupPanel } from "@/components/admin/BlogSetupPanel";
 import { BlogTrafficPanel } from "@/components/admin/BlogTrafficPanel";
+import { ProjectBanner } from "@/components/ProjectBanner";
 import { adminFetch } from "@/lib/admin-client";
+import {
+  CATEGORY_PRESETS,
+  canonicalizeTypeSlug,
+  isPresetCategory,
+  slugifyCategory,
+} from "@/lib/project-taxonomy";
 
 type Tab =
   | "hero"
@@ -29,6 +36,7 @@ export default function AdminPage() {
   const [notice, setNotice] = useState("");
   const [content, setContent] = useState<any>(null);
   const [projects, setProjects] = useState<any[]>([]);
+  const [projectTypes, setProjectTypes] = useState<any[]>([]);
   const [services, setServices] = useState<any[]>([]);
   const [posts, setPosts] = useState<any[]>([]);
   const [editingProject, setEditingProject] = useState<any | null>(null);
@@ -56,6 +64,8 @@ export default function AdminPage() {
       }
       const p = await adminFetch("/api/admin/projects");
       if (p.res.ok) setProjects(p.data.projects || []);
+      const pt = await adminFetch("/api/admin/project-types");
+      if (pt.res.ok) setProjectTypes(pt.data.types || []);
       const s = await adminFetch("/api/admin/services");
       if (s.res.ok) setServices(s.data.services || []);
       const b = await adminFetch("/api/admin/blog");
@@ -171,13 +181,39 @@ export default function AdminPage() {
   }
 
   function openProjectEditor(project: any) {
+    const shotUrls = normalizeShotUrls(project);
+    const order = Array.isArray(project.showcaseImageOrder) ? project.showcaseImageOrder.filter(Boolean) : [];
+    const typeSlugs = Array.isArray(project.typeSlugs) && project.typeSlugs.length
+      ? project.typeSlugs.map((s: string) => canonicalizeTypeSlug(s) || slugifyCategory(s))
+      : [canonicalizeTypeSlug(project.category) || "web-development"];
+    const primary = typeSlugs[0] || "web-development";
+    const preset = isPresetCategory(primary);
     setEditingProject({
       ...project,
+      workContext: project.workContext || "unassigned",
+      needsGroupReview: project.needsGroupReview ?? (project.workContext === "unassigned" ? 1 : 0),
+      typeSlugs,
+      category: primary,
+      categorySelect: preset ? primary : "__custom",
+      categoryCustomDraft: preset ? "" : primary,
+      categoryIcon: project.categoryIcon || (preset ? CATEGORY_PRESETS.find((p) => p.id === primary)?.icon : "spark"),
       coverUrl: project.coverUrl || "",
+      thumbnailUrl: project.thumbnailUrl || "",
       videoUrl: project.videoUrl || "",
-      previewStyle: project.previewStyle || "banner",
-      shotUrls: normalizeShotUrls(project),
+      videoPosterUrl: project.videoPosterUrl || "",
+      previewStyle: "banner",
+      showcaseMode: project.showcaseMode || "static",
+      showcaseAutoplay: project.showcaseAutoplay ?? 1,
+      slideshowIntervalMs: project.slideshowIntervalMs ?? 4200,
+      imageFit: project.imageFit || "cover",
+      bannerAspect: project.bannerAspect || "16/10",
+      scrollPreview: project.scrollPreview ?? 0,
+      isFeatured: project.isFeatured ?? 0,
+      sortOrder: project.sortOrder ?? 0,
+      showcaseImageOrder: order.length ? order : shotUrls,
+      shotUrls,
       shotUrlDraft: "",
+      showListingPreview: true,
     });
     setNotice("");
     window.requestAnimationFrame(() => {
@@ -202,9 +238,25 @@ export default function AdminPage() {
     try {
       const url = await uploadProjectFile(file);
       setEditingProject({ ...editingProject, coverUrl: url });
-      setNotice("Cover image uploaded — save project to publish.");
+      setNotice("Main banner uploaded — save project to publish.");
     } catch (err) {
-      setNotice(err instanceof Error ? err.message : "Cover upload failed");
+      setNotice(err instanceof Error ? err.message : "Banner upload failed");
+    } finally {
+      setBusy(false);
+    }
+  }
+
+  async function onPosterUpload(files: FileList | null) {
+    const file = files?.[0];
+    if (!file || !editingProject) return;
+    setBusy(true);
+    setNotice("");
+    try {
+      const url = await uploadProjectFile(file);
+      setEditingProject({ ...editingProject, videoPosterUrl: url });
+      setNotice("Video poster uploaded — save project to publish.");
+    } catch (err) {
+      setNotice(err instanceof Error ? err.message : "Poster upload failed");
     } finally {
       setBusy(false);
     }
@@ -219,11 +271,10 @@ export default function AdminPage() {
       for (const file of Array.from(files)) {
         uploaded.push(await uploadProjectFile(file));
       }
-      setEditingProject({
-        ...editingProject,
-        shotUrls: [...(editingProject.shotUrls || []), ...uploaded],
-      });
-      setNotice(`${uploaded.length} screenshot(s) uploaded — save project to publish.`);
+      const shotUrls = [...(editingProject.shotUrls || []), ...uploaded];
+      const showcaseImageOrder = [...(editingProject.showcaseImageOrder || []), ...uploaded];
+      setEditingProject({ ...editingProject, shotUrls, showcaseImageOrder });
+      setNotice(`${uploaded.length} image(s) uploaded — save project to publish.`);
     } catch (err) {
       setNotice(err instanceof Error ? err.message : "Screenshot upload failed");
     } finally {
@@ -238,8 +289,8 @@ export default function AdminPage() {
     setNotice("");
     try {
       const url = await uploadProjectFile(file);
-      setEditingProject({ ...editingProject, videoUrl: url });
-      setNotice("Video uploaded — save project to publish.");
+      setEditingProject({ ...editingProject, videoUrl: url, showcaseMode: "video" });
+      setNotice("Video uploaded — display mode set to Video. Save to publish.");
     } catch (err) {
       setNotice(err instanceof Error ? err.message : "Video upload failed");
     } finally {
@@ -252,7 +303,39 @@ export default function AdminPage() {
     setEditingProject({
       ...editingProject,
       shotUrls: (editingProject.shotUrls || []).filter((u: string) => u !== url),
+      showcaseImageOrder: (editingProject.showcaseImageOrder || []).filter((u: string) => u !== url),
     });
+  }
+
+  function moveShot(url: string, dir: -1 | 1) {
+    if (!editingProject) return;
+    const list = [...(editingProject.shotUrls || [])];
+    const i = list.indexOf(url);
+    if (i < 0) return;
+    const j = i + dir;
+    if (j < 0 || j >= list.length) return;
+    [list[i], list[j]] = [list[j], list[i]];
+    const order = [...(editingProject.showcaseImageOrder || [])];
+    const oi = order.indexOf(url);
+    if (oi >= 0) {
+      const oj = oi + dir;
+      if (oj >= 0 && oj < order.length) [order[oi], order[oj]] = [order[oj], order[oi]];
+    }
+    setEditingProject({ ...editingProject, shotUrls: list, showcaseImageOrder: order.length ? order : list });
+  }
+
+  function toggleVisibleShot(url: string) {
+    if (!editingProject) return;
+    const order: string[] = [...(editingProject.showcaseImageOrder || [])];
+    const i = order.indexOf(url);
+    if (i >= 0) order.splice(i, 1);
+    else order.push(url);
+    setEditingProject({ ...editingProject, showcaseImageOrder: order });
+  }
+
+  function setAsBanner(url: string) {
+    if (!editingProject) return;
+    setEditingProject({ ...editingProject, coverUrl: url });
   }
 
   function addShotUrl() {
@@ -266,6 +349,7 @@ export default function AdminPage() {
     setEditingProject({
       ...editingProject,
       shotUrls: [...(editingProject.shotUrls || []), next],
+      showcaseImageOrder: [...(editingProject.showcaseImageOrder || []), next],
       shotUrlDraft: "",
     });
   }
@@ -274,10 +358,30 @@ export default function AdminPage() {
     e.preventDefault();
     if (!editingProject) return;
     const fd = new FormData(e.currentTarget);
+    const customSlug = slugifyCategory(String(editingProject.categoryCustomDraft || ""));
+    const selectedTypes: string[] = Array.from(
+      new Set(
+        [
+          ...(editingProject.typeSlugs || []),
+          ...(editingProject.categorySelect === "__custom" && customSlug ? [customSlug] : []),
+        ]
+          .map((s: string) => canonicalizeTypeSlug(s) || slugifyCategory(s))
+          .filter(Boolean),
+      ),
+    );
+    if (!selectedTypes.length) {
+      setNotice("Select at least one subcategory.");
+      return;
+    }
+    const workContext = String(editingProject.workContext || fd.get("workContext") || "unassigned");
     const payload = {
       title: fd.get("title"),
       slug: fd.get("slug"),
-      category: fd.get("category"),
+      category: selectedTypes[0],
+      typeSlugs: selectedTypes,
+      workContext,
+      needsGroupReview: workContext === "unassigned" ? 1 : 0,
+      categoryIcon: emptyToNull(editingProject.categoryIcon || fd.get("categoryIcon")),
       description: emptyToNull(fd.get("description")),
       longDescription: emptyToNull(fd.get("longDescription")),
       problem: emptyToNull(fd.get("problem")),
@@ -288,8 +392,19 @@ export default function AdminPage() {
         .map((s) => s.trim())
         .filter(Boolean),
       coverUrl: emptyToNull(editingProject.coverUrl),
+      thumbnailUrl: emptyToNull(editingProject.thumbnailUrl || editingProject.coverUrl),
       videoUrl: emptyToNull(editingProject.videoUrl),
-      previewStyle: fd.get("previewStyle") || "banner",
+      videoPosterUrl: emptyToNull(editingProject.videoPosterUrl),
+      previewStyle: "banner",
+      showcaseMode: editingProject.showcaseMode || "static",
+      showcaseAutoplay: Number(editingProject.showcaseAutoplay) === 1,
+      slideshowIntervalMs: Number(editingProject.slideshowIntervalMs) || 4200,
+      imageFit: editingProject.imageFit || "cover",
+      bannerAspect: editingProject.bannerAspect || "16/10",
+      scrollPreview: Number(editingProject.scrollPreview) === 1,
+      showcaseImageOrder: (editingProject.showcaseImageOrder || []).filter(Boolean),
+      isFeatured: Number(editingProject.isFeatured) === 1,
+      sortOrder: Number(fd.get("sortOrder") ?? editingProject.sortOrder) || 0,
       githubLink: emptyToNull(fd.get("githubLink")),
       liveLink: emptyToNull(fd.get("liveLink")),
       playStoreLink: emptyToNull(fd.get("playStoreLink")),
@@ -576,7 +691,8 @@ export default function AdminPage() {
               <div>
                 <h2 style={{ margin: 0 }}>Projects ({projects.length})</h2>
                 <p className="muted small" style={{ margin: "0.35rem 0 0" }}>
-                  Edit opens the form above the list. Use Delete to remove a project.
+                  Banner-first showcase. Media modes (static / slideshow / video / custom) and scrolling webpage
+                  previews are controlled per project and stored in the database.
                 </p>
               </div>
               <button
@@ -586,12 +702,28 @@ export default function AdminPage() {
                   openProjectEditor({
                     title: "",
                     slug: "",
-                    category: "web",
+                    category: "web-development",
+                    workContext: "unassigned",
+                    needsGroupReview: 1,
+                    typeSlugs: ["web-development"],
+                    categorySelect: "web-development",
+                    categoryCustomDraft: "",
+                    categoryIcon: "web",
                     status: "draft",
+                    sortOrder: 0,
                     previewStyle: "banner",
+                    showcaseMode: "static",
+                    showcaseAutoplay: 1,
+                    slideshowIntervalMs: 4200,
+                    imageFit: "cover",
+                    bannerAspect: "16/10",
+                    scrollPreview: 0,
+                    isFeatured: 0,
                     coverUrl: "",
                     videoUrl: "",
+                    videoPosterUrl: "",
                     screenshots: [],
+                    showcaseImageOrder: [],
                   })
                 }
               >
@@ -609,14 +741,138 @@ export default function AdminPage() {
                 <h3 style={{ margin: 0 }}>{editingProject.id ? "Edit project" : "Create project"}</h3>
                 <label>Title<input name="title" defaultValue={editingProject.title || ""} required /></label>
                 <label>Slug<input name="slug" defaultValue={editingProject.slug || ""} required /></label>
-                <label>
-                  Category
-                  <select name="category" defaultValue={editingProject.category || "web"}>
-                    <option value="web">web</option>
-                    <option value="android">android</option>
-                    <option value="flutter">flutter</option>
-                  </select>
-                </label>
+
+                <div className="admin-taxonomy-panel">
+                  <h4>Project taxonomy</h4>
+                  <p className="muted small" style={{ margin: 0 }}>
+                    Choose a <strong>main category</strong>, then one or more <strong>subcategories</strong>. Custom
+                    subcategories are saved to the database and work in shareable <code>/projects?type=…</code> URLs.
+                    Do not invent Client vs Freelance — leave as Needs review until known.
+                  </p>
+                  <div className="admin-taxonomy-grid">
+                    <label>
+                      1. Main category
+                      <select
+                        name="workContext"
+                        value={editingProject.workContext || "unassigned"}
+                        onChange={(e) =>
+                          setEditingProject({
+                            ...editingProject,
+                            workContext: e.target.value,
+                            needsGroupReview: e.target.value === "unassigned" ? 1 : 0,
+                          })
+                        }
+                      >
+                        <option value="unassigned">Needs review (All Projects only)</option>
+                        <option value="client">Client &amp; Company</option>
+                        <option value="personal">Freelance &amp; Personal</option>
+                      </select>
+                    </label>
+                    <label>
+                      Listing order
+                      <input
+                        name="sortOrder"
+                        type="number"
+                        value={editingProject.sortOrder ?? 0}
+                        onChange={(e) =>
+                          setEditingProject({ ...editingProject, sortOrder: Number(e.target.value) || 0 })
+                        }
+                      />
+                    </label>
+                    <label>
+                      Subcategory icon
+                      <select
+                        name="categoryIcon"
+                        value={editingProject.categoryIcon || "web"}
+                        onChange={(e) =>
+                          setEditingProject({ ...editingProject, categoryIcon: e.target.value })
+                        }
+                      >
+                        {CATEGORY_PRESETS.map((p) => (
+                          <option key={`${p.id}-icon`} value={p.icon}>
+                            {p.label}
+                          </option>
+                        ))}
+                        <option value="spark">Custom / spark</option>
+                      </select>
+                    </label>
+                  </div>
+                  <fieldset className="admin-type-multi" style={{ margin: 0, border: 0, padding: 0 }}>
+                    <legend className="muted small" style={{ padding: 0, marginBottom: "0.4rem" }}>
+                      2. Subcategories (multi-select)
+                    </legend>
+                    <div className="admin-type-checks">
+                      {(projectTypes.length
+                        ? projectTypes.filter((t) => Number(t.enabled) !== 0)
+                        : CATEGORY_PRESETS.map((p) => ({ slug: p.id, name: p.label }))
+                      ).map((t: { slug: string; name: string }) => {
+                        const slug = canonicalizeTypeSlug(t.slug) || t.slug;
+                        const checked = (editingProject.typeSlugs || []).includes(slug);
+                        return (
+                          <label key={slug} className="admin-type-check">
+                            <input
+                              type="checkbox"
+                              checked={checked}
+                              onChange={() => {
+                                const current: string[] = editingProject.typeSlugs || [];
+                                const next = checked
+                                  ? current.filter((s) => s !== slug)
+                                  : [...current, slug];
+                                setEditingProject({
+                                  ...editingProject,
+                                  typeSlugs: next,
+                                  category: next[0] || slug,
+                                  categorySelect: next[0] || slug,
+                                });
+                              }}
+                            />
+                            <span>{t.name}</span>
+                          </label>
+                        );
+                      })}
+                    </div>
+                  </fieldset>
+                  <label>
+                    Add custom subcategory
+                    <input
+                      name="categoryCustom"
+                      placeholder="e.g. Shopify Apps"
+                      value={editingProject.categoryCustomDraft || ""}
+                      onChange={(e) =>
+                        setEditingProject({
+                          ...editingProject,
+                          categorySelect: "__custom",
+                          categoryCustomDraft: e.target.value,
+                        })
+                      }
+                    />
+                  </label>
+                  <p className="muted small" style={{ margin: 0 }}>
+                    Public filters:{" "}
+                    <strong>
+                      {editingProject.workContext === "personal"
+                        ? "Freelance & Personal"
+                        : editingProject.workContext === "client"
+                          ? "Client & Company"
+                          : "Needs review"}
+                    </strong>
+                    {" → "}
+                    <strong>
+                      {(editingProject.typeSlugs || [])
+                        .map(
+                          (s: string) =>
+                            projectTypes.find((t) => t.slug === s)?.name ||
+                            CATEGORY_PRESETS.find((p) => p.id === s)?.label ||
+                            s,
+                        )
+                        .join(", ") ||
+                        editingProject.categoryCustomDraft ||
+                        "—"}
+                    </strong>
+                    {Number(editingProject.needsGroupReview) === 1 ? " · flagged for group review" : ""}
+                  </p>
+                </div>
+
                 <label>
                   Status
                   <select name="status" defaultValue={editingProject.status || "draft"}>
@@ -636,139 +892,289 @@ export default function AdminPage() {
                     defaultValue={Array.isArray(editingProject.technologies) ? editingProject.technologies.join(", ") : ""}
                   />
                 </label>
-                <label>
-                  Preview style
-                  <select name="previewStyle" defaultValue={editingProject.previewStyle || "banner"}>
-                    <option value="banner">Banner (default — store-style)</option>
-                    <option value="phone">Phone mockup</option>
-                    <option value="browser">Browser mockup</option>
-                    <option value="stack">Stacked browser</option>
-                  </select>
-                </label>
-
-                <div className="admin-media-block">
-                  <h4>Cover / feature banner</h4>
-                  <p className="muted small">Upload a wide image (~2:1) or paste a URL. Used as the main showcase banner.</p>
-                  {editingProject.coverUrl ? (
-                    <div className="admin-media-cover">
-                      {/* eslint-disable-next-line @next/next/no-img-element */}
-                      <img src={editingProject.coverUrl} alt="Cover preview" />
-                      <button
-                        type="button"
-                        className="btn btn-secondary btn-sm"
-                        onClick={() => setEditingProject({ ...editingProject, coverUrl: "" })}
-                      >
-                        Remove cover
-                      </button>
-                    </div>
-                  ) : null}
-                  <div className="admin-media-row">
-                    <label className="btn btn-secondary btn-sm admin-file-btn">
-                      Upload cover image
-                      <input
-                        type="file"
-                        accept="image/png,image/jpeg,image/webp,image/gif"
-                        hidden
-                        disabled={busy}
-                        onChange={(e) => {
-                          void onCoverUpload(e.target.files);
-                          e.target.value = "";
-                        }}
-                      />
-                    </label>
-                    <input
-                      value={editingProject.coverUrl || ""}
-                      onChange={(e) => setEditingProject({ ...editingProject, coverUrl: e.target.value })}
-                      placeholder="Or paste cover image URL"
-                    />
-                  </div>
-                </div>
-
-                <div className="admin-media-block">
-                  <h4>Screenshots ({(editingProject.shotUrls || []).length})</h4>
-                  <p className="muted small">Upload multiple images for the slideshow. You can also add external URLs.</p>
-                  {(editingProject.shotUrls || []).length ? (
-                    <div className="admin-shot-grid">
-                      {(editingProject.shotUrls || []).map((url: string) => (
-                        <div key={url} className="admin-shot">
-                          {/* eslint-disable-next-line @next/next/no-img-element */}
-                          <img src={url} alt="" />
-                          <button type="button" aria-label="Remove screenshot" onClick={() => removeShot(url)}>
-                            ×
-                          </button>
-                        </div>
-                      ))}
-                    </div>
-                  ) : null}
-                  <div className="admin-media-row">
-                    <label className="btn btn-secondary btn-sm admin-file-btn">
-                      Upload screenshots
-                      <input
-                        type="file"
-                        accept="image/png,image/jpeg,image/webp,image/gif"
-                        multiple
-                        hidden
-                        disabled={busy}
-                        onChange={(e) => {
-                          void onScreenshotsUpload(e.target.files);
-                          e.target.value = "";
-                        }}
-                      />
-                    </label>
-                  </div>
-                  <div className="admin-media-row">
-                    <input
-                      value={editingProject.shotUrlDraft || ""}
-                      onChange={(e) => setEditingProject({ ...editingProject, shotUrlDraft: e.target.value })}
-                      placeholder="Or paste screenshot URL"
-                    />
-                    <button className="btn btn-secondary btn-sm" type="button" onClick={addShotUrl}>
-                      Add URL
-                    </button>
-                  </div>
-                </div>
-
-                <div className="admin-media-block">
-                  <h4>Video</h4>
-                  <p className="muted small">
-                    Upload mp4/webm (max ~40MB) or paste YouTube / Vimeo / Drive / direct mp4 link.
+                <div className="admin-showcase-panel">
+                  <h3>Media &amp; Showcase Settings</h3>
+                  <p className="muted small" style={{ margin: 0 }}>
+                    Controls homepage Selected Work, /projects listings, and the case-study hero. Phone/browser frames
+                    are disabled — banner presentation only.
                   </p>
-                  {editingProject.videoUrl ? (
-                    <div className="admin-media-video">
-                      {/\.(mp4|webm|mov)(\?|$)/i.test(editingProject.videoUrl) ||
-                      String(editingProject.videoUrl).includes("/api/media/") ? (
-                        <video src={editingProject.videoUrl} controls preload="metadata" />
-                      ) : (
-                        <code className="muted small">{editingProject.videoUrl}</code>
-                      )}
-                      <button
-                        type="button"
-                        className="btn btn-secondary btn-sm"
-                        onClick={() => setEditingProject({ ...editingProject, videoUrl: "" })}
-                      >
-                        Remove video
+
+                  <div className="admin-media-block">
+                    <h4>Main banner / thumbnail</h4>
+                    {editingProject.coverUrl ? (
+                      <div className="admin-media-cover">
+                        {/* eslint-disable-next-line @next/next/no-img-element */}
+                        <img src={editingProject.coverUrl} alt="Banner preview" />
+                        <button
+                          type="button"
+                          className="btn btn-secondary btn-sm"
+                          onClick={() => setEditingProject({ ...editingProject, coverUrl: "" })}
+                        >
+                          Remove banner
+                        </button>
+                      </div>
+                    ) : null}
+                    <div className="admin-media-row">
+                      <label className="btn btn-secondary btn-sm admin-file-btn">
+                        Upload banner
+                        <input
+                          type="file"
+                          accept="image/png,image/jpeg,image/webp,image/gif"
+                          hidden
+                          disabled={busy}
+                          onChange={(e) => {
+                            void onCoverUpload(e.target.files);
+                            e.target.value = "";
+                          }}
+                        />
+                      </label>
+                      <input
+                        value={editingProject.coverUrl || ""}
+                        onChange={(e) => setEditingProject({ ...editingProject, coverUrl: e.target.value })}
+                        placeholder="Or paste banner image URL"
+                      />
+                    </div>
+                  </div>
+
+                  <div className="admin-media-block">
+                    <h4>Project images ({(editingProject.shotUrls || []).length})</h4>
+                    <p className="muted small">
+                      Reorder with arrows. Click an image to include/exclude it in custom order. “Banner” sets it as the
+                      main banner.
+                    </p>
+                    {(editingProject.shotUrls || []).length ? (
+                      <div className="admin-shot-grid">
+                        {(editingProject.shotUrls || []).map((url: string) => {
+                          const selected = (editingProject.showcaseImageOrder || []).includes(url);
+                          return (
+                            <div key={url} className={`admin-shot ${selected ? "is-selected" : ""}`}>
+                              {/* eslint-disable-next-line @next/next/no-img-element */}
+                              <img
+                                src={url}
+                                alt=""
+                                onClick={() => toggleVisibleShot(url)}
+                                style={{ cursor: "pointer" }}
+                                title={selected ? "Visible in custom order" : "Click to include"}
+                              />
+                              <button type="button" aria-label="Remove image" onClick={() => removeShot(url)}>
+                                ×
+                              </button>
+                              <div className="admin-shot-tools">
+                                <button type="button" aria-label="Move left" onClick={() => moveShot(url, -1)}>
+                                  ←
+                                </button>
+                                <button type="button" aria-label="Move right" onClick={() => moveShot(url, 1)}>
+                                  →
+                                </button>
+                                <button type="button" aria-label="Set as banner" onClick={() => setAsBanner(url)}>
+                                  ★
+                                </button>
+                              </div>
+                            </div>
+                          );
+                        })}
+                      </div>
+                    ) : null}
+                    <div className="admin-media-row">
+                      <label className="btn btn-secondary btn-sm admin-file-btn">
+                        Upload images
+                        <input
+                          type="file"
+                          accept="image/png,image/jpeg,image/webp,image/gif"
+                          multiple
+                          hidden
+                          disabled={busy}
+                          onChange={(e) => {
+                            void onScreenshotsUpload(e.target.files);
+                            e.target.value = "";
+                          }}
+                        />
+                      </label>
+                    </div>
+                    <div className="admin-media-row">
+                      <input
+                        value={editingProject.shotUrlDraft || ""}
+                        onChange={(e) => setEditingProject({ ...editingProject, shotUrlDraft: e.target.value })}
+                        placeholder="Or paste image URL"
+                      />
+                      <button className="btn btn-secondary btn-sm" type="button" onClick={addShotUrl}>
+                        Add URL
                       </button>
                     </div>
-                  ) : null}
-                  <div className="admin-media-row">
-                    <label className="btn btn-secondary btn-sm admin-file-btn">
-                      Upload video
+                  </div>
+
+                  <div className="admin-media-block">
+                    <h4>Video</h4>
+                    <p className="muted small">
+                      Upload mp4/webm or paste YouTube / Vimeo / direct video URL. Poster is used as fallback.
+                    </p>
+                    {editingProject.videoUrl ? (
+                      <div className="admin-media-video">
+                        {/\.(mp4|webm|mov)(\?|$)/i.test(editingProject.videoUrl) ||
+                        String(editingProject.videoUrl).includes("/api/media/") ? (
+                          <video src={editingProject.videoUrl} controls preload="metadata" />
+                        ) : (
+                          <code className="muted small">{editingProject.videoUrl}</code>
+                        )}
+                        <button
+                          type="button"
+                          className="btn btn-secondary btn-sm"
+                          onClick={() => setEditingProject({ ...editingProject, videoUrl: "" })}
+                        >
+                          Remove video
+                        </button>
+                      </div>
+                    ) : null}
+                    <div className="admin-media-row">
+                      <label className="btn btn-secondary btn-sm admin-file-btn">
+                        Upload video
+                        <input
+                          type="file"
+                          accept="video/mp4,video/webm,video/quicktime"
+                          hidden
+                          disabled={busy}
+                          onChange={(e) => {
+                            void onVideoUpload(e.target.files);
+                            e.target.value = "";
+                          }}
+                        />
+                      </label>
                       <input
-                        type="file"
-                        accept="video/mp4,video/webm,video/quicktime"
-                        hidden
-                        disabled={busy}
-                        onChange={(e) => {
-                          void onVideoUpload(e.target.files);
-                          e.target.value = "";
-                        }}
+                        value={editingProject.videoUrl || ""}
+                        onChange={(e) => setEditingProject({ ...editingProject, videoUrl: e.target.value })}
+                        placeholder="Or paste video URL"
                       />
-                    </label>
-                    <input
-                      value={editingProject.videoUrl || ""}
-                      onChange={(e) => setEditingProject({ ...editingProject, videoUrl: e.target.value })}
-                      placeholder="Or paste video URL"
-                    />
+                    </div>
+                    <div className="admin-media-row">
+                      <label className="btn btn-secondary btn-sm admin-file-btn">
+                        Upload poster
+                        <input
+                          type="file"
+                          accept="image/png,image/jpeg,image/webp,image/gif"
+                          hidden
+                          disabled={busy}
+                          onChange={(e) => {
+                            void onPosterUpload(e.target.files);
+                            e.target.value = "";
+                          }}
+                        />
+                      </label>
+                      <input
+                        value={editingProject.videoPosterUrl || ""}
+                        onChange={(e) => setEditingProject({ ...editingProject, videoPosterUrl: e.target.value })}
+                        placeholder="Video poster URL (optional)"
+                      />
+                    </div>
+                  </div>
+
+                  <div className="admin-media-block">
+                    <h4>Display settings</h4>
+                    <div className="admin-showcase-grid">
+                      <label>
+                        Display mode
+                        <select
+                          value={editingProject.showcaseMode || "static"}
+                          onChange={(e) => setEditingProject({ ...editingProject, showcaseMode: e.target.value })}
+                        >
+                          <option value="static">A — Static banner</option>
+                          <option value="slideshow">B — Banner + slideshow</option>
+                          <option value="video">C — Video preview</option>
+                          <option value="custom">D — Custom image selection</option>
+                        </select>
+                      </label>
+                      <label>
+                        Banner aspect
+                        <select
+                          value={editingProject.bannerAspect || "16/10"}
+                          onChange={(e) => setEditingProject({ ...editingProject, bannerAspect: e.target.value })}
+                        >
+                          <option value="16/10">16:10</option>
+                          <option value="16/9">16:9</option>
+                          <option value="2/1">2:1</option>
+                          <option value="4/3">4:3</option>
+                        </select>
+                      </label>
+                      <label>
+                        Image fit
+                        <select
+                          value={editingProject.imageFit || "cover"}
+                          onChange={(e) => setEditingProject({ ...editingProject, imageFit: e.target.value })}
+                        >
+                          <option value="cover">Cover</option>
+                          <option value="contain">Contain</option>
+                        </select>
+                      </label>
+                      <label>
+                        Slideshow interval (ms)
+                        <input
+                          type="number"
+                          min={1500}
+                          max={20000}
+                          step={100}
+                          value={editingProject.slideshowIntervalMs ?? 4200}
+                          onChange={(e) =>
+                            setEditingProject({
+                              ...editingProject,
+                              slideshowIntervalMs: Number(e.target.value) || 4200,
+                            })
+                          }
+                        />
+                      </label>
+                      <label className="admin-check">
+                        <input
+                          type="checkbox"
+                          checked={Number(editingProject.showcaseAutoplay) === 1}
+                          onChange={(e) =>
+                            setEditingProject({ ...editingProject, showcaseAutoplay: e.target.checked ? 1 : 0 })
+                          }
+                        />
+                        Enable autoplay (slideshow / muted video)
+                      </label>
+                      <label className="admin-check">
+                        <input
+                          type="checkbox"
+                          checked={Number(editingProject.scrollPreview) === 1}
+                          onChange={(e) =>
+                            setEditingProject({ ...editingProject, scrollPreview: e.target.checked ? 1 : 0 })
+                          }
+                        />
+                        Scrolling website preview (tall screenshot)
+                      </label>
+                      <label className="admin-check">
+                        <input
+                          type="checkbox"
+                          checked={Number(editingProject.isFeatured) === 1}
+                          onChange={(e) =>
+                            setEditingProject({ ...editingProject, isFeatured: e.target.checked ? 1 : 0 })
+                          }
+                        />
+                        Featured on homepage
+                      </label>
+                    </div>
+                  </div>
+
+                  <div className="admin-media-block">
+                    <h4>Live preview</h4>
+                    <p className="muted small">Listing card appearance (same component as public gallery).</p>
+                    <div className="admin-preview-stage">
+                      <ProjectBanner
+                        title={editingProject.title || "Untitled project"}
+                        category={editingProject.category || "web"}
+                        coverUrl={editingProject.coverUrl}
+                        thumbnailUrl={editingProject.thumbnailUrl}
+                        videoUrl={editingProject.videoUrl}
+                        videoPosterUrl={editingProject.videoPosterUrl}
+                        showcaseMode={editingProject.showcaseMode}
+                        showcaseAutoplay={editingProject.showcaseAutoplay}
+                        slideshowIntervalMs={editingProject.slideshowIntervalMs}
+                        imageFit={editingProject.imageFit}
+                        bannerAspect={editingProject.bannerAspect}
+                        scrollPreview={editingProject.scrollPreview}
+                        showcaseImageOrder={editingProject.showcaseImageOrder}
+                        screenshots={(editingProject.shotUrls || []).map((url: string) => ({ url }))}
+                        size="md"
+                      />
+                    </div>
                   </div>
                 </div>
                 <label>GitHub<input name="githubLink" defaultValue={editingProject.githubLink || ""} /></label>
@@ -804,7 +1210,15 @@ export default function AdminPage() {
                 <div>
                   <strong>{p.title}</strong>
                   <div className="muted small">
-                    {p.category} · {p.status} · {p.slug} · {p.previewStyle || "banner"}
+                    {p.workContext === "personal"
+                      ? "Freelance"
+                      : p.workContext === "client"
+                        ? "Client"
+                        : "Needs review"}{" "}
+                    → {(p.typeSlugs || [p.category]).join(", ")} · {p.status} · {p.showcaseMode || "static"}
+                    {Number(p.scrollPreview) === 1 ? " · scroll" : ""}
+                    {Number(p.isFeatured) === 1 ? " · featured" : ""}
+                    {Number(p.needsGroupReview) === 1 ? " · review group" : ""} · {p.slug}
                   </div>
                 </div>
                 <div style={{ display: "flex", gap: "0.5rem", flexShrink: 0 }}>

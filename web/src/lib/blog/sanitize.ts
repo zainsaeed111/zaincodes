@@ -1,6 +1,9 @@
-import DOMPurify from "isomorphic-dompurify";
+/**
+ * Workers-safe HTML sanitizer (no jsdom / isomorphic-dompurify).
+ * Strips scripts, event handlers, and javascript: URLs while keeping editorial tags.
+ */
 
-const ALLOWED_TAGS = [
+const ALLOWED_TAGS = new Set([
   "h1",
   "h2",
   "h3",
@@ -32,9 +35,9 @@ const ALLOWED_TAGS = [
   "td",
   "span",
   "div",
-];
+]);
 
-const ALLOWED_ATTR = [
+const ALLOWED_ATTR = new Set([
   "href",
   "target",
   "rel",
@@ -42,21 +45,58 @@ const ALLOWED_ATTR = [
   "alt",
   "title",
   "class",
+  "id",
   "width",
   "height",
   "colspan",
   "rowspan",
-];
+]);
+
+function sanitizeAttributes(tag: string, rawAttrs: string): string {
+  const attrs: string[] = [];
+  const re = /([a-zA-Z_:][-a-zA-Z0-9_:.]*)\s*=\s*("([^"]*)"|'([^']*)'|([^\s>]+))/g;
+  let m: RegExpExecArray | null;
+  while ((m = re.exec(rawAttrs))) {
+    const name = m[1].toLowerCase();
+    const value = m[3] ?? m[4] ?? m[5] ?? "";
+    if (!ALLOWED_ATTR.has(name)) continue;
+    if (name.startsWith("on")) continue;
+    if ((name === "href" || name === "src") && /^\s*javascript:/i.test(value)) continue;
+    if (name === "href" || name === "src") {
+      const safe = value.replace(/"/g, "&quot;");
+      attrs.push(`${name}="${safe}"`);
+      if (name === "href" && /target=/i.test(rawAttrs)) {
+        // keep target/rel handled below
+      }
+      continue;
+    }
+    attrs.push(`${name}="${value.replace(/"/g, "&quot;")}"`);
+  }
+  if (tag === "a") {
+    if (!attrs.some((a) => a.startsWith("rel="))) attrs.push('rel="noopener noreferrer"');
+  }
+  return attrs.length ? ` ${attrs.join(" ")}` : "";
+}
 
 export function sanitizeBlogHtml(dirty: string | null | undefined): string {
   const input = String(dirty || "").trim();
   if (!input) return "";
-  return DOMPurify.sanitize(input, {
-    ALLOWED_TAGS,
-    ALLOWED_ATTR,
-    ALLOW_DATA_ATTR: false,
-    ADD_ATTR: ["target"],
+
+  let html = input
+    .replace(/<script[\s\S]*?>[\s\S]*?<\/script>/gi, "")
+    .replace(/<style[\s\S]*?>[\s\S]*?<\/style>/gi, "")
+    .replace(/<!--[\s\S]*?-->/g, "");
+
+  html = html.replace(/<\/?([a-zA-Z0-9]+)(\s[^>]*)?>/g, (full, tagName: string, rawAttrs = "") => {
+    const tag = tagName.toLowerCase();
+    const closing = full.startsWith("</");
+    if (!ALLOWED_TAGS.has(tag)) return "";
+    if (closing) return `</${tag}>`;
+    if (tag === "br" || tag === "hr") return `<${tag}>`;
+    return `<${tag}${sanitizeAttributes(tag, rawAttrs || "")}>`;
   });
+
+  return html;
 }
 
 export function htmlToPlainText(html: string): string {
