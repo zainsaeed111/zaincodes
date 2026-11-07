@@ -110,8 +110,14 @@ Next: ...
 
 ## 0.7 Unified change log (append entries here only)
 
+### 2026-11-08 — Vercel production deploy (Next.js rootDirectory=web)
+Status: VERIFIED COMPLETE
+Changed: Vercel project `zaincodes` Root Directory set to `web`, Framework `nextjs`; prod deploy aliased to `https://www.zaincodes.tech`.
+Verify: `/projects` has `/_next/` + `pg-filter`; `/api/health` schema v6 postgres ok; `/api/projects` returns taxonomy fields.
+Note: prior www was still CRA because Root Directory was `.`.
+
 ### 2026-11-08 — Portfolio container + compact filter UI regression fix
-Status: VERIFIED COMPLETE (local only — not deployed)
+Status: VERIFIED COMPLETE (deployed to Vercel prod)
 Root cause: `.pg-shell` on the same node as `.container` forced `max-width:100%` / full width, killing gutters.
 Changed code files: `globals.css`, `ProjectsIndex.tsx`, `WorkShowcase.tsx`, `project-taxonomy.ts` (`shortTypeLabel`)
 Implementation: Shared container max 1320px + `calc(100% - 2*gutter)` with gutters 18→28→48–64px. Removed MAIN CATEGORY / 01–02 / repeated Client·Freelance on cards. Compact All/Client/Freelance segment + short type chips (dropdown &lt;900px); subtle Copy link. Same 2-col grid when filtering; single match stays one track (~half width), 16:10 banners.
